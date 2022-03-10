@@ -21,16 +21,16 @@ const Variables = goog.require('Blockly.Variables');
 const Xml = goog.require('Blockly.Xml');
 const eventUtils = goog.require('Blockly.Events.utils');
 const utilsXml = goog.require('Blockly.utils.xml');
-const {Blocks} = goog.require('Blockly.blocks');
+const { Blocks } = goog.require('Blockly.blocks');
 /* eslint-disable-next-line no-unused-vars */
-const {Block} = goog.requireType('Blockly.Block');
+const { Block } = goog.requireType('Blockly.Block');
 /* eslint-disable-next-line no-unused-vars */
-const {Field} = goog.requireType('Blockly.Field');
-const {Msg} = goog.require('Blockly.Msg');
-const {Names} = goog.require('Blockly.Names');
+const { Field } = goog.requireType('Blockly.Field');
+const { Msg } = goog.require('Blockly.Msg');
+const { Names } = goog.require('Blockly.Names');
 /* eslint-disable-next-line no-unused-vars */
-const {WorkspaceSvg} = goog.requireType('Blockly.WorkspaceSvg');
-const {Workspace} = goog.require('Blockly.Workspace');
+const { WorkspaceSvg } = goog.requireType('Blockly.WorkspaceSvg');
+const { Workspace } = goog.require('Blockly.Workspace');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.BlockChange');
 
@@ -76,16 +76,16 @@ exports.ProcedureBlock = ProcedureBlock;
  *     list, and return value boolean.
  * @alias Blockly.Procedures.allProcedures
  */
-const allProcedures = function(root) {
+const allProcedures = function (root) {
   const proceduresNoReturn =
-      root.getBlocksByType('procedures_defnoreturn', false)
-          .map(function(block) {
-            return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
-          });
-  const proceduresReturn =
-      root.getBlocksByType('procedures_defreturn', false).map(function(block) {
+    root.getBlocksByType('procedures_defnoreturn', false)
+      .map(function (block) {
         return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
       });
+  const proceduresReturn =
+    root.getBlocksByType('procedures_defreturn', false).map(function (block) {
+      return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
+    });
   proceduresNoReturn.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
   return [proceduresNoReturn, proceduresReturn];
@@ -99,8 +99,8 @@ exports.allProcedures = allProcedures;
  * @param {!Array} tb Second tuple.
  * @return {number} -1, 0, or 1 to signify greater than, equality, or less than.
  */
-const procTupleComparator = function(ta, tb) {
-  return ta[0].localeCompare(tb[0], undefined, {sensitivity: 'base'});
+const procTupleComparator = function (ta, tb) {
+  return ta[0].localeCompare(tb[0], undefined, { sensitivity: 'base' });
 };
 
 /**
@@ -112,7 +112,7 @@ const procTupleComparator = function(ta, tb) {
  * @return {string} Non-colliding name.
  * @alias Blockly.Procedures.findLegalName
  */
-const findLegalName = function(name, block) {
+const findLegalName = function (name, block) {
   if (block.isInFlyout) {
     // Flyouts can have multiple procedures called 'do something'.
     return name;
@@ -140,7 +140,7 @@ exports.findLegalName = findLegalName;
  *     comparisons (one doesn't want to collide with oneself).
  * @return {boolean} True if the name is legal.
  */
-const isLegalName = function(name, workspace, opt_exclude) {
+const isLegalName = function (name, workspace, opt_exclude) {
   return !isNameUsed(name, workspace, opt_exclude);
 };
 
@@ -153,7 +153,7 @@ const isLegalName = function(name, workspace, opt_exclude) {
  * @return {boolean} True if the name is used, otherwise return false.
  * @alias Blockly.Procedures.isNameUsed
  */
-const isNameUsed = function(name, workspace, opt_exclude) {
+const isNameUsed = function (name, workspace, opt_exclude) {
   const blocks = workspace.getAllBlocks(false);
   // Iterate through every block and check the name.
   for (let i = 0; i < blocks.length; i++) {
@@ -179,13 +179,13 @@ exports.isNameUsed = isNameUsed;
  * @this {Field}
  * @alias Blockly.Procedures.rename
  */
-const rename = function(name) {
+const rename = function (name) {
   // Strip leading and trailing whitespace.  Beyond this, all names are legal.
   name = name.trim();
 
   const legalName = findLegalName(
-      name,
-      /** @type {!Block} */ (this.getSourceBlock()));
+    name,
+      /** @type {!Block} */(this.getSourceBlock()));
   const oldName = this.getValue();
   if (oldName !== name && oldName !== legalName) {
     // Rename any callers.
@@ -194,7 +194,7 @@ const rename = function(name) {
       if (blocks[i].renameProcedure) {
         const procedureBlock = /** @type {!ProcedureBlock} */ (blocks[i]);
         procedureBlock.renameProcedure(
-            /** @type {string} */ (oldName), legalName);
+            /** @type {string} */(oldName), legalName);
       }
     }
   }
@@ -208,7 +208,7 @@ exports.rename = rename;
  * @return {!Array<!Element>} Array of XML block elements.
  * @alias Blockly.Procedures.flyoutCategory
  */
-const flyoutCategory = function(workspace) {
+const flyoutCategory = function (workspace) {
   const xmlList = [];
   if (Blocks['procedures_defnoreturn']) {
     // <block type="procedures_defnoreturn" gap="16">
@@ -220,7 +220,7 @@ const flyoutCategory = function(workspace) {
     const nameField = utilsXml.createElement('field');
     nameField.setAttribute('name', 'NAME');
     nameField.appendChild(
-        utilsXml.createTextNode(Msg['PROCEDURES_DEFNORETURN_PROCEDURE']));
+      utilsXml.createTextNode(Msg['PROCEDURES_DEFNORETURN_PROCEDURE']));
     block.appendChild(nameField);
     xmlList.push(block);
   }
@@ -234,7 +234,7 @@ const flyoutCategory = function(workspace) {
     const nameField = utilsXml.createElement('field');
     nameField.setAttribute('name', 'NAME');
     nameField.appendChild(
-        utilsXml.createTextNode(Msg['PROCEDURES_DEFRETURN_PROCEDURE']));
+      utilsXml.createTextNode(Msg['PROCEDURES_DEFRETURN_PROCEDURE']));
     block.appendChild(nameField);
     xmlList.push(block);
   }
@@ -276,6 +276,23 @@ const flyoutCategory = function(workspace) {
         const arg = utilsXml.createElement('arg');
         arg.setAttribute('name', args[j]);
         mutation.appendChild(arg);
+
+        if (args[j].startsWith("f")) {
+          console.log("jeg er en func");
+          const argNum = parseInt(args[j].charAt(1));
+          const blockFisk = utilsXml.createElement('block');
+          blockFisk.setAttribute('type', "args_callreturn");
+          blockFisk.setAttribute('gap', 16);
+          const mutationFisk = utilsXml.createElement('mutation');
+          mutationFisk.setAttribute('name', args[j]);
+          blockFisk.appendChild(mutationFisk);
+          for (let k = 0; k < argNum; k++) {
+            const argFisk = utilsXml.createElement('arg');
+            argFisk.setAttribute('name', ("a" + k));
+            mutationFisk.appendChild(argFisk);
+          }
+          xmlList.push(blockFisk);
+        }
       }
       xmlList.push(block);
     }
@@ -294,7 +311,7 @@ exports.flyoutCategory = flyoutCategory;
  * @param {!Workspace} workspace The procedure mutator's workspace. This
  *     workspace's flyout is what is being updated.
  */
-const updateMutatorFlyout = function(workspace) {
+const updateMutatorFlyout = function (workspace) {
   const usedNames = [];
   const blocks = workspace.getBlocksByType('procedures_mutatorarg', false);
   for (let i = 0, block; (block = blocks[i]); i++) {
@@ -307,7 +324,7 @@ const updateMutatorFlyout = function(workspace) {
   const nameField = utilsXml.createElement('field');
   nameField.setAttribute('name', 'NAME');
   const argValue =
-      Variables.generateUniqueNameFromOptions(DEFAULT_ARG, usedNames);
+    Variables.generateUniqueNameFromOptions(DEFAULT_ARG, usedNames);
   const fieldContent = utilsXml.createTextNode(argValue);
 
   nameField.appendChild(fieldContent);
@@ -324,9 +341,9 @@ const updateMutatorFlyout = function(workspace) {
  * @alias Blockly.Procedures.mutatorOpenListener
  * @package
  */
-const mutatorOpenListener = function(e) {
+const mutatorOpenListener = function (e) {
   if (!(e.type === eventUtils.BUBBLE_OPEN && e.bubbleType === 'mutator' &&
-        e.isOpen)) {
+    e.isOpen)) {
     return;
   }
   const workspaceId = /** @type {string} */ (e.workspaceId);
@@ -346,15 +363,15 @@ exports.mutatorOpenListener = mutatorOpenListener;
  * necessary.
  * @param {!Abstract} e The event that triggered this listener.
  */
-const mutatorChangeListener = function(e) {
+const mutatorChangeListener = function (e) {
   if (e.type !== eventUtils.BLOCK_CREATE &&
-      e.type !== eventUtils.BLOCK_DELETE &&
-      e.type !== eventUtils.BLOCK_CHANGE) {
+    e.type !== eventUtils.BLOCK_DELETE &&
+    e.type !== eventUtils.BLOCK_CHANGE) {
     return;
   }
   const workspaceId = /** @type {string} */ (e.workspaceId);
   const workspace = /** @type {!WorkspaceSvg} */
-      (Workspace.getById(workspaceId));
+    (Workspace.getById(workspaceId));
   updateMutatorFlyout(workspace);
 };
 
@@ -365,7 +382,7 @@ const mutatorChangeListener = function(e) {
  * @return {!Array<!Block>} Array of caller blocks.
  * @alias Blockly.Procedures.getCallers
  */
-const getCallers = function(name, workspace) {
+const getCallers = function (name, workspace) {
   const callers = [];
   const blocks = workspace.getAllBlocks(false);
   // Iterate through every block and check the name.
@@ -389,7 +406,7 @@ exports.getCallers = getCallers;
  * @param {!Block} defBlock Procedure definition block.
  * @alias Blockly.Procedures.mutateCallers
  */
-const mutateCallers = function(defBlock) {
+const mutateCallers = function (defBlock) {
   const oldRecordUndo = eventUtils.getRecordUndo();
   const procedureBlock = /** @type {!ProcedureBlock} */ (defBlock);
   const name = procedureBlock.getProcedureDef()[0];
@@ -407,7 +424,7 @@ const mutateCallers = function(defBlock) {
       // definition mutation.
       eventUtils.setRecordUndo(false);
       eventUtils.fire(new (eventUtils.get(eventUtils.BLOCK_CHANGE))(
-          caller, 'mutation', null, oldMutation, newMutation));
+        caller, 'mutation', null, oldMutation, newMutation));
       eventUtils.setRecordUndo(oldRecordUndo);
     }
   }
@@ -421,7 +438,7 @@ exports.mutateCallers = mutateCallers;
  * @return {?Block} The procedure definition block, or null not found.
  * @alias Blockly.Procedures.getDefinition
  */
-const getDefinition = function(name, workspace) {
+const getDefinition = function (name, workspace) {
   // Do not assume procedure is a top block. Some languages allow nested
   // procedures. Also do not assume it is one of the built-in blocks. Only
   // rely on getProcedureDef.
