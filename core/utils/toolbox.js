@@ -18,11 +18,11 @@ goog.module('Blockly.utils.toolbox');
 const Xml = goog.require('Blockly.Xml');
 const userAgent = goog.require('Blockly.utils.userAgent');
 /* eslint-disable-next-line no-unused-vars */
-const {ConnectionState} = goog.requireType('Blockly.serialization.blocks');
+const { ConnectionState } = goog.requireType('Blockly.serialization.blocks');
 /* eslint-disable-next-line no-unused-vars */
-const {ToolboxCategory} = goog.requireType('Blockly.ToolboxCategory');
+const { ToolboxCategory } = goog.requireType('Blockly.ToolboxCategory');
 /* eslint-disable-next-line no-unused-vars */
-const {ToolboxSeparator} = goog.requireType('Blockly.ToolboxSeparator');
+const { ToolboxSeparator } = goog.requireType('Blockly.ToolboxSeparator');
 
 /**
  * The information needed to create a block in the toolbox.
@@ -240,7 +240,7 @@ exports.Position = Position;
  * @alias Blockly.utils.toolbox.convertToolboxDefToJson
  * @package
  */
-const convertToolboxDefToJson = function(toolboxDef) {
+const convertToolboxDefToJson = function (toolboxDef) {
   if (!toolboxDef) {
     return null;
   }
@@ -262,17 +262,17 @@ exports.convertToolboxDefToJson = convertToolboxDefToJson;
  *     information for creating a toolbox.
  * @throws {Error} if the toolbox is not the correct format.
  */
-const validateToolbox = function(toolboxJson) {
+const validateToolbox = function (toolboxJson) {
   const toolboxKind = toolboxJson['kind'];
   const toolboxContents = toolboxJson['contents'];
 
   if (toolboxKind) {
     if (toolboxKind !== FLYOUT_TOOLBOX_KIND &&
-        toolboxKind !== CATEGORY_TOOLBOX_KIND) {
+      toolboxKind !== CATEGORY_TOOLBOX_KIND) {
       throw Error(
-          'Invalid toolbox kind ' + toolboxKind + '.' +
-          ' Please supply either ' + FLYOUT_TOOLBOX_KIND + ' or ' +
-          CATEGORY_TOOLBOX_KIND);
+        'Invalid toolbox kind ' + toolboxKind + '.' +
+        ' Please supply either ' + FLYOUT_TOOLBOX_KIND + ' or ' +
+        CATEGORY_TOOLBOX_KIND);
     }
   }
   if (!toolboxContents) {
@@ -288,7 +288,7 @@ const validateToolbox = function(toolboxJson) {
  * @alias Blockly.utils.toolbox.convertFlyoutDefToJsonArray
  * @package
  */
-const convertFlyoutDefToJsonArray = function(flyoutDef) {
+const convertFlyoutDefToJsonArray = function (flyoutDef) {
   if (!flyoutDef) {
     return [];
   }
@@ -299,11 +299,11 @@ const convertFlyoutDefToJsonArray = function(flyoutDef) {
 
   // If it is already in the correct format return the flyoutDef.
   if (Array.isArray(flyoutDef) && flyoutDef.length > 0 &&
-      !flyoutDef[0].nodeType) {
+    !flyoutDef[0].nodeType) {
     return flyoutDef;
   }
 
-  return xmlToJsonArray(/** @type {!Array<Node>|!NodeList} */ (flyoutDef));
+  return xmlToJsonArray(/** @type {!Array<Node>|!NodeList} */(flyoutDef));
 };
 exports.convertFlyoutDefToJsonArray = convertFlyoutDefToJsonArray;
 
@@ -315,7 +315,7 @@ exports.convertFlyoutDefToJsonArray = convertFlyoutDefToJsonArray;
  * @alias Blockly.utils.toolbox.hasCategories
  * @package
  */
-const hasCategories = function(toolboxJson) {
+const hasCategories = function (toolboxJson) {
   if (!toolboxJson) {
     return false;
   }
@@ -325,7 +325,7 @@ const hasCategories = function(toolboxJson) {
     return toolboxKind === CATEGORY_TOOLBOX_KIND;
   }
 
-  const categories = toolboxJson['contents'].filter(function(item) {
+  const categories = toolboxJson['contents'].filter(function (item) {
     return item['kind'].toUpperCase() === 'CATEGORY';
   });
   return !!categories.length;
@@ -340,12 +340,12 @@ exports.hasCategories = hasCategories;
  * @alias Blockly.utils.toolbox.isCategoryCollapsible
  * @package
  */
-const isCategoryCollapsible = function(categoryInfo) {
+const isCategoryCollapsible = function (categoryInfo) {
   if (!categoryInfo || !categoryInfo['contents']) {
     return false;
   }
 
-  const categories = categoryInfo['contents'].filter(function(item) {
+  const categories = categoryInfo['contents'].filter(function (item) {
     return item['kind'].toUpperCase() === 'CATEGORY';
   });
   return !!categories.length;
@@ -359,10 +359,10 @@ exports.isCategoryCollapsible = isCategoryCollapsible;
  * @return {!ToolboxInfo} Object holding information
  *     for creating a toolbox.
  */
-const convertToToolboxJson = function(toolboxDef) {
+const convertToToolboxJson = function (toolboxDef) {
   const contents = xmlToJsonArray(
-      /** @type {!Node|!Array<Node>} */ (toolboxDef));
-  const toolboxJson = {'contents': contents};
+      /** @type {!Node|!Array<Node>} */(toolboxDef));
+  const toolboxJson = { 'contents': contents };
   if (toolboxDef instanceof Node) {
     addAttributes(toolboxDef, toolboxJson);
   }
@@ -377,7 +377,7 @@ const convertToToolboxJson = function(toolboxDef) {
  *          !Array<ToolboxItemInfo>} A list of objects in
  *          the toolbox.
  */
-const xmlToJsonArray = function(toolboxDef) {
+const xmlToJsonArray = function (toolboxDef) {
   const arr = [];
   // If it is a node it will have children.
   let childNodes = toolboxDef.childNodes;
@@ -413,7 +413,7 @@ const xmlToJsonArray = function(toolboxDef) {
  * @param {!Node} node The node to copy the attributes from.
  * @param {!Object} obj The object to copy the attributes to.
  */
-const addAttributes = function(node, obj) {
+const addAttributes = function (node, obj) {
   for (let j = 0; j < node.attributes.length; j++) {
     const attr = node.attributes[j];
     if (attr.nodeName.indexOf('css-') > -1) {
@@ -432,7 +432,7 @@ const addAttributes = function(node, obj) {
  * @return {?Node} DOM tree of blocks, or null.
  * @alias Blockly.utils.toolbox.parseToolboxTree
  */
-const parseToolboxTree = function(toolboxDef) {
+const parseToolboxTree = function (toolboxDef) {
   if (toolboxDef) {
     if (typeof toolboxDef !== 'string') {
       if (userAgent.IE && toolboxDef.outerHTML) {

@@ -12,6 +12,7 @@
 
 goog.module('Blockly.blocks.procedures');
 
+
 /* eslint-disable-next-line no-unused-vars */
 const AbstractEvent = goog.requireType('Blockly.Events.Abstract');
 const ContextMenu = goog.require('Blockly.ContextMenu');
@@ -451,7 +452,7 @@ Blocks['procedures_defnoreturn'] = {
       .appendField(Msg['PROCEDURES_DEFNORETURN_TITLE'])
       .appendField(nameField, 'NAME')
       .appendField('', 'PARAMS');
-    this.setMutator(new Mutator(['procedures_mutatorarg']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_tuple']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
@@ -496,7 +497,7 @@ Blocks['procedures_defreturn'] = {
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
-    this.setMutator(new Mutator(['procedures_mutatorarg']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_tuple']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
@@ -561,9 +562,10 @@ Blocks['procedures_mutatorarg'] = {
     };
     field.showEditor_ = newShowEditorFn;
 
-    this.appendDummyInput()
+    this.appendValueInput("TYPE")
       .appendField(Msg['PROCEDURES_MUTATORARG_TITLE'])
-      .appendField(field, 'NAME');
+      .appendField(field, 'NAME')
+      .appendField("type:");
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setStyle('procedure_blocks');

@@ -331,6 +331,15 @@ const updateMutatorFlyout = function (workspace) {
   argBlock.appendChild(nameField);
   xmlElement.appendChild(argBlock);
 
+  // Our custom mutator blocks
+  const typeIntBlock = utilsXml.createElement('block');
+  typeIntBlock.setAttribute('type', 'type_int');
+  xmlElement.appendChild(typeIntBlock);
+
+  const typeTupleBlock = utilsXml.createElement('block');
+  typeTupleBlock.setAttribute('type', 'type_tuple');
+  xmlElement.appendChild(typeTupleBlock);
+
   workspace.updateToolbox(xmlElement);
 };
 
