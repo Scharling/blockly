@@ -340,6 +340,10 @@ const updateMutatorFlyout = function (workspace) {
   typeTupleBlock.setAttribute('type', 'type_tuple');
   xmlElement.appendChild(typeTupleBlock);
 
+  const typeFunctionBlock = utilsXml.createElement('block');
+  typeFunctionBlock.setAttribute('type', 'type_function');
+  xmlElement.appendChild(typeFunctionBlock);
+
   workspace.updateToolbox(xmlElement);
 };
 
