@@ -122,12 +122,6 @@ const PROCEDURE_DEF_COMMON = {
     if (opt_paramIds) {
       container.setAttribute('name', this.getFieldValue('NAME'));
     }
-    console.trace();
-    
-
-
-    console.log("mutationToDom");
-    console.log(this.argumentVarModels_);
     for (let i = 0; i < this.argumentVarModels_.length; i++) {
       const parameter = xmlUtils.createElement('arg');
       const argModel = this.argumentVarModels_[i];
@@ -163,15 +157,13 @@ const PROCEDURE_DEF_COMMON = {
     this.argumentVarModels_ = [];
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
-        console.log("135");
-        console.log(childNode);
         const varName = childNode.getAttribute('name');
         const varId =
           childNode.getAttribute('varid') || childNode.getAttribute('varId');
         this.arguments_.push(varName);
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, varId, varName, '');
-        console.log(variable);
+        console.log("domToMutation variable", variable);
         if (variable !== null) {
           this.argumentVarModels_.push(variable);
         } else {
@@ -235,6 +227,7 @@ const PROCEDURE_DEF_COMMON = {
         const param = state['params'][i];
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, param['id'], param['name'], param['type']);
+        console.log("pushing variable", variable);
         this.arguments_.push(variable.name);
         this.argumentVarModels_.push(variable);
       }
@@ -276,18 +269,38 @@ const PROCEDURE_DEF_COMMON = {
     statementNode.setAttribute('name', 'STACK');
     containerBlockNode.appendChild(statementNode);
 
+    const outerWs = Mutator.findParentWs(workspace);
     let node = statementNode;
     for (let i = 0; i < this.arguments_.length; i++) {
+      const variableName = this.arguments_[i];
       const argBlockNode = xmlUtils.createElement('block');
       argBlockNode.setAttribute('type', 'procedures_mutatorarg');
       const fieldNode = xmlUtils.createElement('field');
       fieldNode.setAttribute('name', 'NAME');
-      const argumentName = xmlUtils.createTextNode(this.arguments_[i]);
+      const argumentName = xmlUtils.createTextNode(variableName);
       fieldNode.appendChild(argumentName);
       argBlockNode.appendChild(fieldNode);
       const nextNode = xmlUtils.createElement('next');
       argBlockNode.appendChild(nextNode);
 
+      const typeNode = xmlUtils.createElement('value');
+      typeNode.setAttribute('name', 'TYPE');
+
+      const varType = '';
+      console.log(this.arguments_[i])
+      console.log(outerWs);
+      var wsVM = outerWs.getVariableMap();
+      var temp = wsVM.getVariableByName(this.arguments_[i]);
+      console.log(temp);
+      const typeBlockNode = xmlUtils.createElement('block');
+      typeBlockNode.setAttribute('type', 'type_int');
+
+      typeNode.appendChild(typeBlockNode);
+
+      argBlockNode.appendChild(typeNode);
+
+
+      console.log(argBlockNode);
       node.appendChild(argBlockNode);
       node = nextNode;
     }
@@ -301,9 +314,9 @@ const PROCEDURE_DEF_COMMON = {
       returnBlockNode.setAttribute('type', this.returnType_);
       returnNode.appendChild(returnBlockNode);
     }
-
+    console.log(containerBlockNode);
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
-
+    console.log(containerBlock);
     if (this.type === 'procedures_defreturn') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
     } else {
@@ -330,29 +343,20 @@ const PROCEDURE_DEF_COMMON = {
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
     let first = paramBlock;
     while (paramBlock && !paramBlock.isInsertionMarker()) {
-      console.log("paramBlock", paramBlock);
-
       try {
-
-        console.log("calling setVariableType");
-        
         validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'));
       } catch (error) {
-        console.log("setVariableType call failed on", paramBlock);
         console.log(error);
       }
       var varType = '';
       if (paramBlock.childBlocks_[0] && paramBlock.childBlocks_[0].type != null) {
         varType = paramBlock.childBlocks_[0].type;
       }
-      console.log("varType", varType);
 
       const varName = paramBlock.getFieldValue('NAME');
       this.arguments_.push(varName);
       const variable = this.workspace.getVariable(varName, varType);
-      console.log("variable", variable);
       this.argumentVarModels_.push(variable);
-      console.log("this.argumentsVarModels_", this.argumentVarModels_);
       this.paramIds_.push(paramBlock.id);
       paramBlock =
         paramBlock.nextConnection && paramBlock.nextConnection.targetBlock();
@@ -361,7 +365,6 @@ const PROCEDURE_DEF_COMMON = {
     let returnTypeBlock = containerBlock.getInputTargetBlock('RETURNTYPE');
     if (returnTypeBlock) {
       this.returnType_ = returnTypeBlock.type;
-      console.log(returnTypeBlock);
     }
 
     this.updateParams_();
@@ -722,14 +725,10 @@ Blocks['procedures_mutatorarg'] = {
 };
 
 function validatorExternal(sourceBlock, varName) {
-  
-  console.log(sourceBlock);
   var varType = '';
   if (sourceBlock.childBlocks_[0] && sourceBlock.childBlocks_[0].type != null) {
     varType = sourceBlock.childBlocks_[0].type;
-    console.log("bing");
   }
-  console.log(varType);
 
 
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);
@@ -766,7 +765,6 @@ function validatorExternal(sourceBlock, varName) {
     outerWs.renameVariableById(model.getId(), varName);
   }
   if (!model) {
-    console.log("outerWs.createVariable", varName, varType);
     model = outerWs.createVariable(varName, varType);
     if (model && this.createdVariables_) {
       this.createdVariables_.push(model);
@@ -774,32 +772,6 @@ function validatorExternal(sourceBlock, varName) {
   }
   return varName;
 }
-
-function setVariableType(sourceBlock, varName) {
-
-  var varType = '';
-  if (sourceBlock.childBlocks_[0] && sourceBlock.childBlocks_[0].type != null) {
-    varType = sourceBlock.childBlocks_[0].type;
-    console.log("bing");
-  }
-  console.log(varType);
-
-  const outerWs = Mutator.findParentWs(sourceBlock.workspace);
-
-  let model = outerWs.getVariable(varName, varType);
-  if (model && model.name !== varName) {
-    // Rename the variable (case change)
-    outerWs.renameVariableById(model.getId(), varName);
-  }
-  if (!model) {
-    console.log("outerWs.createVariable", varName, varType);
-    model = outerWs.createVariable(varName, varType);
-    if (model && this.createdVariables_) {
-      this.createdVariables_.push(model);
-    }
-  }
-}
-
 
 /**
  * Common properties for the procedure_callnoreturn and
@@ -902,8 +874,6 @@ const PROCEDURE_CALL_COMMON = {
     for (let i = 0; i < this.arguments_.length; i++) {
       const variable = Variables.getOrCreateVariablePackage(
         this.workspace, null, this.arguments_[i], '');
-      console.log("784");
-      console.log(variable);
       this.argumentVarModels_.push(variable);
     }
 
@@ -1102,7 +1072,6 @@ const PROCEDURE_CALL_COMMON = {
         const y = xy.y + internalConstants.SNAP_RADIUS * 2;
         block.setAttribute('x', x);
         block.setAttribute('y', y);
-        console.log("pre call to mutationtodom 980")
         const mutation = this.mutationToDom();
         block.appendChild(mutation);
         const field = xmlUtils.createElement('field');
