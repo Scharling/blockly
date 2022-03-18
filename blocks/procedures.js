@@ -90,6 +90,26 @@ const PROCEDURE_DEF_COMMON = {
     }
   },
   /**
+   * Update the display of return type for this procedure definition block.
+   * @private
+   * @this {Block}
+   */
+  updateReturnType_: function () {
+    // Merge the arguments into a human-readable list.
+    let returnTypeString = '';
+    if (this.returnType_.length) {
+      returnTypeString = "returns: " + this.returnType_;
+    }
+    // The return type field is deterministic based on the mutation,
+    // no need to fire a change event.
+    Events.disable();
+    try {
+      this.setFieldValue(returnTypeString, 'RETURNTYPE');
+    } finally {
+      Events.enable();
+    }
+  },
+  /**
    * Create XML to represent the argument inputs.
    * Backwards compatible serialization implementation.
    * @param {boolean=} opt_paramIds If true include the IDs of the parameter
@@ -119,6 +139,12 @@ const PROCEDURE_DEF_COMMON = {
       container.appendChild(parameter);
     }
 
+    if (this.returnType_.length) {
+      const returnType = xmlUtils.createElement('returntype');
+      returnType.setAttribute('type', this.returnType_);
+      container.appendChild(returnType);
+    }
+
     // Save whether the statement input is visible.
     if (!this.hasStatements_) {
       container.setAttribute('statements', 'false');
@@ -133,6 +159,7 @@ const PROCEDURE_DEF_COMMON = {
    */
   domToMutation: function (xmlElement) {
     this.arguments_ = [];
+    this.returnType_ = '';
     this.argumentVarModels_ = [];
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
@@ -152,9 +179,13 @@ const PROCEDURE_DEF_COMMON = {
             'Failed to create a variable with name ' + varName +
             ', ignoring.');
         }
+      } else if (childNode.nodeName.toLowerCase() === 'returntype') {
+        const returnType = childNode.getAttribute('type');
+        this.returnType_ = returnType;
       }
     }
     this.updateParams_();
+    this.updateReturnType_();
     Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
@@ -167,7 +198,7 @@ const PROCEDURE_DEF_COMMON = {
    *     parameters and statements.
    */
   saveExtraState: function () {
-    if (!this.argumentVarModels_.length && this.hasStatements_) {
+    if (!this.argumentVarModels_.length && this.hasStatements_ && !this.returnType_.length) {
       return null;
     }
     const state = Object.create(null);
@@ -182,6 +213,9 @@ const PROCEDURE_DEF_COMMON = {
           'type': this.argumentVarModels_[i].type,
         });
       }
+    }
+    if (this.returnType_.length) {
+      state['returntype'] = this.returnType_;
     }
     if (!this.hasStatements_) {
       state['hasStatements'] = false;
@@ -205,7 +239,11 @@ const PROCEDURE_DEF_COMMON = {
         this.argumentVarModels_.push(variable);
       }
     }
+    if (state['returntype']) {
+      this.returnType_ = state['returntype'];
+    }
     this.updateParams_();
+    this.updateReturnType_();
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
   },
@@ -225,6 +263,9 @@ const PROCEDURE_DEF_COMMON = {
      *       <next>etc...</next>
      *     </block>
      *   </statement>
+     *   <input name="RETURNTYPE">
+     *     <block type=[return type]></block>
+     *   </input>
      * </block>
      */
     console.log("decompose");
@@ -251,6 +292,16 @@ const PROCEDURE_DEF_COMMON = {
       node = nextNode;
     }
 
+    // Set return type block
+    const returnNode = xmlUtils.createElement('value');
+    returnNode.setAttribute('name', 'RETURNTYPE');
+    containerBlockNode.appendChild(returnNode);
+    if (this.returnType_.length) {
+      const returnBlockNode = xmlUtils.createElement('block');
+      returnBlockNode.setAttribute('type', this.returnType_);
+      returnNode.appendChild(returnBlockNode);
+    }
+
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
 
     if (this.type === 'procedures_defreturn') {
@@ -273,6 +324,7 @@ const PROCEDURE_DEF_COMMON = {
     console.log("compose");
     // Parameter list.
     this.arguments_ = [];
+    this.returnType_ = '';
     this.paramIds_ = [];
     this.argumentVarModels_ = [];
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
@@ -305,7 +357,15 @@ const PROCEDURE_DEF_COMMON = {
       paramBlock =
         paramBlock.nextConnection && paramBlock.nextConnection.targetBlock();
     }
+
+    let returnTypeBlock = containerBlock.getInputTargetBlock('RETURNTYPE');
+    if (returnTypeBlock) {
+      this.returnType_ = returnTypeBlock.type;
+      console.log(returnTypeBlock);
+    }
+
     this.updateParams_();
+    this.updateReturnType_();
     Procedures.mutateCallers(this);
 
     // Show/hide the statement input.
@@ -437,6 +497,7 @@ const PROCEDURE_DEF_COMMON = {
     const option = { enabled: true };
     const name = this.getFieldValue('NAME');
     option.text = Msg['PROCEDURES_CREATE_DO'].replace('%1', name);
+
     const xmlMutation = xmlUtils.createElement('mutation');
     xmlMutation.setAttribute('name', name);
     for (let i = 0; i < this.arguments_.length; i++) {
@@ -444,6 +505,7 @@ const PROCEDURE_DEF_COMMON = {
       xmlArg.setAttribute('name', this.arguments_[i]);
       xmlMutation.appendChild(xmlArg);
     }
+
     const xmlBlock = xmlUtils.createElement('block');
     xmlBlock.setAttribute('type', this.callType_);
     xmlBlock.appendChild(xmlMutation);
@@ -496,6 +558,7 @@ Blocks['procedures_defnoreturn'] = {
     this.setHelpUrl(Msg['PROCEDURES_DEFNORETURN_HELPURL']);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
+    this.returnType_ = '';
     this.setStatements_(true);
     this.statementConnection_ = null;
   },
@@ -525,7 +588,8 @@ Blocks['procedures_defreturn'] = {
     this.appendDummyInput()
       .appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
       .appendField(nameField, 'NAME')
-      .appendField('', 'PARAMS');
+      .appendField('', 'PARAMS')
+      .appendField('', 'RETURNTYPE');
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
@@ -541,6 +605,7 @@ Blocks['procedures_defreturn'] = {
     this.setHelpUrl(Msg['PROCEDURES_DEFRETURN_HELPURL']);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
+    this.returnType_ = '';
     this.setStatements_(true);
     this.statementConnection_ = null;
   },
@@ -569,6 +634,10 @@ Blocks['procedures_mutatorcontainer'] = {
     this.appendDummyInput('STATEMENT_INPUT')
       .appendField(Msg['PROCEDURES_ALLOW_STATEMENTS'])
       .appendField(new FieldCheckbox('TRUE'), 'STATEMENTS');
+    this.appendValueInput("RETURNTYPE")
+      .setCheck("type")
+      .setAlign(Blockly.ALIGN_RIGHT)
+      .appendField("return type");
     this.setStyle('procedure_blocks');
     this.setTooltip(Msg['PROCEDURES_MUTATORCONTAINER_TOOLTIP']);
     this.contextMenu = false;
