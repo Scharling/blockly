@@ -187,6 +187,11 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
   if (opt_id && this.getVariableById(opt_id)) {
     throw Error('Variable id, "' + opt_id + '", is already in use.');
   }
+  if (opt_type && this.getVariableByName(name)) {
+    const variableToDelete = this.getVariableByName(name);
+    console.log("variable to delete", variableToDelete)
+    this.deleteVariable(variableToDelete)
+  }
   const id = opt_id || idGenerator.genUid();
   const type = opt_type || '';
   variable = new VariableModel(this.workspace, name, type, id);
@@ -198,7 +203,7 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
   // This is used so the toolbox's set block is set to the most recent variable.
   delete this.variableMap_[type];
   this.variableMap_[type] = variables;
-
+  console.log("created variable", variable);
   return variable;
 };
 
@@ -340,6 +345,7 @@ VariableMap.prototype.getVariableById = function(id) {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     for (let j = 0, variable; (variable = this.variableMap_[key][j]); j++) {
+      console.log("finding variable: ", name, " == ", variable);
       if (variable.name === name) {
         return variable;
       }
