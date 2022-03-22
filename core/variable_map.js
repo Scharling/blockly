@@ -32,6 +32,7 @@ goog.require('Blockly.Events.VarDelete');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.VarRename');
 
+const typeUtils = goog.require('Blockly.extra.utils.types')
 
 /**
  * Class for a variable map.  This contains a dictionary data structure with
@@ -156,7 +157,7 @@ VariableMap.prototype.renameVariableWithConflict_ = function(
   // Finally delete the original variable, which is now unreferenced.
   eventUtils.fire(new (eventUtils.get(eventUtils.VAR_DELETE))(variable));
   // And remove it from the list.
-  arrayUtils.removeElem(this.variableMap_[type], variable);
+  arrayUtils.removeElem(this.variableMap_[type.getType()], variable);
 };
 
 /* End functions for renaming variables. */
@@ -173,6 +174,7 @@ VariableMap.prototype.renameVariableWithConflict_ = function(
  * @return {!VariableModel} The newly created variable.
  */
 VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
+  console.log("createVariable called", name, opt_type, opt_id);
   let variable = this.getVariable(name, opt_type);
   if (variable) {
     if (opt_id && variable.getId() !== opt_id) {
@@ -193,16 +195,16 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
     this.deleteVariable(variableToDelete)
   }
   const id = opt_id || idGenerator.genUid();
-  const type = opt_type || '';
+  const type = opt_type || typeUtils.createNullType();
   variable = new VariableModel(this.workspace, name, type, id);
 
-  const variables = this.variableMap_[type] || [];
+  const variables = this.variableMap_[type.getType()] || [];
   variables.push(variable);
   // Delete the list of variables of this type, and re-add it so that
   // the most recent addition is at the end.
   // This is used so the toolbox's set block is set to the most recent variable.
-  delete this.variableMap_[type];
-  this.variableMap_[type] = variables;
+  delete this.variableMap_[type.getType()];
+  this.variableMap_[type.getType()] = variables;
   console.log("created variable", variable);
   return variable;
 };
@@ -215,7 +217,7 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
  */
 VariableMap.prototype.deleteVariable = function(variable) {
   const variableId = variable.getId();
-  const variableList = this.variableMap_[variable.type];
+  const variableList = this.variableMap_[variable.type.getType()];
   for (let i = 0; i < variableList.length; i++) {
     const tempVar = variableList[i];
     if (tempVar.getId() === variableId) {
@@ -299,14 +301,17 @@ VariableMap.prototype.deleteVariableInternal = function(variable, uses) {
  * Find the variable by the given name and type and return it.  Return null if
  *     it is not found.
  * @param {string} name The name to check for.
- * @param {?string=} opt_type The type of the variable.  If not provided it
+ * @param {?type} opt_type The type of the variable.  If not provided it
  *     defaults to the empty string, which is a specific type.
  * @return {?VariableModel} The variable with the given name, or null if
  *     it was not found.
  */
 VariableMap.prototype.getVariable = function(name, opt_type) {
-  const type = opt_type || '';
-  const list = this.variableMap_[type];
+  console.log("get_variable", name, opt_type);
+  const type = opt_type || typeUtils.createNullType();
+  const list = this.variableMap_[type.getType()];
+  console.log("list", list);
+  console.log("this.variableMap_", this.variableMap_);
   if (list) {
     for (let j = 0, variable; (variable = list[j]); j++) {
       if (Names.equals(variable.name, name)) {
@@ -357,13 +362,13 @@ VariableMap.prototype.getVariableById = function(id) {
 /**
  * Get a list containing all of the variables of a specified type. If type is
  *     null, return list of variables with empty string type.
- * @param {?string} type Type of the variables to find.
+ * @param {?type} type Type of the variables to find.
  * @return {!Array<!VariableModel>} The sought after variables of the
  *     passed in type. An empty array if none are found.
  */
 VariableMap.prototype.getVariablesOfType = function(type) {
   type = type || '';
-  const variableList = this.variableMap_[type];
+  const variableList = this.variableMap_[type.getType()];
   if (variableList) {
     return variableList.slice();
   }

@@ -24,6 +24,8 @@ const {VariableModel} = goog.require('Blockly.VariableModel');
 /* eslint-disable-next-line no-unused-vars */
 const {Workspace} = goog.requireType('Blockly.Workspace');
 
+const typeUtils = goog.require('Blockly.extra.utils.types')
+
 /**
  * String for use in the "custom" attribute of a category in toolbox XML.
  * This string indicates that the category should be dynamically populated with
@@ -453,7 +455,7 @@ exports.generateVariableFieldDom = generateVariableFieldDom;
  * @param {?string} id The ID to use to look up or create the variable, or null.
  * @param {string=} opt_name The string to use to look up or create the
  *     variable.
- * @param {string=} opt_type The type to use to look up or create the variable.
+ * @param {type} opt_type The type to use to look up or create the variable.
  * @return {!VariableModel} The variable corresponding to the given ID
  *     or name + type combination.
  * @alias Blockly.Variables.getOrCreateVariablePackage
@@ -518,7 +520,7 @@ exports.getVariable = getVariable;
  * variable.  It may be a flyout workspace or main workspace.
  * @param {?string} id The ID to use to create the variable, or null.
  * @param {string=} opt_name The string to use to create the variable.
- * @param {string=} opt_type The type to use to create the variable.
+ * @param {type=} opt_type The type to use to create the variable.
  * @return {!VariableModel} The variable corresponding to the given ID
  *     or name + type combination.
  */

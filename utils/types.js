@@ -40,6 +40,18 @@ const createPrimitiveType = function (blockName) {
 exports.createPrimitiveType = createPrimitiveType;
 
 
+const createNullType = function () {
+    return {
+        block_name: "null",
+        text_name: "nullType",
+        children: [],
+        getType: function () {
+            return this.text_name;
+        }
+    }
+}
+exports.createNullType = createNullType;
+
 // const tupleType = {
 //     block_name: "type_tuple",
 //     text_name_start: "tuple(",

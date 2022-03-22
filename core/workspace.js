@@ -452,7 +452,7 @@ Workspace.prototype.deleteVariableById = function(id) {
 /**
  * Find the variable by the given name and return it. Return null if not found.
  * @param {string} name The name to check for.
- * @param {string=} opt_type The type of the variable.  If not provided it
+ * @param {type} opt_type The type of the variable.  If not provided it
  *     defaults to the empty string, which is a specific type.
  * @return {?VariableModel} The variable with the given name.
  */

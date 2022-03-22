@@ -42,6 +42,8 @@ goog.require('Blockly.Comment');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Warning');
 
+const typeUtils = goog.require('Blockly.extra.utils.types')
+
 
 /**
  * Common properties for the procedure_defnoreturn and
@@ -143,6 +145,7 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       container.setAttribute('statements', 'false');
     }
+    console.log("CONTAINER", container);
     return container;
   },
   /**
@@ -212,6 +215,7 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       state['hasStatements'] = false;
     }
+    console.log("saveExtraState", state);
     return state;
   },
   /**
@@ -220,6 +224,7 @@ const PROCEDURE_DEF_COMMON = {
    *     statements.
    */
   loadExtraState: function (state) {
+    console.log("loadExtraState", state);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
     if (state['params']) {
@@ -261,7 +266,7 @@ const PROCEDURE_DEF_COMMON = {
      *   </input>
      * </block>
      */
-    console.log("decompose");
+    console.log("decompose", workspace);
 
     const containerBlockNode = xmlUtils.createElement('block');
     containerBlockNode.setAttribute('type', 'procedures_mutatorcontainer');
@@ -293,7 +298,7 @@ const PROCEDURE_DEF_COMMON = {
       var temp = wsVM.getVariableByName(this.arguments_[i]);
       console.log("temp", temp);
       const typeBlockNode = xmlUtils.createElement('block');
-      typeBlockNode.setAttribute('type', temp.type);
+      typeBlockNode.setAttribute('type', temp.type.block_name);
       console.log("typeBlockNode", typeBlockNode, temp.type);
       typeNode.appendChild(typeBlockNode);
 
@@ -334,7 +339,7 @@ const PROCEDURE_DEF_COMMON = {
    */
   compose: function (containerBlock) {
     
-    console.log("compose");
+    console.log("compose", containerBlock);
     // Parameter list.
     this.arguments_ = [];
     this.returnType_ = '';
@@ -348,9 +353,10 @@ const PROCEDURE_DEF_COMMON = {
       } catch (error) {
         console.log(error);
       }
-      var varType = '';
+      var varType = typeUtils.createNullType();
       if (paramBlock.childBlocks_[0] && paramBlock.childBlocks_[0].type != null) {
-        varType = paramBlock.childBlocks_[0].type;
+        //varType = paramBlock.childBlocks_[0].type;
+        varType = typeUtils.createPrimitiveType(paramBlock.childBlocks_[0].type);
       }
 
       const varName = paramBlock.getFieldValue('NAME');
@@ -358,6 +364,7 @@ const PROCEDURE_DEF_COMMON = {
       console.log("varType in compose:", varType)
       const variable = this.workspace.getVariable(varName, varType);
       this.argumentVarModels_.push(variable);
+      console.log("variable", variable);
       console.log("argumentVarModels_ in compose: ", this.argumentVarModels_);
       this.paramIds_.push(paramBlock.id);
       paramBlock =
@@ -727,11 +734,15 @@ Blocks['procedures_mutatorarg'] = {
 };
 
 function validatorExternal(sourceBlock, varName) {
-  var varType = '';
+  console.log("validatorExternal", sourceBlock, varName);
+  var varType = typeUtils.createNullType();
   if (sourceBlock.childBlocks_[0] && sourceBlock.childBlocks_[0].type != null) {
-    varType = sourceBlock.childBlocks_[0].type;
+    //varType = sourceBlock.childBlocks_[0].type;
+    console.log("sourceBlock type", sourceBlock.childBlocks_[0].type)
+    varType = typeUtils.createPrimitiveType(sourceBlock.childBlocks_[0].type);
+    
   }
-
+  console.log("varType", varType)
 
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);
   varName = varName.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
