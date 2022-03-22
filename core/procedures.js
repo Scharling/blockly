@@ -336,6 +336,10 @@ const updateMutatorFlyout = function (workspace) {
   typeIntBlock.setAttribute('type', 'type_int');
   xmlElement.appendChild(typeIntBlock);
 
+  const typeStringBlock = utilsXml.createElement('block');
+  typeStringBlock.setAttribute('type', 'type_string');
+  xmlElement.appendChild(typeStringBlock);
+
   const typeTupleBlock = utilsXml.createElement('block');
   typeTupleBlock.setAttribute('type', 'type_tuple');
   xmlElement.appendChild(typeTupleBlock);

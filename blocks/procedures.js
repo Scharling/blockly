@@ -42,6 +42,11 @@ goog.require('Blockly.Comment');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Warning');
 
+const typeUtils = goog.require('Blockly.extra.utils.types');
+
+
+//import * as typeUtils from "../utils/types.js";
+
 
 /**
  * Common properties for the procedure_defnoreturn and
@@ -95,10 +100,10 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   updateReturnType_: function () {
-    // Merge the arguments into a human-readable list.
     let returnTypeString = '';
-    if (this.returnType_.length) {
-      returnTypeString = "returns: " + this.returnType_;
+    if (!!this.returnType_) {
+      console.log(this.returnType_);
+      returnTypeString = "returns: " + this.returnType_.getType();
     }
     // The return type field is deterministic based on the mutation,
     // no need to fire a change event.
@@ -133,9 +138,10 @@ const PROCEDURE_DEF_COMMON = {
       container.appendChild(parameter);
     }
 
-    if (this.returnType_.length) {
+    //XML
+    if (!!this.returnType_) {
       const returnType = xmlUtils.createElement('returntype');
-      returnType.setAttribute('type', this.returnType_);
+      returnType.setAttribute('type', this.returnType_.block_name);
       container.appendChild(returnType);
     }
 
@@ -153,7 +159,7 @@ const PROCEDURE_DEF_COMMON = {
    */
   domToMutation: function (xmlElement) {
     this.arguments_ = [];
-    this.returnType_ = '';
+    this.returnType_ = null;
     this.argumentVarModels_ = [];
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
@@ -163,7 +169,7 @@ const PROCEDURE_DEF_COMMON = {
         this.arguments_.push(varName);
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, varId, varName, '');
-        console.log("domToMutation variable", variable);
+        //console.log("domToMutation variable", variable);
         if (variable !== null) {
           this.argumentVarModels_.push(variable);
         } else {
@@ -172,8 +178,10 @@ const PROCEDURE_DEF_COMMON = {
             ', ignoring.');
         }
       } else if (childNode.nodeName.toLowerCase() === 'returntype') {
+        //XML
         const returnType = childNode.getAttribute('type');
-        this.returnType_ = returnType;
+        this.returnType_ = typeUtils.createTypeFromBlock(returnType);
+        console.log(this.returnType_);
       }
     }
     this.updateParams_();
@@ -190,7 +198,7 @@ const PROCEDURE_DEF_COMMON = {
    *     parameters and statements.
    */
   saveExtraState: function () {
-    if (!this.argumentVarModels_.length && this.hasStatements_ && !this.returnType_.length) {
+    if (!this.argumentVarModels_.length && this.hasStatements_ && !this.returnType_) {
       return null;
     }
     const state = Object.create(null);
@@ -206,8 +214,10 @@ const PROCEDURE_DEF_COMMON = {
         });
       }
     }
-    if (this.returnType_.length) {
+    console.log(this.returnType_);
+    if (!!this.returnType_) {
       state['returntype'] = this.returnType_;
+      console.log(state);
     }
     if (!this.hasStatements_) {
       state['hasStatements'] = false;
@@ -227,12 +237,13 @@ const PROCEDURE_DEF_COMMON = {
         const param = state['params'][i];
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, param['id'], param['name'], param['type']);
-        console.log("pushing variable", variable);
+        //console.log("pushing variable", variable);
         this.arguments_.push(variable.name);
         this.argumentVarModels_.push(variable);
       }
     }
     if (state['returntype']) {
+      console.log(state['returntype']);
       this.returnType_ = state['returntype'];
     }
     this.updateParams_();
@@ -287,11 +298,11 @@ const PROCEDURE_DEF_COMMON = {
       typeNode.setAttribute('name', 'TYPE');
 
       const varType = '';
-      console.log(this.arguments_[i])
-      console.log(outerWs);
+      //console.log(this.arguments_[i])
+      //console.log(outerWs);
       var wsVM = outerWs.getVariableMap();
       var temp = wsVM.getVariableByName(this.arguments_[i]);
-      console.log(temp);
+      //console.log(temp);
       const typeBlockNode = xmlUtils.createElement('block');
       typeBlockNode.setAttribute('type', 'type_int');
 
@@ -300,7 +311,7 @@ const PROCEDURE_DEF_COMMON = {
       argBlockNode.appendChild(typeNode);
 
 
-      console.log(argBlockNode);
+      //console.log(argBlockNode);
       node.appendChild(argBlockNode);
       node = nextNode;
     }
@@ -309,14 +320,19 @@ const PROCEDURE_DEF_COMMON = {
     const returnNode = xmlUtils.createElement('value');
     returnNode.setAttribute('name', 'RETURNTYPE');
     containerBlockNode.appendChild(returnNode);
-    if (this.returnType_.length) {
-      const returnBlockNode = xmlUtils.createElement('block');
-      returnBlockNode.setAttribute('type', this.returnType_);
+    console.log(this.returnType_);
+    if (!!this.returnType_) {
+      //const returnBlockNode = xmlUtils.createElement('block');
+      //returnBlockNode.setAttribute('type', this.returnType_.block_name);
+      console.log("Set return type block");
+      console.log(this.returnType_);
+      const returnBlockNode = typeUtils.createBlockFromType(this.returnType_);
+      console.log(returnBlockNode);
       returnNode.appendChild(returnBlockNode);
     }
-    console.log(containerBlockNode);
+    //console.log(containerBlockNode);
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
-    console.log(containerBlock);
+    //console.log(containerBlock);
     if (this.type === 'procedures_defreturn') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
     } else {
@@ -333,11 +349,11 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   compose: function (containerBlock) {
-    
+
     console.log("compose");
     // Parameter list.
     this.arguments_ = [];
-    this.returnType_ = '';
+    this.returnType_ = null;
     this.paramIds_ = [];
     this.argumentVarModels_ = [];
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
@@ -363,8 +379,8 @@ const PROCEDURE_DEF_COMMON = {
     }
 
     let returnTypeBlock = containerBlock.getInputTargetBlock('RETURNTYPE');
-    if (returnTypeBlock) {
-      this.returnType_ = returnTypeBlock.type;
+    if (!!returnTypeBlock) {
+      this.returnType_ = typeUtils.createTypeFromBlock(returnTypeBlock);
     }
 
     this.updateParams_();
@@ -549,7 +565,7 @@ Blocks['procedures_defnoreturn'] = {
       .appendField(Msg['PROCEDURES_DEFNORETURN_TITLE'])
       .appendField(nameField, 'NAME')
       .appendField('', 'PARAMS');
-    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_tuple']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_string', 'type_tuple', 'type_function']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
@@ -561,7 +577,7 @@ Blocks['procedures_defnoreturn'] = {
     this.setHelpUrl(Msg['PROCEDURES_DEFNORETURN_HELPURL']);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
-    this.returnType_ = '';
+    this.returnType_ = null;
     this.setStatements_(true);
     this.statementConnection_ = null;
   },
@@ -596,7 +612,7 @@ Blocks['procedures_defreturn'] = {
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
-    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_tuple']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_string', 'type_tuple', 'type_function']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
@@ -608,7 +624,7 @@ Blocks['procedures_defreturn'] = {
     this.setHelpUrl(Msg['PROCEDURES_DEFRETURN_HELPURL']);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
-    this.returnType_ = '';
+    this.returnType_ = null;
     this.setStatements_(true);
     this.statementConnection_ = null;
   },
@@ -653,7 +669,7 @@ Blocks['procedures_mutatorarg'] = {
    * @this {Block}
    */
   init: function () {
-    console.log("procedures_mutatorarg constructor");
+    //console.log("procedures_mutatorarg constructor");
     const field = new FieldTextInput(Procedures.DEFAULT_ARG, this.validator_);
     // Hack: override showEditor to do just a little bit more work.
     // We don't have a good place to hook into the start of a text edit.
@@ -697,7 +713,7 @@ Blocks['procedures_mutatorarg'] = {
    * @this {FieldTextInput}
    */
   validator_: function (varName) {
-    console.log("validator_", varName);
+    //console.log("validator_", varName);
     const sourceBlock = this.getSourceBlock();
     return validatorExternal(sourceBlock, varName);
   },

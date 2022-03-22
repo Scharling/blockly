@@ -322,4 +322,3 @@ goog.addDependency('../../generators/python/variables_dynamic.js', ['Blockly.Pyt
 goog.addDependency('base.js', [], []);
 goog.addDependency('base_minimal.js', [], []);
 goog.addDependency('../../utils/types.js', ['Blockly.extra.utils.types'], [], { 'lang': 'es6', 'module': 'goog' });
-
