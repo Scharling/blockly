@@ -331,6 +331,24 @@ VariableMap.prototype.getVariableById = function(id) {
 };
 
 /**
+ * Find the variable by the name and return it.  Return null if not found.
+ * @param {string} name The name to check for.
+ * @return {?VariableModel} The variable with the given name.
+ */
+ VariableMap.prototype.getVariableByName = function(name) {
+  const keys = Object.keys(this.variableMap_);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    for (let j = 0, variable; (variable = this.variableMap_[key][j]); j++) {
+      if (variable.name === name) {
+        return variable;
+      }
+    }
+  }
+  return null;
+};
+
+/**
  * Get a list containing all of the variables of a specified type. If type is
  *     null, return list of variables with empty string type.
  * @param {?string} type Type of the variables to find.

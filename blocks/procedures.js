@@ -163,6 +163,7 @@ const PROCEDURE_DEF_COMMON = {
         this.arguments_.push(varName);
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, varId, varName, '');
+        console.log("domToMutation variable", variable);
         if (variable !== null) {
           this.argumentVarModels_.push(variable);
         } else {
@@ -201,6 +202,7 @@ const PROCEDURE_DEF_COMMON = {
           // to separate params from variables.
           'name': this.argumentVarModels_[i].name,
           'id': this.argumentVarModels_[i].getId(),
+          'type': this.argumentVarModels_[i].type,
         });
       }
     }
@@ -224,7 +226,8 @@ const PROCEDURE_DEF_COMMON = {
       for (let i = 0; i < state['params'].length; i++) {
         const param = state['params'][i];
         const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, param['id'], param['name'], '');
+          this.workspace, param['id'], param['name'], param['type']);
+        console.log("pushing variable", variable);
         this.arguments_.push(variable.name);
         this.argumentVarModels_.push(variable);
       }
@@ -258,24 +261,46 @@ const PROCEDURE_DEF_COMMON = {
      *   </input>
      * </block>
      */
+    console.log("decompose");
+
     const containerBlockNode = xmlUtils.createElement('block');
     containerBlockNode.setAttribute('type', 'procedures_mutatorcontainer');
     const statementNode = xmlUtils.createElement('statement');
     statementNode.setAttribute('name', 'STACK');
     containerBlockNode.appendChild(statementNode);
 
+    const outerWs = Mutator.findParentWs(workspace);
     let node = statementNode;
     for (let i = 0; i < this.arguments_.length; i++) {
+      const variableName = this.arguments_[i];
       const argBlockNode = xmlUtils.createElement('block');
       argBlockNode.setAttribute('type', 'procedures_mutatorarg');
       const fieldNode = xmlUtils.createElement('field');
       fieldNode.setAttribute('name', 'NAME');
-      const argumentName = xmlUtils.createTextNode(this.arguments_[i]);
+      const argumentName = xmlUtils.createTextNode(variableName);
       fieldNode.appendChild(argumentName);
       argBlockNode.appendChild(fieldNode);
       const nextNode = xmlUtils.createElement('next');
       argBlockNode.appendChild(nextNode);
 
+      const typeNode = xmlUtils.createElement('value');
+      typeNode.setAttribute('name', 'TYPE');
+
+      const varType = '';
+      console.log(this.arguments_[i])
+      console.log(outerWs);
+      var wsVM = outerWs.getVariableMap();
+      var temp = wsVM.getVariableByName(this.arguments_[i]);
+      console.log(temp);
+      const typeBlockNode = xmlUtils.createElement('block');
+      typeBlockNode.setAttribute('type', 'type_int');
+
+      typeNode.appendChild(typeBlockNode);
+
+      argBlockNode.appendChild(typeNode);
+
+
+      console.log(argBlockNode);
       node.appendChild(argBlockNode);
       node = nextNode;
     }
@@ -289,9 +314,9 @@ const PROCEDURE_DEF_COMMON = {
       returnBlockNode.setAttribute('type', this.returnType_);
       returnNode.appendChild(returnBlockNode);
     }
-
+    console.log(containerBlockNode);
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
-
+    console.log(containerBlock);
     if (this.type === 'procedures_defreturn') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
     } else {
@@ -308,18 +333,30 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   compose: function (containerBlock) {
+    
+    console.log("compose");
     // Parameter list.
     this.arguments_ = [];
     this.returnType_ = '';
     this.paramIds_ = [];
     this.argumentVarModels_ = [];
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
+    let first = paramBlock;
     while (paramBlock && !paramBlock.isInsertionMarker()) {
+      try {
+        validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'));
+      } catch (error) {
+        console.log(error);
+      }
+      var varType = '';
+      if (paramBlock.childBlocks_[0] && paramBlock.childBlocks_[0].type != null) {
+        varType = paramBlock.childBlocks_[0].type;
+      }
+
       const varName = paramBlock.getFieldValue('NAME');
       this.arguments_.push(varName);
-      const variable = this.workspace.getVariable(varName, '');
+      const variable = this.workspace.getVariable(varName, varType);
       this.argumentVarModels_.push(variable);
-
       this.paramIds_.push(paramBlock.id);
       paramBlock =
         paramBlock.nextConnection && paramBlock.nextConnection.targetBlock();
@@ -328,7 +365,6 @@ const PROCEDURE_DEF_COMMON = {
     let returnTypeBlock = containerBlock.getInputTargetBlock('RETURNTYPE');
     if (returnTypeBlock) {
       this.returnType_ = returnTypeBlock.type;
-      console.log(returnTypeBlock);
     }
 
     this.updateParams_();
@@ -617,6 +653,7 @@ Blocks['procedures_mutatorarg'] = {
    * @this {Block}
    */
   init: function () {
+    console.log("procedures_mutatorarg constructor");
     const field = new FieldTextInput(Procedures.DEFAULT_ARG, this.validator_);
     // Hack: override showEditor to do just a little bit more work.
     // We don't have a good place to hook into the start of a text edit.
@@ -660,47 +697,9 @@ Blocks['procedures_mutatorarg'] = {
    * @this {FieldTextInput}
    */
   validator_: function (varName) {
+    console.log("validator_", varName);
     const sourceBlock = this.getSourceBlock();
-    const outerWs = Mutator.findParentWs(sourceBlock.workspace);
-    varName = varName.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
-    if (!varName) {
-      return null;
-    }
-
-    // Prevents duplicate parameter names in functions
-    const workspace =
-      sourceBlock.workspace.targetWorkspace || sourceBlock.workspace;
-    const blocks = workspace.getAllBlocks(false);
-    const caselessName = varName.toLowerCase();
-    for (let i = 0; i < blocks.length; i++) {
-      if (blocks[i].id === this.getSourceBlock().id) {
-        continue;
-      }
-      // Other blocks values may not be set yet when this is loaded.
-      const otherVar = blocks[i].getFieldValue('NAME');
-      if (otherVar && otherVar.toLowerCase() === caselessName) {
-        return null;
-      }
-    }
-
-    // Don't create variables for arg blocks that
-    // only exist in the mutator's flyout.
-    if (sourceBlock.isInFlyout) {
-      return varName;
-    }
-
-    let model = outerWs.getVariable(varName, '');
-    if (model && model.name !== varName) {
-      // Rename the variable (case change)
-      outerWs.renameVariableById(model.getId(), varName);
-    }
-    if (!model) {
-      model = outerWs.createVariable(varName, '');
-      if (model && this.createdVariables_) {
-        this.createdVariables_.push(model);
-      }
-    }
-    return varName;
+    return validatorExternal(sourceBlock, varName);
   },
 
   /**
@@ -724,6 +723,55 @@ Blocks['procedures_mutatorarg'] = {
     }
   },
 };
+
+function validatorExternal(sourceBlock, varName) {
+  var varType = '';
+  if (sourceBlock.childBlocks_[0] && sourceBlock.childBlocks_[0].type != null) {
+    varType = sourceBlock.childBlocks_[0].type;
+  }
+
+
+  const outerWs = Mutator.findParentWs(sourceBlock.workspace);
+  varName = varName.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
+  if (!varName) {
+    return null;
+  }
+
+  // Prevents duplicate parameter names in functions
+  const workspace =
+    sourceBlock.workspace.targetWorkspace || sourceBlock.workspace;
+  const blocks = workspace.getAllBlocks(false);
+  const caselessName = varName.toLowerCase();
+  for (let i = 0; i < blocks.length; i++) {
+    if (blocks[i].id === sourceBlock.id) {
+      continue;
+    }
+    // Other blocks values may not be set yet when this is loaded.
+    const otherVar = blocks[i].getFieldValue('NAME');
+    if (otherVar && otherVar.toLowerCase() === caselessName) {
+      return null;
+    }
+  }
+
+  // Don't create variables for arg blocks that
+  // only exist in the mutator's flyout.
+  if (sourceBlock.isInFlyout) {
+    return varName;
+  }
+
+  let model = outerWs.getVariable(varName, varType);
+  if (model && model.name !== varName) {
+    // Rename the variable (case change)
+    outerWs.renameVariableById(model.getId(), varName);
+  }
+  if (!model) {
+    model = outerWs.createVariable(varName, varType);
+    if (model && this.createdVariables_) {
+      this.createdVariables_.push(model);
+    }
+  }
+  return varName;
+}
 
 /**
  * Common properties for the procedure_callnoreturn and
