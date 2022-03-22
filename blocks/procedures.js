@@ -288,13 +288,13 @@ const PROCEDURE_DEF_COMMON = {
 
       const varType = '';
       console.log(this.arguments_[i])
-      console.log(outerWs);
+      console.log("outerWs", outerWs);
       var wsVM = outerWs.getVariableMap();
       var temp = wsVM.getVariableByName(this.arguments_[i]);
-      console.log(temp);
+      console.log("temp", temp);
       const typeBlockNode = xmlUtils.createElement('block');
-      typeBlockNode.setAttribute('type', 'type_int');
-
+      typeBlockNode.setAttribute('type', temp.type);
+      console.log("typeBlockNode", typeBlockNode, temp.type);
       typeNode.appendChild(typeBlockNode);
 
       argBlockNode.appendChild(typeNode);
@@ -355,8 +355,10 @@ const PROCEDURE_DEF_COMMON = {
 
       const varName = paramBlock.getFieldValue('NAME');
       this.arguments_.push(varName);
+      console.log("varType in compose:", varType)
       const variable = this.workspace.getVariable(varName, varType);
       this.argumentVarModels_.push(variable);
+      console.log("argumentVarModels_ in compose: ", this.argumentVarModels_);
       this.paramIds_.push(paramBlock.id);
       paramBlock =
         paramBlock.nextConnection && paramBlock.nextConnection.targetBlock();
