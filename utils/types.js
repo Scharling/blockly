@@ -45,7 +45,7 @@ exports.createPrimitiveType = createPrimitiveType;
 
 const createNullType = function () {
     return {
-        block_name: "null",
+        block_name: "type_null",
         text_name: "nullType",
         children: [],
         getType: function () {
@@ -231,6 +231,8 @@ const createBlockFromType = function (type) {
         // const input = inputBlock ? createTypeFromBlock(inputBlock) : null;
         // const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
         // return createFunctionType(input, output);
+        case "type_null":   
+            return null;
     }
 }
 exports.createBlockFromType = createBlockFromType;

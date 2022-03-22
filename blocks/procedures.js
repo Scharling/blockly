@@ -42,14 +42,7 @@ goog.require('Blockly.Comment');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Warning');
 
-<<<<<<< HEAD
 const typeUtils = goog.require('Blockly.extra.utils.types')
-=======
-const typeUtils = goog.require('Blockly.extra.utils.types');
-
-
-//import * as typeUtils from "../utils/types.js";
->>>>>>> 7bcb216bb3c5612754d02c716779abb795955175
 
 
 /**
