@@ -24,8 +24,14 @@ const createPrimitiveType = function (blockName) {
         case "type_int":
             textName = "int";
             break;
+        case "type_float":
+            textName = "float";
+            break;
         case "type_string":
             textName = "string";
+            break;
+        case "type_bool":
+            textName = "bool";
             break;
         default:
             break;
@@ -199,7 +205,9 @@ exports.createFunctionType = createFunctionType;
 const createTypeFromBlock = function (block) {
     switch (block.type) {
         case "type_int":
+        case "type_float":
         case "type_string":
+        case "type_bool":
             return createPrimitiveType(block.type);
         case "type_tuple":
             const children = block.childBlocks_.map(b => createTypeFromBlock(b));
@@ -222,7 +230,9 @@ exports.createTypeFromBlock = createTypeFromBlock;
 const createBlockFromType = function (type) {
     switch (type.block_name) {
         case "type_int":
+        case "type_float":
         case "type_string":
+        case "type_bool":
             const blockNode = xmlUtils.createElement('block');
             blockNode.setAttribute('type', type.block_name);
             return blockNode;
@@ -284,7 +294,9 @@ const createTypeFromXml = function (xmlElement) {
     const type = xmlElement.getAttribute('type')
     switch (type) {
         case "type_int":
+        case "type_float":
         case "type_string":
+        case "type_bool":
             return createPrimitiveType(type);
 
         case "type_tuple":

@@ -565,7 +565,7 @@ Blocks['procedures_defnoreturn'] = {
       .appendField(Msg['PROCEDURES_DEFNORETURN_TITLE'])
       .appendField(nameField, 'NAME')
       .appendField('', 'PARAMS');
-    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_string', 'type_tuple', 'type_function']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_float', 'type_string', 'type_bool', 'type_tuple', 'type_function']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
@@ -612,7 +612,7 @@ Blocks['procedures_defreturn'] = {
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
-    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_string', 'type_tuple', 'type_function']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_float', 'type_string', 'type_bool', 'type_tuple', 'type_function']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
