@@ -135,10 +135,8 @@ const PROCEDURE_DEF_COMMON = {
       container.appendChild(parameter);
     }
 
-    //XML
     if (!!this.returnType_) {
-      const returnType = xmlUtils.createElement('returntype');
-      returnType.setAttribute('type', this.returnType_.block_name);
+      const returnType = typeUtils.createXmlFromType(this.returnType_, 'returntype');
       container.appendChild(returnType);
     }
 
@@ -176,10 +174,8 @@ const PROCEDURE_DEF_COMMON = {
             ', ignoring.');
         }
       } else if (childNode.nodeName.toLowerCase() === 'returntype') {
-        //XML
-        const returnType = childNode.getAttribute('type');
-        this.returnType_ = typeUtils.createTypeFromBlock(returnType);
-        console.log(this.returnType_);
+        const returnType = typeUtils.createTypeFromXml(childNode);
+        this.returnType_ = returnType;
       }
     }
     this.updateParams_();
@@ -349,7 +345,7 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   compose: function (containerBlock) {
-    
+
     console.log("compose", containerBlock);
     // Parameter list.
     this.arguments_ = [];
@@ -751,7 +747,7 @@ function validatorExternal(sourceBlock, varName) {
     //varType = sourceBlock.childBlocks_[0].type;
     console.log("sourceBlock type", sourceBlock.childBlocks_[0].type)
     varType = typeUtils.createPrimitiveType(sourceBlock.childBlocks_[0].type);
-    
+
   }
   console.log("varType", varType)
 

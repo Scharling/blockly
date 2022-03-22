@@ -191,7 +191,11 @@ function createFunctionType(input, output) {
 }
 exports.createFunctionType = createFunctionType;
 
-
+/**
+   * Create type object from a block.
+   * @param block Type block.
+   * @return Type object.
+   */
 const createTypeFromBlock = function (block) {
     switch (block.type) {
         case "type_int":
@@ -203,8 +207,6 @@ const createTypeFromBlock = function (block) {
         case "type_function":
             const inputBlock = block.inputList[0].connection.targetConnection?.sourceBlock_;
             const outputBlock = block.inputList[2].connection.targetConnection?.sourceBlock_;
-            console.log(inputBlock);
-            console.log(outputBlock);
             const input = inputBlock ? createTypeFromBlock(inputBlock) : null;
             const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
             return createFunctionType(input, output);
@@ -212,7 +214,11 @@ const createTypeFromBlock = function (block) {
 }
 exports.createTypeFromBlock = createTypeFromBlock;
 
-
+/**
+   * Create Block from a type object.
+   * @param type Type object.
+   * @return Type block.
+   */
 const createBlockFromType = function (type) {
     switch (type.block_name) {
         case "type_int":
@@ -231,21 +237,78 @@ const createBlockFromType = function (type) {
         // const input = inputBlock ? createTypeFromBlock(inputBlock) : null;
         // const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
         // return createFunctionType(input, output);
-        case "type_null":   
+        case "type_null":
             return null;
     }
 }
 exports.createBlockFromType = createBlockFromType;
 
+/**
+   * Create XML to represent type.
+   * @param type Type object.
+   * @param name Name for XML element.
+   * @return XML storage element.
+   */
 const createXmlFromType = function (type, name) {
+    let typeXml = xmlUtils.createElement(name);
+    typeXml.setAttribute('type', type.block_name);
+
     switch (type.block_name) {
-        case "type_int":
-        case "type_string":
-            const typeXml = xmlUtils.createElement(name);
-            typeXml.setAttribute('type', this.returnType_.block_name);
-            return typeXml;
         case "type_tuple":
+            for (c in type.children) {
+                const childXml = createXmlFromType(type.children[c], 'child');
+                typeXml.appendChild(childXml);
+            }
+            break;
         case "type_function":
+            const input = type.input ? createXmlFromType(type.input, 'input') : null;
+            const output = type.output ? createXmlFromType(type.output, 'output') : null;
+            if (input) typeXml.appendChild(input);
+            if (output) typeXml.appendChild(output);
+            break;
+        default:
+            break;
     }
+
+    return typeXml;
 }
 exports.createXmlFromType = createXmlFromType;
+
+/**
+   * Parse XML to restore type object.
+   * @param xmlElement XML storage element.
+   * @return Type object.
+   */
+const createTypeFromXml = function (xmlElement) {
+
+    const type = xmlElement.getAttribute('type')
+    switch (type) {
+        case "type_int":
+        case "type_string":
+            return createPrimitiveType(type);
+
+        case "type_tuple":
+            const children = [];
+            for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
+                if (childNode.nodeName.toLowerCase() === 'child') {
+                    const childType = createTypeFromXml(childNode);
+                    children.push(childType);
+                }
+            }
+            return createTupleType(children);
+
+        case "type_function":
+            let input = null;
+            let output = null;
+            for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
+                if (childNode.nodeName.toLowerCase() === 'input') {
+                    input = createTypeFromXml(childNode);
+                }
+                if (childNode.nodeName.toLowerCase() === 'output') {
+                    output = createTypeFromXml(childNode);
+                }
+            }
+            return createFunctionType(input, output);
+    }
+}
+exports.createTypeFromXml = createTypeFromXml;
