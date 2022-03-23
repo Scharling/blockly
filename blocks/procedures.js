@@ -893,6 +893,7 @@ const PROCEDURE_CALL_COMMON = {
     // And rebuild the argument model list.
     this.argumentVarModels_ = [];
     for (let i = 0; i < this.arguments_.length; i++) {
+      console.log("this.arguments_[i]", this.arguments_[i]);
       const variable = Variables.getOrCreateVariablePackage(
         this.workspace, null, this.arguments_[i], '');
       this.argumentVarModels_.push(variable);

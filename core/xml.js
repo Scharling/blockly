@@ -37,6 +37,7 @@ goog.requireType('Blockly.Variables');
 goog.requireType('Blockly.WorkspaceComment');
 goog.requireType('Blockly.WorkspaceCommentSvg');
 
+const typeUtils = goog.require('Blockly.extra.utils.types')
 
 /**
  * Encode a block tree as XML.
@@ -80,7 +81,11 @@ const variablesToDom = function(variableList) {
     const element = utilsXml.createElement('variable');
     element.appendChild(utilsXml.createTextNode(variable.name));
     if (variable.type) {
-      element.setAttribute('type', variable.type);
+
+      const typeBlock = typeUtils.createXmlFromType(variable.type, 'type');
+      console.log(typeBlock);
+      element.appendChild(typeBlock);
+      element.setAttribute('type', variable.type.getType());
     }
     element.id = variable.getId();
     variables.appendChild(element);
@@ -660,7 +665,9 @@ const domToVariables = function(xmlVariables, workspace) {
     if (xmlChild.nodeType !== dom.NodeType.ELEMENT_NODE) {
       continue;  // Skip text nodes.
     }
-    const type = xmlChild.getAttribute('type');
+    const type = typeUtils.createTypeFromXml(xmlChild.childNodes[1]);
+    
+    console.log("boing", xmlChild.childNodes, type);
     const id = xmlChild.getAttribute('id');
     const name = xmlChild.textContent;
 
