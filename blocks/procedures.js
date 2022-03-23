@@ -297,22 +297,19 @@ const PROCEDURE_DEF_COMMON = {
       const typeNode = xmlUtils.createElement('value');
       typeNode.setAttribute('name', 'TYPE');
 
-      const varType = '';
-      //console.log(this.arguments_[i])
-      //console.log(outerWs);
-      var wsVM = outerWs.getVariableMap();
-      var temp = wsVM.getVariableByName(this.arguments_[i]);
-      //console.log(temp);
-      const typeBlockNode = xmlUtils.createElement('block');
-      typeBlockNode.setAttribute('type', temp.type.block_name);
-      console.log("typeBlockNode", typeBlockNode, temp.type);
-      typeNode.appendChild(typeBlockNode);
-
-      argBlockNode.appendChild(typeNode);
+      console.log("getvariablemap in decompose", outerWs.getVariableMap());
+      var variable =  outerWs.getVariableMap().getVariableByName(this.arguments_[i]);
+      const typeBlockNode = typeUtils.createBlockFromType(variable.type);
+      console.log("typeBlockNode", typeBlockNode, variable.type);
+      if (typeBlockNode != null) {
+        typeNode.appendChild(typeBlockNode);
+        argBlockNode.appendChild(typeNode);
+      }
 
 
       //console.log(argBlockNode);
       node.appendChild(argBlockNode);
+      console.log("node", node);
       node = nextNode;
     }
 
@@ -330,9 +327,9 @@ const PROCEDURE_DEF_COMMON = {
       console.log(returnBlockNode);
       returnNode.appendChild(returnBlockNode);
     }
-    //console.log(containerBlockNode);
+    console.log("containerBlockNode", containerBlockNode);
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
-    //console.log(containerBlock);
+    console.log("containerBlock", containerBlock);
     if (this.type === 'procedures_defreturn') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
     } else {
@@ -366,8 +363,10 @@ const PROCEDURE_DEF_COMMON = {
       }
       var varType = typeUtils.createNullType();
       if (paramBlock.childBlocks_[0] && paramBlock.childBlocks_[0].type != null) {
-        //varType = paramBlock.childBlocks_[0].type;
-        varType = typeUtils.createPrimitiveType(paramBlock.childBlocks_[0].type);
+        const typedBlock = paramBlock.childBlocks_[0];
+        console.log("typedBlock", typedBlock, typeUtils.createTypeFromBlock(typedBlock))
+
+        varType = typeUtils.createTypeFromBlock(typedBlock);
       }
 
       const varName = paramBlock.getFieldValue('NAME');
@@ -749,8 +748,10 @@ function validatorExternal(sourceBlock, varName) {
   var varType = typeUtils.createNullType();
   if (sourceBlock.childBlocks_[0] && sourceBlock.childBlocks_[0].type != null) {
     //varType = sourceBlock.childBlocks_[0].type;
-    console.log("sourceBlock type", sourceBlock.childBlocks_[0].type)
-    varType = typeUtils.createPrimitiveType(sourceBlock.childBlocks_[0].type);
+    
+    console.log("sourceBlock", sourceBlock);
+    console.log("sourceBlock child", sourceBlock.childBlocks_[0]);
+    varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[0]);
     
   }
   console.log("varType", varType)

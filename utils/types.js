@@ -221,8 +221,23 @@ const createBlockFromType = function (type) {
             blockNode.setAttribute('type', type.block_name);
             return blockNode;
         case "type_tuple":
-        // const children = block.childBlocks_.map(b => createTypeFromBlock(b));
-        // return createTupleType(children);
+            const tupleBlockNode = xmlUtils.createElement('block');
+            tupleBlockNode.setAttribute('type', type.block_name);
+            
+            const mutationBlock = xmlUtils.createElement('mutation');
+            mutationBlock.setAttribute('items', type.children.length-2);
+            tupleBlockNode.appendChild(mutationBlock);
+            let i = 0;
+            type.children.forEach(element => {
+                const valueBlock = xmlUtils.createElement('value');
+                valueBlock.setAttribute('name', getTupleValueName(i));
+                var childBlock = createBlockFromType(element);
+                valueBlock.appendChild(childBlock);
+                tupleBlockNode.appendChild(valueBlock);
+                i++;
+                console.log("valueblock", valueBlock);
+            });
+            return tupleBlockNode;
         case "type_function":
         // const inputBlock = block.inputList[0].connection.targetConnection?.sourceBlock_;
         // const outputBlock = block.inputList[2].connection.targetConnection?.sourceBlock_;
@@ -236,6 +251,19 @@ const createBlockFromType = function (type) {
     }
 }
 exports.createBlockFromType = createBlockFromType;
+
+function getTupleValueName(i) {
+    switch (i){
+        case 0:
+            return "FST";
+        case 1:
+            return "SND";
+        default:
+            return "ADD" + (i-2);
+    }
+        
+}
+
 
 const createXmlFromType = function (type, name) {
     switch (type.block_name) {

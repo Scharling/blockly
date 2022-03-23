@@ -166,7 +166,7 @@ VariableMap.prototype.renameVariableWithConflict_ = function(
  * Create a variable with a given name, optional type, and optional ID.
  * @param {string} name The name of the variable. This must be unique across
  *     variables and procedures.
- * @param {?string=} opt_type The type of the variable like 'int' or 'string'.
+ * @param {?type=} opt_type The type of the variable like 'int' or 'string'.
  *     Does not need to be unique. Field_variable can filter variables based on
  *     their type. This will default to '' which is a specific type.
  * @param {?string=} opt_id The unique ID of the variable. This will default to
@@ -197,7 +197,7 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
   const id = opt_id || idGenerator.genUid();
   const type = opt_type || typeUtils.createNullType();
   variable = new VariableModel(this.workspace, name, type, id);
-
+  console.log(type);
   const variables = this.variableMap_[type.getType()] || [];
   variables.push(variable);
   // Delete the list of variables of this type, and re-add it so that
@@ -206,6 +206,7 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
   delete this.variableMap_[type.getType()];
   this.variableMap_[type.getType()] = variables;
   console.log("created variable", variable);
+  console.log("varMap", this.variableMap_);
   return variable;
 };
 
