@@ -108,7 +108,6 @@ const PROCEDURE_DEF_COMMON = {
   updateReturnType_: function () {
     let returnTypeString = '';
     if (!!this.returnType_) {
-      console.log(this.returnType_);
       returnTypeString = "returns: " + this.returnType_.getType();
     }
     // The return type field is deterministic based on the mutation,
@@ -153,7 +152,6 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       container.setAttribute('statements', 'false');
     }
-    console.log("CONTAINER", container);
     return container;
   },
   /**
@@ -174,7 +172,6 @@ const PROCEDURE_DEF_COMMON = {
         this.arguments_.push(varName);
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, varId, varName, '');
-        //console.log("domToMutation variable", variable);
         if (variable !== null) {
           this.argumentVarModels_.push(variable);
         } else {
@@ -217,15 +214,12 @@ const PROCEDURE_DEF_COMMON = {
         });
       }
     }
-    console.log(this.returnType_);
     if (!!this.returnType_) {
       state['returntype'] = this.returnType_;
-      console.log(state);
     }
     if (!this.hasStatements_) {
       state['hasStatements'] = false;
     }
-    console.log("saveExtraState", state);
     return state;
   },
   /**
@@ -234,7 +228,6 @@ const PROCEDURE_DEF_COMMON = {
    *     statements.
    */
   loadExtraState: function (state) {
-    console.log("loadExtraState", state);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
     if (state['params']) {
@@ -242,13 +235,11 @@ const PROCEDURE_DEF_COMMON = {
         const param = state['params'][i];
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, param['id'], param['name'], param['type']);
-        //console.log("pushing variable", variable);
         this.arguments_.push(variable.name);
         this.argumentVarModels_.push(variable);
       }
     }
     if (state['returntype']) {
-      console.log(state['returntype']);
       this.returnType_ = state['returntype'];
     }
     this.updateParams_();
@@ -277,8 +268,6 @@ const PROCEDURE_DEF_COMMON = {
      *   </input>
      * </block>
      */
-    console.log("decompose", workspace);
-
     const containerBlockNode = xmlUtils.createElement('block');
     containerBlockNode.setAttribute('type', 'procedures_mutatorcontainer');
     const statementNode = xmlUtils.createElement('statement');
@@ -302,19 +291,14 @@ const PROCEDURE_DEF_COMMON = {
       const typeNode = xmlUtils.createElement('value');
       typeNode.setAttribute('name', 'TYPE');
 
-      console.log("getvariablemap in decompose", outerWs.getVariableMap());
-      var variable =  outerWs.getVariableMap().getVariableByName(this.arguments_[i]);
+      var variable = outerWs.getVariableMap().getVariableByName(this.arguments_[i]);
       const typeBlockNode = typeUtils.createBlockFromType(variable.type);
-      console.log("typeBlockNode", typeBlockNode, variable.type);
+
       if (typeBlockNode != null) {
         typeNode.appendChild(typeBlockNode);
         argBlockNode.appendChild(typeNode);
       }
-
-
-      //console.log(argBlockNode);
       node.appendChild(argBlockNode);
-      console.log("node", node);
       node = nextNode;
     }
 
@@ -322,19 +306,13 @@ const PROCEDURE_DEF_COMMON = {
     const returnNode = xmlUtils.createElement('value');
     returnNode.setAttribute('name', 'RETURNTYPE');
     containerBlockNode.appendChild(returnNode);
-    console.log(this.returnType_);
     if (!!this.returnType_) {
       //const returnBlockNode = xmlUtils.createElement('block');
       //returnBlockNode.setAttribute('type', this.returnType_.block_name);
-      console.log("Set return type block");
-      console.log(this.returnType_);
       const returnBlockNode = typeUtils.createBlockFromType(this.returnType_);
-      console.log(returnBlockNode);
       returnNode.appendChild(returnBlockNode);
     }
-    console.log("containerBlockNode", containerBlockNode);
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
-    console.log("containerBlock", containerBlock);
     if (this.type === 'procedures_defreturn') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
     } else {
@@ -351,8 +329,6 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   compose: function (containerBlock) {
-
-    console.log("compose", containerBlock);
     // Parameter list.
     this.arguments_ = [];
     this.returnType_ = null;
@@ -374,14 +350,10 @@ const PROCEDURE_DEF_COMMON = {
           break;
         }
       }
-
       const varName = paramBlock.getFieldValue('NAME');
       this.arguments_.push(varName);
-      console.log("varType in compose:", varType)
       const variable = this.workspace.getVariable(varName, varType);
       this.argumentVarModels_.push(variable);
-      console.log("variable", variable);
-      console.log("argumentVarModels_ in compose: ", this.argumentVarModels_);
       this.paramIds_.push(paramBlock.id);
       paramBlock =
         paramBlock.nextConnection && paramBlock.nextConnection.targetBlock();
@@ -678,7 +650,6 @@ Blocks['procedures_mutatorarg'] = {
    * @this {Block}
    */
   init: function () {
-    //console.log("procedures_mutatorarg constructor");
     const field = new FieldTextInput(Procedures.DEFAULT_ARG, this.validator_);
     // Hack: override showEditor to do just a little bit more work.
     // We don't have a good place to hook into the start of a text edit.
@@ -722,7 +693,6 @@ Blocks['procedures_mutatorarg'] = {
    * @this {FieldTextInput}
    */
   validator_: function (varName) {
-    //console.log("validator_", varName);
     const sourceBlock = this.getSourceBlock();
     return validatorExternal(sourceBlock, varName);
   },
@@ -750,7 +720,6 @@ Blocks['procedures_mutatorarg'] = {
 };
 
 function validatorExternal(sourceBlock, varName) {
-  console.log("validatorExternal", sourceBlock, varName);
   var varType = typeUtils.createNullType();
 
   for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
@@ -765,6 +734,7 @@ function validatorExternal(sourceBlock, varName) {
 
   console.log("varType", varType)
 
+  
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);
   varName = varName.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
   if (!varName) {
@@ -906,7 +876,6 @@ const PROCEDURE_CALL_COMMON = {
     // And rebuild the argument model list.
     this.argumentVarModels_ = [];
     for (let i = 0; i < this.arguments_.length; i++) {
-      console.log("this.arguments_[i]", this.arguments_[i]);
       const variable = Variables.getOrCreateVariablePackage(
         this.workspace, null, this.arguments_[i], '');
       this.argumentVarModels_.push(variable);
