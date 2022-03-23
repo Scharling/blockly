@@ -440,7 +440,7 @@ const generateVariableFieldDom = function(variableModel) {
   const field = utilsXml.createElement('field');
   field.setAttribute('name', 'VAR');
   field.setAttribute('id', variableModel.getId());
-  field.setAttribute('variabletype', variableModel.type);
+  field.setAttribute('variabletype', variableModel.type.getType());
   const name = utilsXml.createTextNode(variableModel.name);
   field.appendChild(name);
   return field;

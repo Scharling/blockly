@@ -79,16 +79,25 @@ const PROCEDURE_DEF_COMMON = {
     // Merge the arguments into a human-readable list.
     let paramString = '';
     if (this.arguments_.length) {
-      paramString =
-        Msg['PROCEDURES_BEFORE_PARAMS'] + ' ' + this.arguments_.join(', ');
+      paramString = Msg['PROCEDURES_BEFORE_PARAMS'] + ' ';
+      for (var i = 0; i < this.arguments_.length; i++) {
+        let arg = this.arguments_[i];
+        let variable = this.workspace.getVariableMap().getVariableByName(arg);
+        if (variable.type.block_name != typeUtils.createNullType().block_name) {
+          paramString = paramString + arg + " : " + variable.type.getType() + ", ";
+        } else {
+          paramString = paramString + arg + ", ";
+        }
+        console.log("arg", variable);
+      }
     }
     // The params field is deterministic based on the mutation,
     // no need to fire a change event.
-    Events.disable();
+    //Events.disable();
     try {
       this.setFieldValue(paramString, 'PARAMS');
     } finally {
-      Events.enable();
+      //Events.enable();
     }
   },
   /**
@@ -350,7 +359,6 @@ const PROCEDURE_DEF_COMMON = {
     this.paramIds_ = [];
     this.argumentVarModels_ = [];
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
-    let first = paramBlock;
     while (paramBlock && !paramBlock.isInsertionMarker()) {
       try {
         validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'));
@@ -358,11 +366,13 @@ const PROCEDURE_DEF_COMMON = {
         console.log(error);
       }
       var varType = typeUtils.createNullType();
-      if (paramBlock.childBlocks_[0] && paramBlock.childBlocks_[0].type != null) {
-        const typedBlock = paramBlock.childBlocks_[0];
-        console.log("typedBlock", typedBlock, typeUtils.createTypeFromBlock(typedBlock))
-
-        varType = typeUtils.createTypeFromBlock(typedBlock);
+      for (var i = 0; i < paramBlock.childBlocks_.length; i++) {
+        if (paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && paramBlock.childBlocks_[i].type.startsWith("type_")) {
+          const typedBlock = paramBlock.childBlocks_[i];
+  
+          varType = typeUtils.createTypeFromBlock(typedBlock);
+          break;
+        }
       }
 
       const varName = paramBlock.getFieldValue('NAME');
@@ -742,14 +752,17 @@ Blocks['procedures_mutatorarg'] = {
 function validatorExternal(sourceBlock, varName) {
   console.log("validatorExternal", sourceBlock, varName);
   var varType = typeUtils.createNullType();
-  if (sourceBlock.childBlocks_[0] && sourceBlock.childBlocks_[0].type != null) {
-    //varType = sourceBlock.childBlocks_[0].type;
-    
-    console.log("sourceBlock", sourceBlock);
-    console.log("sourceBlock child", sourceBlock.childBlocks_[0]);
-    varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[0]);
-    
+
+  for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
+    console.log("childBlock", sourceBlock.childBlocks_[i])
+    if (sourceBlock.childBlocks_[i] && sourceBlock.childBlocks_[i].type != null && sourceBlock.childBlocks_[i].type.startsWith("type_")) {
+      console.log("sourceBlock", sourceBlock);
+      console.log("sourceBlock child", sourceBlock.childBlocks_[i]);
+      varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[i]);
+      break;
+    }
   }
+
   console.log("varType", varType)
 
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);

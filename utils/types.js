@@ -68,7 +68,7 @@ const createTupleType = function (children) {
             for (var i = 0; i < this.children.length; i++) {
                 s = s + this.children[i].getType() + ", "
             }
-            s = s.slice(0, -2)
+            if (this.children.length > 0) s = s.slice(0, -2)
             s = s + this.text_name_end
             return s
         }

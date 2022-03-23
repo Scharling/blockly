@@ -33,6 +33,7 @@ const {Size} = goog.require('Blockly.utils.Size');
 const {VariableModel} = goog.require('Blockly.VariableModel');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.BlockChange');
+const typeUtils = goog.require('Blockly.extra.utils.types')
 
 
 /**
@@ -165,13 +166,11 @@ FieldVariable.prototype.fromXml = function(fieldElement) {
   // 'variabletype' should be lowercase, but until July 2019 it was sometimes
   // recorded as 'variableType'.  Thus we need to check for both.
   const variableType = fieldElement.getAttribute('variabletype') ||
-      fieldElement.getAttribute('variableType') || '';
-
+      fieldElement.getAttribute('variableType') || typeUtils.createNullType();
   const variable = Variables.getOrCreateVariablePackage(
       this.sourceBlock_.workspace, id, variableName, variableType);
-
   // This should never happen :)
-  if (variableType !== null && variableType !== variable.type) {
+  if (variableType !== null && variableType.getType() !== variable.type.getType()) {
     throw Error(
         'Serialized variable type with id \'' + variable.getId() +
         '\' had type ' + variable.type + ', and ' +
@@ -318,8 +317,8 @@ FieldVariable.prototype.doClassValidation_ = function(opt_newValue) {
   }
   // Type Checks.
   const type = variable.type;
-  if (!this.typeIsAllowed_(type)) {
-    console.warn('Variable type doesn\'t match this field!  Type was ' + type);
+  if (!this.typeIsAllowed_(type.getType())) {
+    console.warn('Variable type doesn\'t match this field!  Type was ' + type.getType());
     return null;
   }
   return newId;
@@ -451,7 +450,11 @@ FieldVariable.dropdownCreate = function() {
   const name = this.getText();
   let variableModelList = [];
   if (this.sourceBlock_ && this.sourceBlock_.workspace) {
+
+    variableModelList = this.sourceBlock_.workspace.getVariableMap().getAllVariables();
+    /*
     const variableTypes = this.getVariableTypes_();
+    console.log("variableTypes", variableTypes);
     // Get a copy of the list, so that adding rename and new variable options
     // doesn't modify the workspace's list.
     for (let i = 0; i < variableTypes.length; i++) {
@@ -459,7 +462,7 @@ FieldVariable.dropdownCreate = function() {
       const variables =
           this.sourceBlock_.workspace.getVariablesOfType(variableType);
       variableModelList = variableModelList.concat(variables);
-    }
+    }*/
   }
   variableModelList.sort(VariableModel.compareByName);
 

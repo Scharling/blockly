@@ -324,6 +324,29 @@ VariableMap.prototype.getVariable = function(name, opt_type) {
 };
 
 /**
+ * Find the variable by the given name and type and return it.  Return null if
+ *     it is not found.
+ * @param {string} name The name to check for.
+ * @param {string} type_name The name of the type of the variable.
+ * @return {?VariableModel} The variable with the given name, or null if
+ *     it was not found.
+ */
+ VariableMap.prototype.getVariableByTypeName = function(name, type_name) {
+  console.log("get_variableByTypeName", name, type_name);
+  const list = this.variableMap_[type_name];
+  console.log("list", list);
+  console.log("this.variableMap_", this.variableMap_);
+  if (list) {
+    for (let j = 0, variable; (variable = list[j]); j++) {
+      if (Names.equals(variable.name, name)) {
+        return variable;
+      }
+    }
+  }
+  return null;
+};
+
+/**
  * Find the variable by the given ID and return it.  Return null if not found.
  * @param {string} id The ID to check for.
  * @return {?VariableModel} The variable with the given ID.
@@ -368,7 +391,7 @@ VariableMap.prototype.getVariableById = function(id) {
  *     passed in type. An empty array if none are found.
  */
 VariableMap.prototype.getVariablesOfType = function(type) {
-  type = type || '';
+  type = type || typeUtils.createNullType();
   const variableList = this.variableMap_[type.getType()];
   if (variableList) {
     return variableList.slice();
