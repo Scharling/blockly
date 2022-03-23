@@ -1,23 +1,11 @@
 goog.module('Blockly.extra.utils.types');
 const xmlUtils = goog.require('Blockly.utils.xml');
 
-// const intType = {
-//     block_name: "type_int",
-//     text_name: "int",
-//     children: [],
-//     getType: function () {
-//         return this.text_name;
-//     }
-// }
-
-// const stringType = {
-//     block_name: "type_string",
-//     text_name: "string",
-//     children: [],
-//     getType: function () {
-//         return this.text_name;
-//     }
-// }
+/**
+   * Create type object for a primitive type.
+   * @param blockName The name of the block, indicating its type.
+   * @return Type object.
+   */
 const createPrimitiveType = function (blockName) {
     let textName = "";
     switch (blockName) {
@@ -48,7 +36,10 @@ const createPrimitiveType = function (blockName) {
 }
 exports.createPrimitiveType = createPrimitiveType;
 
-
+/**
+   * Create type object for a null type.
+   * @return Type object.
+   */
 const createNullType = function () {
     return {
         block_name: "type_null",
@@ -61,21 +52,11 @@ const createNullType = function () {
 }
 exports.createNullType = createNullType;
 
-// const tupleType = {
-//     block_name: "type_tuple",
-//     text_name_start: "tuple(",
-//     text_name_end: ")",
-//     children: [intType, intType, stringType],
-//     getType: function () {
-//         var s = this.text_name_start;
-//         for (var i = 0; i < this.children.length; i++) {
-//             s = s + this.children[i].getType() + ", "
-//         }
-//         s = s.slice(0, -2)
-//         s = s + this.text_name_end
-//         return s
-//     }
-// }
+/**
+   * Create type object for a tuple type.
+   * @param children The items of the tuple.
+   * @return Type object.
+   */
 const createTupleType = function (children) {
     return {
         block_name: "type_tuple",
@@ -95,72 +76,12 @@ const createTupleType = function (children) {
 }
 exports.createTupleType = createTupleType;
 
-// const functionType = {
-//     block_name: "type_function",
-//     text_name_start: "",
-//     text_name_middle: "->",
-//     text_name_end: "",
-//     input: intType,
-//     output: stringType,
-//     getType: function () {
-//         var s = this.text_name_start;
-//         if (this.input.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.input.getType();
-//         if (this.input.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_middle;
-
-//         if (this.output.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.output.getType();
-//         if (this.output.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_end;
-
-//         return s
-//     }
-// }
-
-// const function2Type = {
-//     block_name: "type_function",
-//     text_name_start: "",
-//     text_name_middle: "->",
-//     text_name_end: "",
-//     input: functionType,
-//     output: functionType,
-//     getType: function () {
-//         var s = this.text_name_start;
-//         if (this.input.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.input.getType();
-//         if (this.input.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_middle;
-
-//         if (this.output.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.output.getType();
-//         if (this.output.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_end;
-
-//         return s
-//     }
-// }
-
+/**
+   * Create type object for a function type.
+   * @param input Type object for the input of the function.
+   * @param output Type object for the output of the function.
+   * @return Type object.
+   */
 const createFunctionType = function (input, output) {
     return {
         block_name: "type_function",
@@ -245,10 +166,7 @@ const createBlockFromType = function (type) {
             tupleBlockNode.appendChild(mutationBlock);
             let i = 0;
             type.children.forEach(element => {
-                const valueBlock = xmlUtils.createElement('value');
-                valueBlock.setAttribute('name', getTupleValueName(i));
-                var childBlock = createBlockFromType(element);
-                valueBlock.appendChild(childBlock);
+                const valueBlock = createValueBlock(getTupleValueName(i), element);
                 tupleBlockNode.appendChild(valueBlock);
                 i++;
                 console.log("valueblock", valueBlock);
@@ -301,7 +219,6 @@ const createValueBlock = function (name, childType) {
     valueBlock.appendChild(childBlock);
     return valueBlock;
 }
-
 
 /**
    * Create XML to represent type.
