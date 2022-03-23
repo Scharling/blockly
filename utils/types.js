@@ -1,23 +1,11 @@
 goog.module('Blockly.extra.utils.types');
 const xmlUtils = goog.require('Blockly.utils.xml');
 
-// const intType = {
-//     block_name: "type_int",
-//     text_name: "int",
-//     children: [],
-//     getType: function () {
-//         return this.text_name;
-//     }
-// }
-
-// const stringType = {
-//     block_name: "type_string",
-//     text_name: "string",
-//     children: [],
-//     getType: function () {
-//         return this.text_name;
-//     }
-// }
+/**
+   * Create type object for a primitive type.
+   * @param blockName The name of the block, indicating its type.
+   * @return Type object.
+   */
 const createPrimitiveType = function (blockName) {
     let textName = "";
     switch (blockName) {
@@ -48,7 +36,10 @@ const createPrimitiveType = function (blockName) {
 }
 exports.createPrimitiveType = createPrimitiveType;
 
-
+/**
+   * Create type object for a null type.
+   * @return Type object.
+   */
 const createNullType = function () {
     return {
         block_name: "type_null",
@@ -61,22 +52,12 @@ const createNullType = function () {
 }
 exports.createNullType = createNullType;
 
-// const tupleType = {
-//     block_name: "type_tuple",
-//     text_name_start: "tuple(",
-//     text_name_end: ")",
-//     children: [intType, intType, stringType],
-//     getType: function () {
-//         var s = this.text_name_start;
-//         for (var i = 0; i < this.children.length; i++) {
-//             s = s + this.children[i].getType() + ", "
-//         }
-//         s = s.slice(0, -2)
-//         s = s + this.text_name_end
-//         return s
-//     }
-// }
-function createTupleType(children) {
+/**
+   * Create type object for a tuple type.
+   * @param children The items of the tuple.
+   * @return Type object.
+   */
+const createTupleType = function (children) {
     return {
         block_name: "type_tuple",
         text_name_start: "tuple(",
@@ -95,73 +76,13 @@ function createTupleType(children) {
 }
 exports.createTupleType = createTupleType;
 
-// const functionType = {
-//     block_name: "type_function",
-//     text_name_start: "",
-//     text_name_middle: "->",
-//     text_name_end: "",
-//     input: intType,
-//     output: stringType,
-//     getType: function () {
-//         var s = this.text_name_start;
-//         if (this.input.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.input.getType();
-//         if (this.input.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_middle;
-
-//         if (this.output.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.output.getType();
-//         if (this.output.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_end;
-
-//         return s
-//     }
-// }
-
-// const function2Type = {
-//     block_name: "type_function",
-//     text_name_start: "",
-//     text_name_middle: "->",
-//     text_name_end: "",
-//     input: functionType,
-//     output: functionType,
-//     getType: function () {
-//         var s = this.text_name_start;
-//         if (this.input.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.input.getType();
-//         if (this.input.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_middle;
-
-//         if (this.output.block_name === "type_function") {
-//             s = s + "(";
-//         }
-//         s = s + this.output.getType();
-//         if (this.output.block_name === "type_function") {
-//             s = s + ")";
-//         }
-
-//         s = s + this.text_name_end;
-
-//         return s
-//     }
-// }
-
-function createFunctionType(input, output) {
+/**
+   * Create type object for a function type.
+   * @param input Type object for the input of the function.
+   * @param output Type object for the output of the function.
+   * @return Type object.
+   */
+const createFunctionType = function (input, output) {
     return {
         block_name: "type_function",
         text_name_start: "",
@@ -239,47 +160,65 @@ const createBlockFromType = function (type) {
         case "type_tuple":
             const tupleBlockNode = xmlUtils.createElement('block');
             tupleBlockNode.setAttribute('type', type.block_name);
-            
+
             const mutationBlock = xmlUtils.createElement('mutation');
-            mutationBlock.setAttribute('items', type.children.length-2);
+            mutationBlock.setAttribute('items', type.children.length - 2);
             tupleBlockNode.appendChild(mutationBlock);
             let i = 0;
             type.children.forEach(element => {
-                const valueBlock = xmlUtils.createElement('value');
-                valueBlock.setAttribute('name', getTupleValueName(i));
-                var childBlock = createBlockFromType(element);
-                valueBlock.appendChild(childBlock);
+                const valueBlock = createValueBlock(getTupleValueName(i), element);
                 tupleBlockNode.appendChild(valueBlock);
                 i++;
                 console.log("valueblock", valueBlock);
             });
             return tupleBlockNode;
         case "type_function":
-        // const inputBlock = block.inputList[0].connection.targetConnection?.sourceBlock_;
-        // const outputBlock = block.inputList[2].connection.targetConnection?.sourceBlock_;
-        // console.log(inputBlock);
-        // console.log(outputBlock);
-        // const input = inputBlock ? createTypeFromBlock(inputBlock) : null;
-        // const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
-        // return createFunctionType(input, output);
+            const functionBlockNode = xmlUtils.createElement('block');
+            functionBlockNode.setAttribute('type', type.block_name);
+            if (type.input) {
+                const inputValueBlock = createValueBlock("INPUT", type.input);
+                functionBlockNode.appendChild(inputValueBlock);
+            }
+            if (type.output) {
+                const outputValueBlock = createValueBlock("OUTPUT", type.output);
+                functionBlockNode.appendChild(outputValueBlock);
+            }
+            return functionBlockNode;
         case "type_null":
             return null;
     }
 }
 exports.createBlockFromType = createBlockFromType;
 
-function getTupleValueName(i) {
-    switch (i){
+/**
+   * Helper function for getting name for a tuple element based on index.
+   * @param i Index for tuple element.
+   * @return Name of tuple element.
+   */
+const getTupleValueName = function (i) {
+    switch (i) {
         case 0:
             return "FST";
         case 1:
             return "SND";
         default:
-            return "ADD" + (i-2);
+            return "ADD" + (i - 2);
     }
-        
 }
 
+/**
+   * Helper function for creating a value block with child block.
+   * @param name Name of the value block.
+   * @param childType The type object for the child element.
+   * @return Return value block with appended child.
+   */
+const createValueBlock = function (name, childType) {
+    const valueBlock = xmlUtils.createElement('value');
+    valueBlock.setAttribute('name', name);
+    const childBlock = createBlockFromType(childType);
+    valueBlock.appendChild(childBlock);
+    return valueBlock;
+}
 
 /**
    * Create XML to represent type.
