@@ -169,7 +169,6 @@ const createBlockFromType = function (type) {
                 const valueBlock = createValueBlock(getTupleValueName(i), element);
                 tupleBlockNode.appendChild(valueBlock);
                 i++;
-                console.log("valueblock", valueBlock);
             });
             return tupleBlockNode;
         case "type_function":
