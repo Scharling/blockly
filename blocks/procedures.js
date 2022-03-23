@@ -135,10 +135,8 @@ const PROCEDURE_DEF_COMMON = {
       container.appendChild(parameter);
     }
 
-    //XML
     if (!!this.returnType_) {
-      const returnType = xmlUtils.createElement('returntype');
-      returnType.setAttribute('type', this.returnType_.block_name);
+      const returnType = typeUtils.createXmlFromType(this.returnType_, 'returntype');
       container.appendChild(returnType);
     }
 
@@ -176,10 +174,8 @@ const PROCEDURE_DEF_COMMON = {
             ', ignoring.');
         }
       } else if (childNode.nodeName.toLowerCase() === 'returntype') {
-        //XML
-        const returnType = childNode.getAttribute('type');
-        this.returnType_ = typeUtils.createTypeFromBlock(returnType);
-        console.log(this.returnType_);
+        const returnType = typeUtils.createTypeFromXml(childNode);
+        this.returnType_ = returnType;
       }
     }
     this.updateParams_();
@@ -346,7 +342,7 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   compose: function (containerBlock) {
-    
+
     console.log("compose", containerBlock);
     // Parameter list.
     this.arguments_ = [];
@@ -568,7 +564,7 @@ Blocks['procedures_defnoreturn'] = {
       .appendField(Msg['PROCEDURES_DEFNORETURN_TITLE'])
       .appendField(nameField, 'NAME')
       .appendField('', 'PARAMS');
-    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_string', 'type_tuple', 'type_function']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_float', 'type_string', 'type_bool', 'type_tuple', 'type_function']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
@@ -615,7 +611,7 @@ Blocks['procedures_defreturn'] = {
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
-    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_string', 'type_tuple', 'type_function']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_float', 'type_string', 'type_bool', 'type_tuple', 'type_function']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
