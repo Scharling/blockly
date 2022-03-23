@@ -76,7 +76,7 @@ exports.createNullType = createNullType;
 //         return s
 //     }
 // }
-function createTupleType(children) {
+const createTupleType = function (children) {
     return {
         block_name: "type_tuple",
         text_name_start: "tuple(",
@@ -161,7 +161,7 @@ exports.createTupleType = createTupleType;
 //     }
 // }
 
-function createFunctionType(input, output) {
+const createFunctionType = function (input, output) {
     return {
         block_name: "type_function",
         text_name_start: "",
@@ -239,9 +239,9 @@ const createBlockFromType = function (type) {
         case "type_tuple":
             const tupleBlockNode = xmlUtils.createElement('block');
             tupleBlockNode.setAttribute('type', type.block_name);
-            
+
             const mutationBlock = xmlUtils.createElement('mutation');
-            mutationBlock.setAttribute('items', type.children.length-2);
+            mutationBlock.setAttribute('items', type.children.length - 2);
             tupleBlockNode.appendChild(mutationBlock);
             let i = 0;
             type.children.forEach(element => {
@@ -255,29 +255,51 @@ const createBlockFromType = function (type) {
             });
             return tupleBlockNode;
         case "type_function":
-        // const inputBlock = block.inputList[0].connection.targetConnection?.sourceBlock_;
-        // const outputBlock = block.inputList[2].connection.targetConnection?.sourceBlock_;
-        // console.log(inputBlock);
-        // console.log(outputBlock);
-        // const input = inputBlock ? createTypeFromBlock(inputBlock) : null;
-        // const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
-        // return createFunctionType(input, output);
+            const functionBlockNode = xmlUtils.createElement('block');
+            functionBlockNode.setAttribute('type', type.block_name);
+            if (type.input) {
+                const inputValueBlock = createValueBlock("INPUT", type.input);
+                functionBlockNode.appendChild(inputValueBlock);
+            }
+            if (type.output) {
+                const outputValueBlock = createValueBlock("OUTPUT", type.output);
+                functionBlockNode.appendChild(outputValueBlock);
+            }
+            return functionBlockNode;
         case "type_null":
             return null;
     }
 }
 exports.createBlockFromType = createBlockFromType;
 
-function getTupleValueName(i) {
-    switch (i){
+/**
+   * Helper function for getting name for a tuple element based on index.
+   * @param i Index for tuple element.
+   * @return Name of tuple element.
+   */
+const getTupleValueName = function (i) {
+    switch (i) {
         case 0:
             return "FST";
         case 1:
             return "SND";
         default:
-            return "ADD" + (i-2);
+            return "ADD" + (i - 2);
     }
-        
+}
+
+/**
+   * Helper function for creating a value block with child block.
+   * @param name Name of the value block.
+   * @param childType The type object for the child element.
+   * @return Return value block with appended child.
+   */
+const createValueBlock = function (name, childType) {
+    const valueBlock = xmlUtils.createElement('value');
+    valueBlock.setAttribute('name', name);
+    const childBlock = createBlockFromType(childType);
+    valueBlock.appendChild(childBlock);
+    return valueBlock;
 }
 
 
