@@ -334,7 +334,7 @@ const PROCEDURE_DEF_COMMON = {
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
     while (paramBlock && !paramBlock.isInsertionMarker()) {
       try {
-        validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'), null);
+        validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'), this);
       } catch (error) {
         console.log(error);
       }
@@ -877,11 +877,13 @@ const PROCEDURE_CALL_COMMON = {
     // Rebuild the block's arguments.
     this.arguments_ = [].concat(paramNames);
     // And rebuild the argument model list.
-    this.argumentVarModels_ = [];
-    for (let i = 0; i < this.arguments_.length; i++) {
-      const variable = Variables.getOrCreateVariablePackage(
-        this.workspace, null, this.arguments_[i], '');
-      this.argumentVarModels_.push(variable);
+    if (this.type !== "args_callreturn") {
+      this.argumentVarModels_ = [];
+      for (let i = 0; i < this.arguments_.length; i++) {
+        const variable = Variables.getOrCreateVariablePackage(
+          this.workspace, null, this.arguments_[i], '');
+        this.argumentVarModels_.push(variable);
+      }
     }
 
     this.updateShape_();
