@@ -266,36 +266,46 @@ const flyoutCategory = function (workspace) {
       //     <arg name="x"></arg>
       //   </mutation>
       // </block>
-      const block = utilsXml.createElement('block');
-      block.setAttribute('type', templateName);
-      block.setAttribute('gap', 16);
-      const mutation = utilsXml.createElement('mutation');
-      mutation.setAttribute('name', name);
+      const block = createCallBlock(templateName);
+      const mutation = createCallMutation(name);
       block.appendChild(mutation);
       for (let j = 0; j < args.length; j++) {
-        const arg = utilsXml.createElement('arg');
-        arg.setAttribute('name', args[j]);
+        const arg = createCallArg(args[j].name);
         mutation.appendChild(arg);
-
-        if (args[j].startsWith("f")) {
-          console.log("jeg er en func");
-          const argNum = parseInt(args[j].charAt(1));
-          const blockFisk = utilsXml.createElement('block');
-          blockFisk.setAttribute('type', "args_callreturn");
-          blockFisk.setAttribute('gap', 16);
-          const mutationFisk = utilsXml.createElement('mutation');
-          mutationFisk.setAttribute('name', args[j]);
-          blockFisk.appendChild(mutationFisk);
+        const type = args[j].type;
+        if (type.block_name === "type_function") {
+          const argNum = type.inputs.length;
+          const subBlock = createCallBlock("args_callreturn");
+          const subMutation = createCallMutation(args[j].name);
+          subBlock.appendChild(subMutation);
           for (let k = 0; k < argNum; k++) {
-            const argFisk = utilsXml.createElement('arg');
-            argFisk.setAttribute('name', ("a" + k));
-            mutationFisk.appendChild(argFisk);
+            const subArg = createCallArg(("a" + k + " (" + type.inputs[k].getType() + ")"));
+            subMutation.appendChild(subArg);
           }
-          xmlList.push(blockFisk);
+          xmlList.push(subBlock);
         }
       }
       xmlList.push(block);
     }
+  }
+
+  function createCallBlock(templateName) {
+    const block = utilsXml.createElement('block');
+    block.setAttribute('type', templateName);
+    block.setAttribute('gap', 16);
+    return block;
+  }
+
+  function createCallMutation(name) {
+    const mutation = utilsXml.createElement('mutation');
+    mutation.setAttribute('name', name);
+    return mutation;
+  }
+
+  function createCallArg(name) {
+    const arg = utilsXml.createElement('arg');
+    arg.setAttribute('name', name);
+    return arg;
   }
 
   const tuple = allProcedures(workspace);

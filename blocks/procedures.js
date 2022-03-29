@@ -88,7 +88,6 @@ const PROCEDURE_DEF_COMMON = {
         } else {
           paramString = paramString + arg + ", ";
         }
-        console.log("arg", variable);
       }
     }
     // The params field is deterministic based on the mutation,
@@ -307,8 +306,6 @@ const PROCEDURE_DEF_COMMON = {
     returnNode.setAttribute('name', 'RETURNTYPE');
     containerBlockNode.appendChild(returnNode);
     if (!!this.returnType_) {
-      //const returnBlockNode = xmlUtils.createElement('block');
-      //returnBlockNode.setAttribute('type', this.returnType_.block_name);
       const returnBlockNode = typeUtils.createBlockFromType(this.returnType_);
       returnNode.appendChild(returnBlockNode);
     }
@@ -345,7 +342,7 @@ const PROCEDURE_DEF_COMMON = {
       for (var i = 0; i < paramBlock.childBlocks_.length; i++) {
         if (paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && paramBlock.childBlocks_[i].type.startsWith("type_")) {
           const typedBlock = paramBlock.childBlocks_[i];
-  
+
           varType = typeUtils.createTypeFromBlock(typedBlock);
           break;
         }
@@ -571,6 +568,12 @@ Blocks['procedures_defnoreturn'] = {
    * @this {Block}
    */
   getProcedureDef: function () {
+    const args = [];
+
+    this.arguments_.forEach(argName => {
+      const variable = this.workspace.getVariableMap().getVariableByName(argName);
+      args.push(variable);
+    });
     return [this.getFieldValue('NAME'), this.arguments_, false];
   },
 };
@@ -618,7 +621,12 @@ Blocks['procedures_defreturn'] = {
    * @this {Block}
    */
   getProcedureDef: function () {
-    return [this.getFieldValue('NAME'), this.arguments_, true];
+    const args = [];
+    this.arguments_.forEach(argName => {
+      const variable = this.workspace.getVariableMap().getVariableByName(argName);
+      args.push(variable);
+    });
+    return [this.getFieldValue('NAME'), args, true];
   },
 };
 
@@ -723,18 +731,13 @@ function validatorExternal(sourceBlock, varName) {
   var varType = typeUtils.createNullType();
 
   for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
-    console.log("childBlock", sourceBlock.childBlocks_[i])
     if (sourceBlock.childBlocks_[i] && sourceBlock.childBlocks_[i].type != null && sourceBlock.childBlocks_[i].type.startsWith("type_")) {
-      console.log("sourceBlock", sourceBlock);
-      console.log("sourceBlock child", sourceBlock.childBlocks_[i]);
+
       varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[i]);
       break;
     }
   }
 
-  console.log("varType", varType)
-
-  
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);
   varName = varName.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
   if (!varName) {
