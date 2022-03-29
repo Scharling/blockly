@@ -337,7 +337,7 @@ const PROCEDURE_DEF_COMMON = {
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
     while (paramBlock && !paramBlock.isInsertionMarker()) {
       try {
-        validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'));
+        validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'), null);
       } catch (error) {
         console.log(error);
       }
@@ -694,7 +694,7 @@ Blocks['procedures_mutatorarg'] = {
    */
   validator_: function (varName) {
     const sourceBlock = this.getSourceBlock();
-    return validatorExternal(sourceBlock, varName);
+    return validatorExternal(sourceBlock, varName, this);
   },
 
   /**
@@ -719,9 +719,9 @@ Blocks['procedures_mutatorarg'] = {
   },
 };
 
-function validatorExternal(sourceBlock, varName) {
+function validatorExternal(sourceBlock, varName, thisBlock) {
   var varType = typeUtils.createNullType();
-
+  
   for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
     console.log("childBlock", sourceBlock.childBlocks_[i])
     if (sourceBlock.childBlocks_[i] && sourceBlock.childBlocks_[i].type != null && sourceBlock.childBlocks_[i].type.startsWith("type_")) {
@@ -731,8 +731,6 @@ function validatorExternal(sourceBlock, varName) {
       break;
     }
   }
-
-  console.log("varType", varType)
 
   
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);
@@ -770,8 +768,8 @@ function validatorExternal(sourceBlock, varName) {
   }
   if (!model) {
     model = outerWs.createVariable(varName, varType);
-    if (model && this.createdVariables_) {
-      this.createdVariables_.push(model);
+    if (model && thisBlock.createdVariables_) {
+      thisBlock.createdVariables_.push(model);
     }
   }
   return varName;
