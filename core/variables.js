@@ -149,7 +149,8 @@ exports.flyoutCategory = flyoutCategory;
  * @alias Blockly.Variables.flyoutCategoryBlocks
  */
 const flyoutCategoryBlocks = function(workspace) {
-  const variableModelList = workspace.getVariablesOfType('');
+  //const variableModelList = workspace.getVariablesOfType('');
+  const variableModelList = workspace.getAllVariables();
 
   const xmlList = [];
   if (variableModelList.length > 0) {

@@ -169,11 +169,13 @@ FieldVariable.prototype.fromXml = function(fieldElement) {
       fieldElement.getAttribute('variableType') || typeUtils.createNullType();
   const variable = Variables.getOrCreateVariablePackage(
       this.sourceBlock_.workspace, id, variableName, variableType);
+  const variableTypeType = (variableType.getType != null) ? variableType.getType() : variableType;
+  console.log("variableTypeType", variableTypeType)
   // This should never happen :)
-  if (variableType !== null && variableType.getType() !== variable.type.getType()) {
+  if (variableType !== null && variableTypeType !== variable.type.getType()) {
     throw Error(
         'Serialized variable type with id \'' + variable.getId() +
-        '\' had type ' + variable.type + ', and ' +
+        '\' had type ' + variable.getType() + ', and ' +
         'does not match variable field that references it: ' +
         Xml.domToText(fieldElement) + '.');
   }
