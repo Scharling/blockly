@@ -5,18 +5,18 @@
  */
 
 /**
- * @fileoverview Generating Python for math blocks.
+ * @fileoverview Generating FSharp for math blocks.
  */
 'use strict';
 
-goog.module('Blockly.Python.math');
+goog.module('Blockly.FSharp.math');
 
-const Python = goog.require('Blockly.Python');
+const FSharp = goog.require('Blockly.FSharp');
 const {NameType} = goog.require('Blockly.Names');
 
 
 // If any new block imports any library, add that library name here.
-Python.addReservedWords('math,random,Number');
+FSharp.addReservedWords('math,random,Number');
 
 Python['math_number'] = function(block) {
   // Numeric value.
@@ -34,20 +34,20 @@ Python['math_number'] = function(block) {
   return [code, order];
 };
 
-Python['math_arithmetic'] = function(block) {
+FSharp['math_arithmetic'] = function(block) {
   // Basic arithmetic operators, and power.
   const OPERATORS = {
-    'ADD': [' + ', Python.ORDER_ADDITIVE],
-    'MINUS': [' - ', Python.ORDER_ADDITIVE],
-    'MULTIPLY': [' * ', Python.ORDER_MULTIPLICATIVE],
-    'DIVIDE': [' / ', Python.ORDER_MULTIPLICATIVE],
-    'POWER': [' ** ', Python.ORDER_EXPONENTIATION]
+    'ADD': [' + ', FSharp.ORDER_ADDITIVE],
+    'MINUS': [' - ', FSharp.ORDER_ADDITIVE],
+    'MULTIPLY': [' * ', FSharp.ORDER_MULTIPLICATIVE],
+    'DIVIDE': [' / ', FSharp.ORDER_MULTIPLICATIVE],
+    'POWER': [' ** ', FSharp.ORDER_EXPONENTIATION]
   };
   const tuple = OPERATORS[block.getFieldValue('OP')];
   const operator = tuple[0];
   const order = tuple[1];
-  const argument0 = Python.valueToCode(block, 'A', order) || '0';
-  const argument1 = Python.valueToCode(block, 'B', order) || '0';
+  const argument0 = FSharp.valueToCode(block, 'A', order) || '0';
+  const argument1 = FSharp.valueToCode(block, 'B', order) || '0';
   const code = argument0 + operator + argument1;
   return [code, order];
   // In case of 'DIVIDE', division between integers returns different results
@@ -57,21 +57,21 @@ Python['math_arithmetic'] = function(block) {
   // legibility of the generated code.
 };
 
-Python['math_single'] = function(block) {
+FSharp['math_single'] = function(block) {
   // Math operators with single operand.
   const operator = block.getFieldValue('OP');
   let code;
   let arg;
   if (operator === 'NEG') {
     // Negation is a special case given its different operator precedence.
-    code = Python.valueToCode(block, 'NUM', Python.ORDER_UNARY_SIGN) || '0';
-    return ['-' + code, Python.ORDER_UNARY_SIGN];
+    code = FSharp.valueToCode(block, 'NUM', FSharp.ORDER_PREFIX_OPERATORS) || '0';
+    return ['-' + code, FSharp.ORDER_PREFIX_OPERATORS];
   }
-  Python.definitions_['import_math'] = 'import math';
+  FSharp.definitions_['import_math'] = 'import math';
   if (operator === 'SIN' || operator === 'COS' || operator === 'TAN') {
-    arg = Python.valueToCode(block, 'NUM', Python.ORDER_MULTIPLICATIVE) || '0';
+    arg = FSharp.valueToCode(block, 'NUM', FSharp.ORDER_MULTIPLICATIVE) || '0';
   } else {
-    arg = Python.valueToCode(block, 'NUM', Python.ORDER_NONE) || '0';
+    arg = FSharp.valueToCode(block, 'NUM', FSharp.ORDER_NONE) || '0';
   }
   // First, handle cases which generate values that don't need parentheses
   // wrapping the code.

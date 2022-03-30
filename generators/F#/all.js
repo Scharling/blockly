@@ -1,19 +1,19 @@
 /**
- * @fileoverview Complete helper functions for generating F# for
+ * @fileoverview Complete helper functions for generating FSharp for
  *     blocks.  This is the entrypoint for fsharp_compressed.js.
  * @suppress {extraRequire}
  */
 'use strict';
 
-goog.module('Blockly.F#.all');
+goog.module('Blockly.FSharp.all');
 
-goog.require('Blockly.F#.colour');
-goog.require('Blockly.F#.lists');
-goog.require('Blockly.F#.logic');
-goog.require('Blockly.F#.loops');
-goog.require('Blockly.F#.math');
-goog.require('Blockly.F#.procedures');
-goog.require('Blockly.F#.texts');
-goog.require('Blockly.F#.variables');
-goog.require('Blockly.F#.variablesDynamic');
+goog.require('Blockly.FSharp.colour');
+goog.require('Blockly.FSharp.lists');
+goog.require('Blockly.FSharp.logic');
+goog.require('Blockly.FSharp.loops');
+goog.require('Blockly.FSharp.math');
+goog.require('Blockly.FSharp.procedures');
+goog.require('Blockly.FSharp.texts');
+goog.require('Blockly.FSharp.variables');
+goog.require('Blockly.FSharp.variablesDynamic');
 
