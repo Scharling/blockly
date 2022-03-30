@@ -202,7 +202,8 @@ FSharp.finish = function (code) {
   const definitions = [];
   for (let name in this.definitions_) {
     const def = this.definitions_[name];
-    if (def.match(/^(from\s+\S+\s+)?import\s+\S+/)) {
+    // if (def.match(/^(from\s+\S+\s+)?import\s+\S+/)) {
+    if (def.match(/open\s+\S+/)) {
       imports.push(def);
     } else {
       definitions.push(def);

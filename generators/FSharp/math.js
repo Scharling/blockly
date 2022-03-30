@@ -18,44 +18,39 @@ const { NameType } = goog.require('Blockly.Names');
 // If any new block imports any library, add that library name here.
 FSharp.addReservedWords('math,random,Number');
 
-// Python['math_number'] = function(block) {
-//   // Numeric value.
-//   let code = Number(block.getFieldValue('NUM'));
-//   let order;
-//   if (code === Infinity) {
-//     code = 'float("inf")';
-//     order = Python.ORDER_FUNCTION_CALL;
-//   } else if (code === -Infinity) {
-//     code = '-float("inf")';
-//     order = Python.ORDER_UNARY_SIGN;
-//   } else {
-//     order = code < 0 ? Python.ORDER_UNARY_SIGN : Python.ORDER_ATOMIC;
-//   }
-//   return [code, order];
-// };
+FSharp['math_number'] = function (block) {
+  // Numeric value.
+  let code = Number(block.getFieldValue('NUM'));
+  let order;
+  if (code === Infinity) {
+    code = 'infinity';
+    order = FSharp.ORDER_ATOMIC;
+  } else if (code === -Infinity) {
+    code = '-infinity';
+    order = FSharp.ORDER_PREFIX_OPERATORS;
+  } else {
+    order = code < 0 ? FSharp.ORDER_PREFIX_OPERATORS : FSharp.ORDER_ATOMIC;
+  }
+  return [code, order];
+};
 
-// FSharp['math_arithmetic'] = function(block) {
-//   // Basic arithmetic operators, and power.
-//   const OPERATORS = {
-//     'ADD': [' + ', FSharp.ORDER_ADDITIVE],
-//     'MINUS': [' - ', FSharp.ORDER_ADDITIVE],
-//     'MULTIPLY': [' * ', FSharp.ORDER_MULTIPLICATIVE],
-//     'DIVIDE': [' / ', FSharp.ORDER_MULTIPLICATIVE],
-//     'POWER': [' ** ', FSharp.ORDER_EXPONENTIATION]
-//   };
-//   const tuple = OPERATORS[block.getFieldValue('OP')];
-//   const operator = tuple[0];
-//   const order = tuple[1];
-//   const argument0 = FSharp.valueToCode(block, 'A', order) || '0';
-//   const argument1 = FSharp.valueToCode(block, 'B', order) || '0';
-//   const code = argument0 + operator + argument1;
-//   return [code, order];
-//   // In case of 'DIVIDE', division between integers returns different results
-//   // in Python 2 and 3. However, is not an issue since Blockly does not
-//   // guarantee identical results in all languages.  To do otherwise would
-//   // require every operator to be wrapped in a function call.  This would kill
-//   // legibility of the generated code.
-// };
+FSharp['math_arithmetic'] = function (block) {
+  // Basic arithmetic operators, and power.
+  const OPERATORS = {
+    'ADD': [' + ', FSharp.ORDER_ADDITIVE],
+    'MINUS': [' - ', FSharp.ORDER_ADDITIVE],
+    'MULTIPLY': [' * ', FSharp.ORDER_MULTIPLICATIVE],
+    'DIVIDE': [' / ', FSharp.ORDER_MULTIPLICATIVE],
+    'POWER': [' ** ', FSharp.ORDER_EXPONENT]
+  };
+  const tuple = OPERATORS[block.getFieldValue('OP')];
+  const operator = tuple[0];
+  const order = tuple[1];
+  const argument0 = FSharp.valueToCode(block, 'A', order) || '0';
+  const argument1 = FSharp.valueToCode(block, 'B', order) || '0';
+  const code = argument0 + operator + argument1;
+  return [code, order];
+};
 
 // FSharp['math_single'] = function(block) {
 //   // Math operators with single operand.
@@ -134,22 +129,22 @@ FSharp.addReservedWords('math,random,Number');
 //   return [code, Python.ORDER_MULTIPLICATIVE];
 // };
 
-// Python['math_constant'] = function(block) {
-//   // Constants: PI, E, the Golden Ratio, sqrt(2), 1/sqrt(2), INFINITY.
-//   const CONSTANTS = {
-//     'PI': ['math.pi', Python.ORDER_MEMBER],
-//     'E': ['math.e', Python.ORDER_MEMBER],
-//     'GOLDEN_RATIO': ['(1 + math.sqrt(5)) / 2', Python.ORDER_MULTIPLICATIVE],
-//     'SQRT2': ['math.sqrt(2)', Python.ORDER_MEMBER],
-//     'SQRT1_2': ['math.sqrt(1.0 / 2)', Python.ORDER_MEMBER],
-//     'INFINITY': ['float(\'inf\')', Python.ORDER_ATOMIC]
-//   };
-//   const constant = block.getFieldValue('CONSTANT');
-//   if (constant !== 'INFINITY') {
-//     Python.definitions_['import_math'] = 'import math';
-//   }
-//   return CONSTANTS[constant];
-// };
+FSharp['math_constant'] = function (block) {
+  // Constants: PI, E, the Golden Ratio, sqrt(2), 1/sqrt(2), INFINITY.
+  const CONSTANTS = {
+    'PI': ['Math.PI', FSharp.ORDER_MEMBER],
+    'E': ['math.E', FSharp.ORDER_MEMBER],
+    'GOLDEN_RATIO': ['(1.0 + Math.Sqrt 5) / 2.0', FSharp.ORDER_MULTIPLICATIVE],
+    'SQRT2': ['Math.Sqrt 2', FSharp.ORDER_MEMBER],
+    'SQRT1_2': ['Math.Sqrt (1.0 / 2.0)', FSharp.ORDER_MEMBER],
+    'INFINITY': ['infinity', FSharp.ORDER_ATOMIC]
+  };
+  const constant = block.getFieldValue('CONSTANT');
+  if (constant !== 'INFINITY') {
+    FSharp.definitions_['open_system'] = 'open System';
+  }
+  return CONSTANTS[constant];
+};
 
 // Python['math_number_property'] = function(block) {
 //   // Check if a number is even, odd, prime, whole, positive, or negative
@@ -213,22 +208,10 @@ FSharp.addReservedWords('math,random,Number');
 //   return [code, Python.ORDER_RELATIONAL];
 // };
 
-// Python['math_change'] = function(block) {
-//   // Add to a variable in place.
-//   Python.definitions_['from_numbers_import_Number'] =
-//       'from numbers import Number';
-//   const argument0 =
-//       Python.valueToCode(block, 'DELTA', Python.ORDER_ADDITIVE) || '0';
-//   const varName =
-//       Python.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
-//   return varName + ' = (' + varName + ' if isinstance(' + varName +
-//       ', Number) else 0) + ' + argument0 + '\n';
-// };
-
-// // Rounding functions have a single operand.
-// Python['math_round'] = Python['math_single'];
-// // Trigonometry functions have a single operand.
-// Python['math_trig'] = Python['math_single'];
+// Rounding functions have a single operand.
+FSharp['math_round'] = FSharp['math_single'];
+// Trigonometry functions have a single operand.
+FSharp['math_trig'] = FSharp['math_single'];
 
 // Python['math_on_list'] = function(block) {
 //   // Math functions for lists.
@@ -326,27 +309,28 @@ FSharp.addReservedWords('math,random,Number');
 //   return [code, Python.ORDER_FUNCTION_CALL];
 // };
 
-// Python['math_modulo'] = function(block) {
-//   // Remainder computation.
-//   const argument0 =
-//       Python.valueToCode(block, 'DIVIDEND', Python.ORDER_MULTIPLICATIVE) || '0';
-//   const argument1 =
-//       Python.valueToCode(block, 'DIVISOR', Python.ORDER_MULTIPLICATIVE) || '0';
-//   const code = argument0 + ' % ' + argument1;
-//   return [code, Python.ORDER_MULTIPLICATIVE];
-// };
+FSharp['math_modulo'] = function (block) {
+  // Remainder computation.
+  const argument0 =
+    FSharp.valueToCode(block, 'DIVIDEND', FSharp.ORDER_MULTIPLICATIVE) || '0';
+  const argument1 =
+    FSharp.valueToCode(block, 'DIVISOR', FSharp.ORDER_MULTIPLICATIVE) || '0';
+  const code = argument0 + ' % ' + argument1;
+  return [code, FSharp.ORDER_MULTIPLICATIVE];
+};
 
-// Python['math_constrain'] = function(block) {
-//   // Constrain a number between two limits.
-//   const argument0 =
-//       Python.valueToCode(block, 'VALUE', Python.ORDER_NONE) || '0';
-//   const argument1 = Python.valueToCode(block, 'LOW', Python.ORDER_NONE) || '0';
-//   const argument2 =
-//       Python.valueToCode(block, 'HIGH', Python.ORDER_NONE) || 'float(\'inf\')';
-//   const code =
-//       'min(max(' + argument0 + ', ' + argument1 + '), ' + argument2 + ')';
-//   return [code, Python.ORDER_FUNCTION_CALL];
-// };
+FSharp['math_constrain'] = function (block) {
+  // Constrain a number between two limits.
+  const argument0 =
+    FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '0';
+  const argument1 = FSharp.valueToCode(block, 'LOW', FSharp.ORDER_NONE) || '0';
+  const argument2 =
+    FSharp.valueToCode(block, 'HIGH', FSharp.ORDER_NONE) || 'infinity';
+  const code =
+    'Math.Min(Math.Max(' + argument0 + ', ' + argument1 + '), ' + argument2 + ')';
+  FSharp.definitions_['open_system'] = 'open System';
+  return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
 
 // Python['math_random_int'] = function(block) {
 //   // Random integer between [X] and [Y].
