@@ -85,7 +85,7 @@ FSharp['logic_operation'] = function (block) {
 FSharp['logic_negate'] = function (block) {
   // Negation.
   const argument0 =
-    FSharp.valueToCode(block, 'BOOL', Python.ORDER_LOGICAL_NOT) || 'true';
+    FSharp.valueToCode(block, 'BOOL', FSharp.ORDER_LOGICAL_NOT) || 'true';
   const code = 'not ' + argument0;
   return [code, FSharp.ORDER_LOGICAL_NOT];
 };
@@ -104,11 +104,11 @@ FSharp['logic_null'] = function (block) {
 FSharp['logic_ternary'] = function (block) {
   // Ternary operator.
   const value_if =
-    FSharp.valueToCode(block, 'IF', Python.ORDER_CONDITIONAL) || 'false';
+    FSharp.valueToCode(block, 'IF', FSharp.ORDER_CONDITIONAL) || 'false';
   const value_then =
-    FSharp.valueToCode(block, 'THEN', Python.ORDER_CONDITIONAL) || 'None';
+    FSharp.valueToCode(block, 'THEN', FSharp.ORDER_CONDITIONAL) || 'None';
   const value_else =
-    FSharp.valueToCode(block, 'ELSE', Python.ORDER_CONDITIONAL) || 'None';
+    FSharp.valueToCode(block, 'ELSE', FSharp.ORDER_CONDITIONAL) || 'None';
   const code = 'if ' + value_if + ' then ' + value_then + ' else ' + value_else;
   return [code, FSharp.ORDER_CONDITIONAL];
 };
