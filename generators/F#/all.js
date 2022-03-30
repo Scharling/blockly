@@ -1,25 +1,19 @@
 /**
- * @license
- * Copyright 2021 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
- * @fileoverview Complete helper functions for generating Python for
- *     blocks.  This is the entrypoint for python_compressed.js.
+ * @fileoverview Complete helper functions for generating F# for
+ *     blocks.  This is the entrypoint for fsharp_compressed.js.
  * @suppress {extraRequire}
  */
 'use strict';
 
-goog.module('Blockly.Python.all');
+goog.module('Blockly.F#.all');
 
-goog.require('Blockly.Python.colour');
-goog.require('Blockly.Python.lists');
-goog.require('Blockly.Python.logic');
-goog.require('Blockly.Python.loops');
-goog.require('Blockly.Python.math');
-goog.require('Blockly.Python.procedures');
-goog.require('Blockly.Python.texts');
-goog.require('Blockly.Python.variables');
-goog.require('Blockly.Python.variablesDynamic');
+goog.require('Blockly.F#.colour');
+goog.require('Blockly.F#.lists');
+goog.require('Blockly.F#.logic');
+goog.require('Blockly.F#.loops');
+goog.require('Blockly.F#.math');
+goog.require('Blockly.F#.procedures');
+goog.require('Blockly.F#.texts');
+goog.require('Blockly.F#.variables');
+goog.require('Blockly.F#.variablesDynamic');
 
