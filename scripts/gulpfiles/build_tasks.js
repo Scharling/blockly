@@ -129,6 +129,10 @@ const chunks = [
     name: 'dart',
     entry: 'generators/dart/all.js',
     exports: 'Blockly.Dart',
+  }, {
+    name: 'FSharp',
+    entry: 'generators/FSharp/all.js',
+    exports: 'Blockly.FSharp',
   }
 ];
 
@@ -229,6 +233,7 @@ function buildDeps(done) {
     'core',
     'blocks',
     'generators',
+    'utils',
   ];
 
   const testRoots = [
