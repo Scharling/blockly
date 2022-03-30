@@ -53,31 +53,31 @@ defineBlocksWithJsonArray([
     'helpUrl': '%{BKY_LOGIC_BOOLEAN_HELPURL}',
   },
   // Block for if/elseif/else condition.
-  {
-    'type': 'controls_if',
-    'message0': '%{BKY_CONTROLS_IF_MSG_IF} %1',
-    'args0': [
-      {
-        'type': 'input_value',
-        'name': 'IF0',
-        'check': 'Boolean',
-      },
-    ],
-    'message1': '%{BKY_CONTROLS_IF_MSG_THEN} %1',
-    'args1': [
-      {
-        'type': 'input_statement',
-        'name': 'DO0',
-      },
-    ],
-    'previousStatement': null,
-    'nextStatement': null,
-    'style': 'logic_blocks',
-    'helpUrl': '%{BKY_CONTROLS_IF_HELPURL}',
-    'suppressPrefixSuffix': true,
-    'mutator': 'controls_if_mutator',
-    'extensions': ['controls_if_tooltip'],
-  },
+  // {
+  //   'type': 'controls_if',
+  //   'message0': '%{BKY_CONTROLS_IF_MSG_IF} %1',
+  //   'args0': [
+  //     {
+  //       'type': 'input_value',
+  //       'name': 'IF0',
+  //       'check': 'Boolean',
+  //     },
+  //   ],
+  //   'message1': '%{BKY_CONTROLS_IF_MSG_THEN} %1',
+  //   'args1': [
+  //     {
+  //       'type': 'input_statement',
+  //       'name': 'DO0',
+  //     },
+  //   ],
+  //   'previousStatement': null,
+  //   'nextStatement': null,
+  //   'style': 'logic_blocks',
+  //   'helpUrl': '%{BKY_CONTROLS_IF_HELPURL}',
+  //   'suppressPrefixSuffix': true,
+  //   'mutator': 'controls_if_mutator',
+  //   'extensions': ['controls_if_tooltip'],
+  // },
   // If/else block that does not use a mutator.
   {
     'type': 'controls_ifelse',

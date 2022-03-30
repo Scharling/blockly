@@ -26,7 +26,7 @@ const FSharp = goog.require('Blockly.FSharp');
 //           FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT) +
 //         branchCode;
 //     }
-//     code += (n === 0 ? 'if ' : 'elif ') + conditionCode + ':\n' + branchCode;
+//     code += (n === 0 ? 'if ' : 'elif ') + conditionCode + ' then \n' + branchCode;
 //     n++;
 //   } while (block.getInput('IF' + n));
 
@@ -38,7 +38,7 @@ const FSharp = goog.require('Blockly.FSharp');
 //           FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT) +
 //         branchCode;
 //     }
-//     code += 'else:\n' + branchCode;
+//     code += 'else\n' + branchCode;
 //   }
 //   return code;
 // };
@@ -61,7 +61,7 @@ FSharp['logic_operation'] = function (block) {
   // Operations 'and', 'or'.
   const operator = (block.getFieldValue('OP') === 'AND') ? '&&' : '||';
   const order =
-    (operator === '&&') ? FSharp.ORDER_LOGICAL_AND : FSharp.ORDER_LOGICAL_OR;
+    (operator === '&&') ? FSharp.ORDER_AND : FSharp.ORDER_OR;
   let argument0 = FSharp.valueToCode(block, 'A', order);
   let argument1 = FSharp.valueToCode(block, 'B', order);
   if (!argument0 && !argument1) {
@@ -85,9 +85,9 @@ FSharp['logic_operation'] = function (block) {
 FSharp['logic_negate'] = function (block) {
   // Negation.
   const argument0 =
-    FSharp.valueToCode(block, 'BOOL', Python.ORDER_LOGICAL_NOT) || 'true';
+    FSharp.valueToCode(block, 'BOOL', FSharp.ORDER_NOT) || 'true';
   const code = 'not ' + argument0;
-  return [code, FSharp.ORDER_LOGICAL_NOT];
+  return [code, FSharp.ORDER_NOT];
 };
 
 FSharp['logic_boolean'] = function (block) {
@@ -106,9 +106,9 @@ FSharp['logic_ternary'] = function (block) {
   const value_if =
     FSharp.valueToCode(block, 'IF', FSharp.ORDER_IF) || 'false';
   const value_then =
-    FSharp.valueToCode(block, 'THEN', FSharp.ORDER_IF) || 'None';
+    FSharp.valueToCode(block, 'THEN', FSharp.ORDER_IF) || '()';
   const value_else =
-    FSharp.valueToCode(block, 'ELSE', FSharp.ORDER_IF) || 'None';
+    FSharp.valueToCode(block, 'ELSE', FSharp.ORDER_IF) || '()';
   const code = 'if ' + value_if + ' then ' + value_then + ' else ' + value_else;
   return [code, FSharp.ORDER_IF];
 };
