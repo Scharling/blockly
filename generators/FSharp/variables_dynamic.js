@@ -9,13 +9,13 @@
  */
 'use strict';
 
-goog.module('Blockly.Python.variablesDynamic');
+goog.module('Blockly.FSharp.variablesDynamic');
 
-const Python = goog.require('Blockly.Python');
+const FSharp = goog.require('Blockly.FSharp');
 /** @suppress {extraRequire} */
-goog.require('Blockly.Python.variables');
+goog.require('Blockly.FSharp.variables');
 
 
 // Python is dynamically typed.
-Python['variables_get_dynamic'] = Python['variables_get'];
-Python['variables_set_dynamic'] = Python['variables_set'];
+FSharp['variables_get_dynamic'] = FSharp['variables_get'];
+FSharp['variables_set_dynamic'] = FSharp['variables_set'];

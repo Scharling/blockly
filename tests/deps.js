@@ -265,8 +265,14 @@ goog.addDependency('../../core/workspace_svg.js', ['Blockly.WorkspaceSvg'], ['Bl
 goog.addDependency('../../core/xml.js', ['Blockly.Xml'], ['Blockly.Events.utils', 'Blockly.extra.utils.types', 'Blockly.inputTypes', 'Blockly.utils.Size', 'Blockly.utils.dom', 'Blockly.utils.xml'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../core/zoom_controls.js', ['Blockly.ZoomControls'], ['Blockly.ComponentManager', 'Blockly.Css', 'Blockly.Events.Click', 'Blockly.Events.utils', 'Blockly.IPositionable', 'Blockly.Touch', 'Blockly.browserEvents', 'Blockly.internalConstants', 'Blockly.uiPosition', 'Blockly.utils.Rect', 'Blockly.utils.Size', 'Blockly.utils.Svg', 'Blockly.utils.dom'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/FSharp.js', ['Blockly.FSharp'], ['Blockly.Generator', 'Blockly.Names', 'Blockly.Variables', 'Blockly.inputTypes', 'Blockly.utils.string'], {'lang': 'es6', 'module': 'goog'});
-goog.addDependency('../../generators/FSharp/all.js', ['Blockly.FSharp.all'], ['Blockly.FSharp.logic'], {'module': 'goog'});
+goog.addDependency('../../generators/FSharp/all.js', ['Blockly.FSharp.all'], ['Blockly.FSharp.logic', 'Blockly.FSharp.variables'], {'module': 'goog'});
+goog.addDependency('../../generators/FSharp/lists.js', ['Blockly.FSharp.lists'], ['Blockly.FSharp', 'Blockly.Names', 'Blockly.utils.string'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/FSharp/logic.js', ['Blockly.FSharp.logic'], ['Blockly.FSharp'], {'lang': 'es6', 'module': 'goog'});
+goog.addDependency('../../generators/FSharp/math.js', ['Blockly.FSharp.math'], ['Blockly.FSharp', 'Blockly.Names'], {'lang': 'es6', 'module': 'goog'});
+goog.addDependency('../../generators/FSharp/procedures.js', ['Blockly.FSharp.procedures'], ['Blockly.FSharp', 'Blockly.Names', 'Blockly.Variables'], {'lang': 'es6', 'module': 'goog'});
+goog.addDependency('../../generators/FSharp/text.js', ['Blockly.FSharp.texts'], ['Blockly.FSharp', 'Blockly.Names', 'Blockly.utils.string'], {'lang': 'es6', 'module': 'goog'});
+goog.addDependency('../../generators/FSharp/variables.js', ['Blockly.FSharp.variables'], ['Blockly.FSharp', 'Blockly.Names'], {'lang': 'es6', 'module': 'goog'});
+goog.addDependency('../../generators/FSharp/variables_dynamic.js', ['Blockly.FSharp.variablesDynamic'], ['Blockly.FSharp', 'Blockly.FSharp.variables'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/dart.js', ['Blockly.Dart'], ['Blockly.Generator', 'Blockly.Names', 'Blockly.Variables', 'Blockly.inputTypes', 'Blockly.utils.string'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/dart/all.js', ['Blockly.Dart.all'], ['Blockly.Dart.colour', 'Blockly.Dart.lists', 'Blockly.Dart.logic', 'Blockly.Dart.loops', 'Blockly.Dart.math', 'Blockly.Dart.procedures', 'Blockly.Dart.texts', 'Blockly.Dart.variables', 'Blockly.Dart.variablesDynamic'], {'module': 'goog'});
 goog.addDependency('../../generators/dart/colour.js', ['Blockly.Dart.colour'], ['Blockly.Dart'], {'lang': 'es6', 'module': 'goog'});

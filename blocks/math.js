@@ -18,9 +18,9 @@ const Extensions = goog.require('Blockly.Extensions');
 const FieldDropdown = goog.require('Blockly.FieldDropdown');
 const xmlUtils = goog.require('Blockly.utils.xml');
 /* eslint-disable-next-line no-unused-vars */
-const {Block} = goog.requireType('Blockly.Block');
+const { Block } = goog.requireType('Blockly.Block');
 /* eslint-disable-next-line no-unused-vars */
-const {defineBlocksWithJsonArray} = goog.require('Blockly.common');
+const { defineBlocksWithJsonArray } = goog.require('Blockly.common');
 /** @suppress {extraRequire} */
 goog.require('Blockly.FieldLabel');
 /** @suppress {extraRequire} */
@@ -196,27 +196,27 @@ defineBlocksWithJsonArray([
   },
 
   // Block for adding to a variable in place.
-  {
-    'type': 'math_change',
-    'message0': '%{BKY_MATH_CHANGE_TITLE}',
-    'args0': [
-      {
-        'type': 'field_variable',
-        'name': 'VAR',
-        'variable': '%{BKY_MATH_CHANGE_TITLE_ITEM}',
-      },
-      {
-        'type': 'input_value',
-        'name': 'DELTA',
-        'check': 'Number',
-      },
-    ],
-    'previousStatement': null,
-    'nextStatement': null,
-    'style': 'variable_blocks',
-    'helpUrl': '%{BKY_MATH_CHANGE_HELPURL}',
-    'extensions': ['math_change_tooltip'],
-  },
+  // {
+  //   'type': 'math_change',
+  //   'message0': '%{BKY_MATH_CHANGE_TITLE}',
+  //   'args0': [
+  //     {
+  //       'type': 'field_variable',
+  //       'name': 'VAR',
+  //       'variable': '%{BKY_MATH_CHANGE_TITLE_ITEM}',
+  //     },
+  //     {
+  //       'type': 'input_value',
+  //       'name': 'DELTA',
+  //       'check': 'Number',
+  //     },
+  //   ],
+  //   'previousStatement': null,
+  //   'nextStatement': null,
+  //   'style': 'variable_blocks',
+  //   'helpUrl': '%{BKY_MATH_CHANGE_HELPURL}',
+  //   'extensions': ['math_change_tooltip'],
+  // },
 
   // Block for rounding functions.
   {
@@ -429,8 +429,8 @@ const TOOLTIPS_BY_OP = {
 };
 
 Extensions.register(
-    'math_op_tooltip',
-    Extensions.buildTooltipForDropdown('OP', TOOLTIPS_BY_OP));
+  'math_op_tooltip',
+  Extensions.buildTooltipForDropdown('OP', TOOLTIPS_BY_OP));
 
 
 /**
@@ -447,7 +447,7 @@ const IS_DIVISIBLEBY_MUTATOR_MIXIN = {
    * @return {!Element} XML storage element.
    * @this {Block}
    */
-  mutationToDom: function() {
+  mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     const divisorInput = (this.getFieldValue('PROPERTY') === 'DIVISIBLE_BY');
     container.setAttribute('divisor_input', divisorInput);
@@ -459,7 +459,7 @@ const IS_DIVISIBLEBY_MUTATOR_MIXIN = {
    * @param {!Element} xmlElement XML storage element.
    * @this {Block}
    */
-  domToMutation: function(xmlElement) {
+  domToMutation: function (xmlElement) {
     const divisorInput = (xmlElement.getAttribute('divisor_input') === 'true');
     this.updateShape_(divisorInput);
   },
@@ -475,7 +475,7 @@ const IS_DIVISIBLEBY_MUTATOR_MIXIN = {
    * @private
    * @this {Block}
    */
-  updateShape_: function(divisorInput) {
+  updateShape_: function (divisorInput) {
     // Add or remove a Value Input.
     const inputExists = this.getInput('DIVISOR');
     if (divisorInput) {
@@ -495,27 +495,27 @@ const IS_DIVISIBLEBY_MUTATOR_MIXIN = {
  * @this {Block}
  * @package
  */
-const IS_DIVISIBLE_MUTATOR_EXTENSION = function() {
+const IS_DIVISIBLE_MUTATOR_EXTENSION = function () {
   this.getField('PROPERTY')
-      .setValidator(
-          /**
-           * @this {FieldDropdown}
-           * @param {*} option The selected dropdown option.
-           */
-          function(option) {
-            const divisorInput = (option === 'DIVISIBLE_BY');
-            this.getSourceBlock().updateShape_(divisorInput);
-          });
+    .setValidator(
+      /**
+       * @this {FieldDropdown}
+       * @param {*} option The selected dropdown option.
+       */
+      function (option) {
+        const divisorInput = (option === 'DIVISIBLE_BY');
+        this.getSourceBlock().updateShape_(divisorInput);
+      });
 };
 
 Extensions.registerMutator(
-    'math_is_divisibleby_mutator', IS_DIVISIBLEBY_MUTATOR_MIXIN,
-    IS_DIVISIBLE_MUTATOR_EXTENSION);
+  'math_is_divisibleby_mutator', IS_DIVISIBLEBY_MUTATOR_MIXIN,
+  IS_DIVISIBLE_MUTATOR_EXTENSION);
 
 // Update the tooltip of 'math_change' block to reference the variable.
 Extensions.register(
-    'math_change_tooltip',
-    Extensions.buildTooltipWithFieldText('%{BKY_MATH_CHANGE_TOOLTIP}', 'VAR'));
+  'math_change_tooltip',
+  Extensions.buildTooltipWithFieldText('%{BKY_MATH_CHANGE_TOOLTIP}', 'VAR'));
 
 /**
  * Mixin with mutator methods to support alternate output based if the
@@ -532,7 +532,7 @@ const LIST_MODES_MUTATOR_MIXIN = {
    * @private
    * @this {Block}
    */
-  updateType_: function(newOp) {
+  updateType_: function (newOp) {
     if (newOp === 'MODE') {
       this.outputConnection.setCheck('Array');
     } else {
@@ -545,7 +545,7 @@ const LIST_MODES_MUTATOR_MIXIN = {
    * @return {!Element} XML storage element.
    * @this {Block}
    */
-  mutationToDom: function() {
+  mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     container.setAttribute('op', this.getFieldValue('OP'));
     return container;
@@ -556,7 +556,7 @@ const LIST_MODES_MUTATOR_MIXIN = {
    * @param {!Element} xmlElement XML storage element.
    * @this {Block}
    */
-  domToMutation: function(xmlElement) {
+  domToMutation: function (xmlElement) {
     this.updateType_(xmlElement.getAttribute('op'));
   },
 
@@ -572,12 +572,12 @@ const LIST_MODES_MUTATOR_MIXIN = {
  * @this {Block}
  * @package
  */
-const LIST_MODES_MUTATOR_EXTENSION = function() {
-  this.getField('OP').setValidator(function(newOp) {
+const LIST_MODES_MUTATOR_EXTENSION = function () {
+  this.getField('OP').setValidator(function (newOp) {
     this.updateType_(newOp);
   }.bind(this));
 };
 
 Extensions.registerMutator(
-    'math_modes_of_list_mutator', LIST_MODES_MUTATOR_MIXIN,
-    LIST_MODES_MUTATOR_EXTENSION);
+  'math_modes_of_list_mutator', LIST_MODES_MUTATOR_MIXIN,
+  LIST_MODES_MUTATOR_EXTENSION);

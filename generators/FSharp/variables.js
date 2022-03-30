@@ -5,28 +5,28 @@
  */
 
 /**
- * @fileoverview Generating Python for variable blocks.
+ * @fileoverview Generating FSharp for variable blocks.
  */
 'use strict';
 
-goog.module('Blockly.Python.variables');
+goog.module('Blockly.FSharp.variables');
 
-const Python = goog.require('Blockly.Python');
-const {NameType} = goog.require('Blockly.Names');
+const FSharp = goog.require('Blockly.FSharp');
+const { NameType } = goog.require('Blockly.Names');
 
 
-Python['variables_get'] = function(block) {
+FSharp['variables_get'] = function (block) {
   // Variable getter.
   const code =
-      Python.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
-  return [code, Python.ORDER_ATOMIC];
+    FSharp.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
+  return [code, FSharp.ORDER_ATOMIC];
 };
 
-Python['variables_set'] = function(block) {
+FSharp['variables_set'] = function (block) {
   // Variable setter.
   const argument0 =
-      Python.valueToCode(block, 'VALUE', Python.ORDER_NONE) || '0';
+    FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '0';
   const varName =
-      Python.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
-  return varName + ' = ' + argument0 + '\n';
+    FSharp.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
+  return 'let ' + varName + ' = ' + argument0 + '\n';
 };

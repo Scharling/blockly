@@ -7,7 +7,7 @@
     "all3:11:blockly",
     "all4:11:blockly",
     "all5:11:blockly",
-    "all6:3:blockly"
+    "all6:4:blockly"
   ],
   "js": [
     "./core/inject.js",
@@ -333,6 +333,7 @@
     "./generators/dart.js",
     "./generators/dart/colour.js",
     "./generators/dart/all.js",
+    "./generators/FSharp/variables.js",
     "./generators/FSharp.js",
     "./generators/FSharp/logic.js",
     "./generators/FSharp/all.js"
