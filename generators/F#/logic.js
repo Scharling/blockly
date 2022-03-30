@@ -3,45 +3,45 @@
  */
 'use strict';
 
-goog.module('Blockly.F#.logic');
+goog.module('Blockly.FSharp.logic');
 
 const FSharp = goog.require('Blockly.FSharp');
 
 
-// FSharp['controls_if'] = function (block) {
-//   // If/elseif/else condition.
-//   let n = 0;
-//   let code = '', branchCode, conditionCode;
-//   if (FSharp.STATEMENT_PREFIX) {
-//     // Automatic prefix insertion is switched off for this block.  Add manually.
-//     code += FSharp.injectId(FSharp.STATEMENT_PREFIX, block);
-//   }
-//   do {
-//     conditionCode =
-//       FSharp.valueToCode(block, 'IF' + n, FSharp.ORDER_NONE) || 'false';
-//     branchCode = FSharp.statementToCode(block, 'DO' + n) || FSharp.PASS;
-//     if (FSharp.STATEMENT_SUFFIX) {
-//       branchCode =
-//         FSharp.prefixLines(
-//           FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT) +
-//         branchCode;
-//     }
-//     code += (n === 0 ? 'if ' : 'elif ') + conditionCode + ':\n' + branchCode;
-//     n++;
-//   } while (block.getInput('IF' + n));
+FSharp['controls_if'] = function (block) {
+  // If/elseif/else condition.
+  let n = 0;
+  let code = '', branchCode, conditionCode;
+  if (FSharp.STATEMENT_PREFIX) {
+    // Automatic prefix insertion is switched off for this block.  Add manually.
+    code += FSharp.injectId(FSharp.STATEMENT_PREFIX, block);
+  }
+  do {
+    conditionCode =
+      FSharp.valueToCode(block, 'IF' + n, FSharp.ORDER_NONE) || 'false';
+    branchCode = FSharp.statementToCode(block, 'DO' + n) || FSharp.PASS;
+    if (FSharp.STATEMENT_SUFFIX) {
+      branchCode =
+        FSharp.prefixLines(
+          FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT) +
+        branchCode;
+    }
+    code += (n === 0 ? 'if ' : 'elif ') + conditionCode + ' then \n' + branchCode;
+    n++;
+  } while (block.getInput('IF' + n));
 
-//   if (block.getInput('ELSE') || FSharp.STATEMENT_SUFFIX) {
-//     branchCode = FSharp.statementToCode(block, 'ELSE') || FSharp.PASS;
-//     if (FSharp.STATEMENT_SUFFIX) {
-//       branchCode =
-//         FSharp.prefixLines(
-//           FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT) +
-//         branchCode;
-//     }
-//     code += 'else:\n' + branchCode;
-//   }
-//   return code;
-// };
+  if (block.getInput('ELSE') || FSharp.STATEMENT_SUFFIX) {
+    branchCode = FSharp.statementToCode(block, 'ELSE') || FSharp.PASS;
+    if (FSharp.STATEMENT_SUFFIX) {
+      branchCode =
+        FSharp.prefixLines(
+          FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT) +
+        branchCode;
+    }
+    code += 'else\n' + branchCode;
+  }
+  return code;
+};
 
 FSharp['controls_ifelse'] = FSharp['controls_if'];
 
@@ -85,7 +85,7 @@ FSharp['logic_operation'] = function (block) {
 FSharp['logic_negate'] = function (block) {
   // Negation.
   const argument0 =
-    FSharp.valueToCode(block, 'BOOL', Python.ORDER_LOGICAL_NOT) || 'true';
+    FSharp.valueToCode(block, 'BOOL', FSharp.ORDER_LOGICAL_NOT) || 'true';
   const code = 'not ' + argument0;
   return [code, FSharp.ORDER_LOGICAL_NOT];
 };
@@ -104,11 +104,11 @@ FSharp['logic_null'] = function (block) {
 FSharp['logic_ternary'] = function (block) {
   // Ternary operator.
   const value_if =
-    FSharp.valueToCode(block, 'IF', Python.ORDER_CONDITIONAL) || 'false';
+    FSharp.valueToCode(block, 'IF', FSharp.ORDER_CONDITIONAL) || 'false';
   const value_then =
-    FSharp.valueToCode(block, 'THEN', Python.ORDER_CONDITIONAL) || 'None';
+    FSharp.valueToCode(block, 'THEN', FSharp.ORDER_CONDITIONAL) || 'None';
   const value_else =
-    FSharp.valueToCode(block, 'ELSE', Python.ORDER_CONDITIONAL) || 'None';
+    FSharp.valueToCode(block, 'ELSE', FSharp.ORDER_CONDITIONAL) || 'None';
   const code = 'if ' + value_if + ' then ' + value_then + ' else ' + value_else;
   return [code, FSharp.ORDER_CONDITIONAL];
 };
