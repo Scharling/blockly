@@ -328,32 +328,19 @@ const updateMutatorFlyout = function (workspace) {
   xmlElement.appendChild(argBlock);
 
   // Our custom mutator blocks
-  const typeIntBlock = utilsXml.createElement('block');
-  typeIntBlock.setAttribute('type', 'type_int');
-  xmlElement.appendChild(typeIntBlock);
-
-  const typeFloatBlock = utilsXml.createElement('block');
-  typeFloatBlock.setAttribute('type', 'type_float');
-  xmlElement.appendChild(typeFloatBlock);
-
-  const typeStringBlock = utilsXml.createElement('block');
-  typeStringBlock.setAttribute('type', 'type_string');
-  xmlElement.appendChild(typeStringBlock);
-
-  const typeBoolBlock = utilsXml.createElement('block');
-  typeBoolBlock.setAttribute('type', 'type_bool');
-  xmlElement.appendChild(typeBoolBlock);
-
-  const typeTupleBlock = utilsXml.createElement('block');
-  typeTupleBlock.setAttribute('type', 'type_tuple');
-  xmlElement.appendChild(typeTupleBlock);
-
-  const typeFunctionBlock = utilsXml.createElement('block');
-  typeFunctionBlock.setAttribute('type', 'type_function');
-  xmlElement.appendChild(typeFunctionBlock);
+  const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function'];
+  types.forEach(t => {
+    xmlElement.appendChild(createTypeBlock(t));
+  });
 
   workspace.updateToolbox(xmlElement);
 };
+
+function createTypeBlock(type) {
+  const typeBlock = utilsXml.createElement('block');
+  typeBlock.setAttribute('type', type);
+  return typeBlock;
+}
 
 /**
  * Listens for when a procedure mutator is opened. Then it triggers a flyout

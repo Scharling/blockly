@@ -21,6 +21,9 @@ const createPrimitiveType = function (blockName) {
         case "type_bool":
             textName = "bool";
             break;
+        case "type_unit":
+            textName = "unit";
+            break;
         default:
             break;
     }
@@ -145,6 +148,7 @@ const createTypeFromBlock = function (block) {
         case "type_float":
         case "type_string":
         case "type_bool":
+        case "type_unit":
             return createPrimitiveType(block.type);
         case "type_tuple":
             const children = block.childBlocks_.map(b => createTypeFromBlock(b));
@@ -178,6 +182,7 @@ const createBlockFromType = function (type) {
         case "type_float":
         case "type_string":
         case "type_bool":
+        case "type_unit":
             const blockNode = xmlUtils.createElement('block');
             blockNode.setAttribute('type', type.block_name);
             return blockNode;
@@ -300,8 +305,8 @@ const createTypeFromXml = function (xmlElement) {
         case "type_float":
         case "type_string":
         case "type_bool":
+        case "type_unit":
             return createPrimitiveType(type);
-
         case "type_tuple":
             const children = [];
             for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {

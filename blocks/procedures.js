@@ -44,6 +44,7 @@ goog.require('Blockly.Warning');
 
 const typeUtils = goog.require('Blockly.extra.utils.types')
 
+const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function'];
 
 /**
  * Common properties for the procedure_defnoreturn and
@@ -83,10 +84,13 @@ const PROCEDURE_DEF_COMMON = {
       for (var i = 0; i < this.arguments_.length; i++) {
         let arg = this.arguments_[i];
         let variable = this.workspace.getVariableMap().getVariableByName(arg);
-        if (variable.type.block_name != typeUtils.createNullType().block_name) {
-          paramString = paramString + arg + " : " + variable.type.getType() + ", ";
+        if (i > 0) {
+          paramString += ", ";
+        }
+        if (variable.type.block_name !== typeUtils.createNullType().block_name) {
+          paramString = paramString + arg + " : " + variable.type.getType();
         } else {
-          paramString = paramString + arg + ", ";
+          paramString = paramString + arg;
         }
       }
     }
@@ -547,7 +551,7 @@ Blocks['procedures_defreturn'] = {
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
-    this.setMutator(new Mutator(['procedures_mutatorarg', 'type_int', 'type_float', 'type_string', 'type_bool', 'type_tuple', 'type_function']));
+    this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
