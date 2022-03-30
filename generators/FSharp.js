@@ -81,70 +81,77 @@ FSharp.addReservedWords(
  
  /**
   * Order of operation ENUMs.
-  * http://docs.python.org/reference/expressions.html#summary
+  * https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/symbol-and-operator-reference/
   */
- Python.ORDER_ATOMIC = 0;             // 0 "" ...
- Python.ORDER_COLLECTION = 1;         // tuples, lists, dictionaries
- Python.ORDER_STRING_CONVERSION = 1;  // `expression...`
- Python.ORDER_MEMBER = 2.1;           // . []
- Python.ORDER_FUNCTION_CALL = 2.2;    // ()
- Python.ORDER_EXPONENTIATION = 3;     // **
- Python.ORDER_UNARY_SIGN = 4;         // + -
- Python.ORDER_BITWISE_NOT = 4;        // ~
- Python.ORDER_MULTIPLICATIVE = 5;     // * / // %
- Python.ORDER_ADDITIVE = 6;           // + -
- Python.ORDER_BITWISE_SHIFT = 7;      // << >>
- Python.ORDER_BITWISE_AND = 8;        // &
- Python.ORDER_BITWISE_XOR = 9;        // ^
- Python.ORDER_BITWISE_OR = 10;        // |
- Python.ORDER_RELATIONAL = 11;        // in, not in, is, is not,
-                                      //     <, <=, >, >=, <>, !=, ==
- Python.ORDER_LOGICAL_NOT = 12;       // not
- Python.ORDER_LOGICAL_AND = 13;       // and
- Python.ORDER_LOGICAL_OR = 14;        // or
- Python.ORDER_CONDITIONAL = 15;       // if else
- Python.ORDER_LAMBDA = 16;            // lambda
- Python.ORDER_NONE = 99;              // (...)
+ FSharp.ORDER_ATOMIC = 0;               // 0 "" ...
+ FSharp.ORDER_FTYPES = 1;               // f<types> (LEFT)
+ FSharp.ORDER_TYPE_CREATION = 2;        // f(x)
+ FSharp.ORDER_MEMBER = 3;               // .
+ FSharp.ORDER_PREFIX_OPERATORS = 4;     // prefix operators (+op, -op, %, %%, &, &&, !op, ~op)
+ FSharp.ORDER_PIPE_PATTERN_MATCH = 5;   // | (pattern match)
+ FSharp.ORDER_FUNCTION_APPLICATION = 6; // f x (function application) including lazy x, assert x
+ FSharp.ORDER_EXPONENT = 7;             // ** op
+ FSharp.ORDER_MULTIPLICATIVE = 8;       // * op, /op, %op
+ FSharp.ORDER_ADDITIVE = 9;             // - op, +op, (binary)
+ FSharp.ORDER_TYPE_CHECK = 10;          // :? (some kind of type check)
+ FSharp.ORDER_LIST_OPERATOR = 11;       // ::
+ FSharp.ORDER_STATIC_TYPE = 12;         // ^op (including ^^^)
+ FSharp.ORDER_RELATIONAL = 13;          // <op, >op, =, |op, &op, &, $
+                                        // (including <<<, >>>, |||, &&&)
+ FSharp.ORDER_TYPE_CASTING = 14;        // :>, :?>
+ FSharp.ORDER_AND = 15;                 // &, &&
+ FSharp.ORDER_OR = 16;                  // or, ||
+ FSharp.ORDER_COMMA = 17;               // ,
+ FSharp.ORDER_FUNCTION_ARROW = 18;      // ->
+ FSharp.ORDER_NOT = 19;                 // not
+ FSharp.ORDER_IF = 20;                  // if
+ FSharp.ORDER_FUNCTION_MATCH_TRY = 21;  // function, fun, match, try
+ FSharp.ORDER_LET = 22;                 // let
+ FSharp.ORDER_SEMI_COLON = 23;          // ;
+ FSharp.ORDER_PIPE = 24;                // |
+ FSharp.ORDER_WHEN = 25;                // when
+ FSharp.ORDER_AS = 26;                  // as
+ FSharp.ORDER_NONE = 99;                // (...)
  
  /**
   * List of outer-inner pairings that do NOT require parentheses.
   * @type {!Array<!Array<number>>}
   */
- Python.ORDER_OVERRIDES = [
+ FSharp.ORDER_OVERRIDES = [
    // (foo()).bar -> foo().bar
    // (foo())[0] -> foo()[0]
-   [Python.ORDER_FUNCTION_CALL, Python.ORDER_MEMBER],
+   [FSharp.ORDER_FUNCTION_CALL, FSharp.ORDER_MEMBER],
    // (foo())() -> foo()()
-   [Python.ORDER_FUNCTION_CALL, Python.ORDER_FUNCTION_CALL],
+   [FSharp.ORDER_FUNCTION_CALL, FSharp.ORDER_FUNCTION_CALL],
    // (foo.bar).baz -> foo.bar.baz
    // (foo.bar)[0] -> foo.bar[0]
    // (foo[0]).bar -> foo[0].bar
    // (foo[0])[1] -> foo[0][1]
-   [Python.ORDER_MEMBER, Python.ORDER_MEMBER],
+   [FSharp.ORDER_MEMBER, FSharp.ORDER_MEMBER],
    // (foo.bar)() -> foo.bar()
    // (foo[0])() -> foo[0]()
-   [Python.ORDER_MEMBER, Python.ORDER_FUNCTION_CALL],
+   [FSharp.ORDER_MEMBER, FSharp.ORDER_FUNCTION_CALL],
  
    // not (not foo) -> not not foo
-   [Python.ORDER_LOGICAL_NOT, Python.ORDER_LOGICAL_NOT],
+   [FSharp.ORDER_LOGICAL_NOT, FSharp.ORDER_LOGICAL_NOT],
    // a and (b and c) -> a and b and c
-   [Python.ORDER_LOGICAL_AND, Python.ORDER_LOGICAL_AND],
+   [FSharp.ORDER_LOGICAL_AND, FSharp.ORDER_LOGICAL_AND],
    // a or (b or c) -> a or b or c
-   [Python.ORDER_LOGICAL_OR, Python.ORDER_LOGICAL_OR]
+   [FSharp.ORDER_LOGICAL_OR, FSharp.ORDER_LOGICAL_OR]
  ];
  
  /**
   * Whether the init method has been called.
   * @type {?boolean}
   */
- Python.isInitialized = false;
+  FSharp.isInitialized = false;
  
  /**
   * Initialise the database of variable names.
   * @param {!Workspace} workspace Workspace to generate code from.
   * @this {Generator}
   */
- Python.init = function(workspace) {
+  FSharp.init = function(workspace) {
    // Call Blockly.Generator's init.
    Object.getPrototypeOf(this).init.call(this);
  
@@ -189,7 +196,7 @@ FSharp.addReservedWords(
   * @param {string} code Generated code.
   * @return {string} Completed code.
   */
- Python.finish = function(code) {
+  FSharp.finish = function(code) {
    // Convert the definitions dictionary into a list.
    const imports = [];
    const definitions = [];
@@ -216,17 +223,17 @@ FSharp.addReservedWords(
   * @param {string} line Line of generated code.
   * @return {string} Legal line of code.
   */
- Python.scrubNakedValue = function(line) {
+  FSharp.scrubNakedValue = function(line) {
    return line + '\n';
  };
  
  /**
-  * Encode a string as a properly escaped Python string, complete with quotes.
+  * Encode a string as a properly escaped FSharp string, complete with quotes.
   * @param {string} string Text to encode.
-  * @return {string} Python string.
+  * @return {string} FSharp string.
   * @protected
   */
- Python.quote_ = function(string) {
+  FSharp.quote_ = function(string) {
    // Can't use goog.string.quote since % must also be escaped.
    string = string.replace(/\\/g, '\\\\').replace(/\n/g, '\\\n');
  
@@ -243,13 +250,13 @@ FSharp.addReservedWords(
  };
  
  /**
-  * Encode a string as a properly escaped multiline Python string, complete
+  * Encode a string as a properly escaped multiline FSharp string, complete
   * with quotes.
   * @param {string} string Text to encode.
   * @return {string} Python string.
   * @protected
   */
- Python.multiline_quote_ = function(string) {
+  FSharp.multiline_quote_ = function(string) {
    const lines = string.split(/\n/g).map(this.quote_);
    // Join with the following, plus a newline:
    // + '\n' +
@@ -257,16 +264,16 @@ FSharp.addReservedWords(
  };
  
  /**
-  * Common tasks for generating Python from blocks.
+  * Common tasks for generating FSharp from blocks.
   * Handles comments for the specified block and any connected value blocks.
   * Calls any statements following this block.
   * @param {!Block} block The current block.
-  * @param {string} code The Python code created for this block.
+  * @param {string} code The FSharp code created for this block.
   * @param {boolean=} opt_thisOnly True to generate code for only this statement.
-  * @return {string} Python code with comments and subsequent blocks added.
+  * @return {string} FSharp code with comments and subsequent blocks added.
   * @protected
   */
- Python.scrub_ = function(block, code, opt_thisOnly) {
+  FSharp.scrub_ = function(block, code, opt_thisOnly) {
    let commentCode = '';
    // Only collect comments for blocks that aren't inline.
    if (!block.outputConnection || !block.outputConnection.targetConnection) {
@@ -304,7 +311,7 @@ FSharp.addReservedWords(
   * @param {boolean=} opt_negate Whether to negate the value.
   * @return {string|number}
   */
- Python.getAdjustedInt = function(block, atId, opt_delta, opt_negate) {
+  FSharp.getAdjustedInt = function(block, atId, opt_delta, opt_negate) {
    let delta = opt_delta || 0;
    if (block.workspace.options.oneBasedIndex) {
      delta--;
@@ -335,5 +342,5 @@ FSharp.addReservedWords(
    return at;
  };
  
- exports = Python;
+ exports = FSharp;
  
