@@ -343,4 +343,12 @@ FSharp.getAdjustedInt = function (block, atId, opt_delta, opt_negate) {
   return at;
 };
 
+// FSharp.isNumber = function (n) {
+//   return !isNaN(Number(n));
+// }
+
+// FSharp.numberIsInt = function (n) {
+//   return Number.isInteger(Number(n));
+// }
+
 exports = FSharp;
