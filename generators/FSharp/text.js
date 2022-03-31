@@ -16,13 +16,13 @@ const stringUtils = goog.require('Blockly.utils.string');
 const { NameType } = goog.require('Blockly.Names');
 
 
-// Python['text'] = function(block) {
-//   // Text value.
-//   const code = Python.quote_(block.getFieldValue('TEXT'));
-//   return [code, Python.ORDER_ATOMIC];
-// };
+FSharp['text'] = function (block) {
+  // Text value.
+  const code = FSharp.quote_(block.getFieldValue('TEXT'));
+  return [code, FSharp.ORDER_ATOMIC];
+};
 
-// Python['text_multiline'] = function(block) {
+// FSharp['text_multiline'] = function(block) {
 //   // Text value.
 //   const code = Python.multiline_quote_(block.getFieldValue('TEXT'));
 //   const order =
@@ -30,80 +30,80 @@ const { NameType } = goog.require('Blockly.Names');
 //   return [code, order];
 // };
 
-// /**
-//  * Regular expression to detect a single-quoted string literal.
-//  */
-// const strRegExp = /^\s*'([^']|\\')*'\s*$/;
+/**
+ * Regular expression to detect a single-quoted string literal.
+ */
+const strRegExp = /^\s*'([^']|\\')*'\s*$/;
 
-// /**
-//  * Enclose the provided value in 'str(...)' function.
-//  * Leave string literals alone.
-//  * @param {string} value Code evaluating to a value.
-//  * @return {Array<string|number>} Array containing code evaluating to a string
-//  *     and
-//  *    the order of the returned code.[string, number]
-//  */
-// const forceString = function(value) {
-//   if (strRegExp.test(value)) {
-//     return [value, Python.ORDER_ATOMIC];
-//   }
-//   return ['str(' + value + ')', Python.ORDER_FUNCTION_CALL];
-// };
+/**
+ * Enclose the provided value in 'str(...)' function.
+ * Leave string literals alone.
+ * @param {string} value Code evaluating to a value.
+ * @return {Array<string|number>} Array containing code evaluating to a string
+ *     and
+ *    the order of the returned code.[string, number]
+ */
+const forceString = function (value) {
+  if (strRegExp.test(value)) {
+    return [value, FSharp.ORDER_ATOMIC];
+  }
+  return ['string ' + value, FSharp.ORDER_FUNCTION_CALL];
+};
 
-// Python['text_join'] = function(block) {
+// FSharp['text_join'] = function (block) {
 //   // Create a string made up of any number of elements of any type.
 //   // Should we allow joining by '-' or ',' or any other characters?
 //   switch (block.itemCount_) {
 //     case 0:
-//       return ['\'\'', Python.ORDER_ATOMIC];
+//       return ['\'\'', FSharp.ORDER_ATOMIC];
 //     case 1: {
 //       const element =
-//           Python.valueToCode(block, 'ADD0', Python.ORDER_NONE) || '\'\'';
+//         FSharp.valueToCode(block, 'ADD0', FSharp.ORDER_NONE) || '\'\'';
 //       const codeAndOrder = forceString(element);
 //       return codeAndOrder;
 //     }
 //     case 2: {
 //       const element0 =
-//           Python.valueToCode(block, 'ADD0', Python.ORDER_NONE) || '\'\'';
+//         FSharp.valueToCode(block, 'ADD0', FSharp.ORDER_NONE) || '\'\'';
 //       const element1 =
-//           Python.valueToCode(block, 'ADD1', Python.ORDER_NONE) || '\'\'';
+//         FSharp.valueToCode(block, 'ADD1', FSharp.ORDER_NONE) || '\'\'';
 //       const code = forceString(element0)[0] + ' + ' + forceString(element1)[0];
-//       return [code, Python.ORDER_ADDITIVE];
+//       return [code, FSharp.ORDER_ADDITIVE];
 //     }
 //     default: {
 //       const elements = [];
 //       for (let i = 0; i < block.itemCount_; i++) {
 //         elements[i] =
-//             Python.valueToCode(block, 'ADD' + i, Python.ORDER_NONE) || '\'\'';
+//           FSharp.valueToCode(block, 'ADD' + i, FSharp.ORDER_NONE) || '\'\'';
 //       }
-//       const tempVar = Python.nameDB_.getDistinctName('x', NameType.VARIABLE);
+//       const tempVar = FSharp.nameDB_.getDistinctName('x', NameType.VARIABLE);
 //       const code = '\'\'.join([str(' + tempVar + ') for ' + tempVar + ' in [' +
-//           elements.join(', ') + ']])';
-//       return [code, Python.ORDER_FUNCTION_CALL];
+//         elements.join(', ') + ']])';
+//       return [code, FSharp.ORDER_FUNCTION_CALL];
 //     }
 //   }
 // };
 
-// Python['text_append'] = function(block) {
+// FSharp['text_append'] = function (block) {
 //   // Append to a variable in place.
 //   const varName =
-//       Python.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
-//   const value = Python.valueToCode(block, 'TEXT', Python.ORDER_NONE) || '\'\'';
-//   return varName + ' = str(' + varName + ') + ' + forceString(value)[0] + '\n';
+//     FSharp.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
+//   const value = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_NONE) || '\'\'';
+//   return varName + ' = sting ' + varName + ' + ' + forceString(value)[0] + '\n';
 // };
 
-// Python['text_length'] = function(block) {
-//   // Is the string null or array empty?
-//   const text = Python.valueToCode(block, 'VALUE', Python.ORDER_NONE) || '\'\'';
-//   return ['len(' + text + ')', Python.ORDER_FUNCTION_CALL];
-// };
+FSharp['text_length'] = function (block) {
+  // Is the string null or array empty?
+  const text = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '\'\'';
+  return ['String.length ' + text, FSharp.ORDER_FUNCTION_APPLICATION];
+};
 
-// Python['text_isEmpty'] = function(block) {
-//   // Is the string null or array empty?
-//   const text = Python.valueToCode(block, 'VALUE', Python.ORDER_NONE) || '\'\'';
-//   const code = 'not len(' + text + ')';
-//   return [code, Python.ORDER_LOGICAL_NOT];
-// };
+FSharp['text_isEmpty'] = function (block) {
+  // Is the string null or array empty?
+  const text = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '\'\'';
+  const code = 'String.length ' + text + ' = 0';
+  return [code, FSharp.ORDER_RELATIONAL];
+};
 
 // Python['text_indexOf'] = function(block) {
 //   // Search the text for a substring.
