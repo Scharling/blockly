@@ -15,6 +15,9 @@ const FSharp = goog.require('Blockly.FSharp');
 const stringUtils = goog.require('Blockly.utils.string');
 const { NameType } = goog.require('Blockly.Names');
 
+// If any new block imports any library, add that library name here.
+FSharp.addReservedWords('System');
+
 
 FSharp['text'] = function (block) {
   // Text value.
@@ -120,44 +123,51 @@ FSharp['text_isEmpty'] = function (block) {
 //   return [code, Python.ORDER_FUNCTION_CALL];
 // };
 
-// Python['text_charAt'] = function(block) {
-//   // Get letter at index.
-//   // Note: Until January 2013 this block did not have the WHERE input.
-//   const where = block.getFieldValue('WHERE') || 'FROM_START';
-//   const textOrder =
-//       (where === 'RANDOM') ? Python.ORDER_NONE : Python.ORDER_MEMBER;
-//   const text = Python.valueToCode(block, 'VALUE', textOrder) || '\'\'';
-//   switch (where) {
-//     case 'FIRST': {
-//       const code = text + '[0]';
-//       return [code, Python.ORDER_MEMBER];
-//     }
-//     case 'LAST': {
-//       const code = text + '[-1]';
-//       return [code, Python.ORDER_MEMBER];
-//     }
-//     case 'FROM_START': {
-//       const at = Python.getAdjustedInt(block, 'AT');
-//       const code = text + '[' + at + ']';
-//       return [code, Python.ORDER_MEMBER];
-//     }
-//     case 'FROM_END': {
-//       const at = Python.getAdjustedInt(block, 'AT', 1, true);
-//       const code = text + '[' + at + ']';
-//       return [code, Python.ORDER_MEMBER];
-//     }
-//     case 'RANDOM': {
-//       Python.definitions_['import_random'] = 'import random';
-//       const functionName = Python.provideFunction_('text_random_letter', [
-//         'def ' + Python.FUNCTION_NAME_PLACEHOLDER_ + '(text):',
-//         '  x = int(random.random() * len(text))', '  return text[x];'
-//       ]);
-//       const code = functionName + '(' + text + ')';
-//       return [code, Python.ORDER_FUNCTION_CALL];
-//     }
-//   }
-//   throw Error('Unhandled option (text_charAt).');
-// };
+FSharp['text_charAt'] = function (block) {
+  // Get letter at index.
+  // Note: Until January 2013 this block did not have the WHERE input.
+  const where = block.getFieldValue('WHERE') || 'FROM_START';
+  const textOrder =
+    (where === 'RANDOM') ? FSharp.ORDER_NONE : FSharp.ORDER_MEMBER;
+  const text = FSharp.valueToCode(block, 'VALUE', textOrder) || '\'\'';
+  switch (where) {
+    case 'FIRST': {
+      const code = text + '[0]';
+      return [code, FSharp.ORDER_MEMBER];
+    }
+    case 'LAST': {
+      const functionName = FSharp.provideFunction_('last_char_of_string', [
+        'let ' + FSharp.FUNCTION_NAME_PLACEHOLDER_ + ' (str:string) = str[str.Length - 1]'
+      ]);
+      code = functionName + ' ' + text;
+      return [code, FSharp.ORDER_MEMBER];
+    }
+    case 'FROM_START': {
+      const at = FSharp.getAdjustedInt(block, 'AT');
+      const code = text + '[' + at + ']';
+      return [code, FSharp.ORDER_MEMBER];
+    }
+    case 'FROM_END': {
+      const at = FSharp.getAdjustedInt(block, 'AT');
+      const functionName = FSharp.provideFunction_('char_from_end', [
+        'let ' + FSharp.FUNCTION_NAME_PLACEHOLDER_ + ' (str:string) at = str[str.Length - (1 + at)]'
+      ]);
+      const code = functionName + ' ' + text + ' ' + at;
+      return [code, FSharp.ORDER_MEMBER];
+    }
+    case 'RANDOM': {
+      FSharp.definitions_['import_random'] = 'import random';
+      const functionName = FSharp.provideFunction_('string_random_letter', [
+        'let ' + FSharp.FUNCTION_NAME_PLACEHOLDER_ + ' (str:string) =',
+        ' let index = Random().NextDouble() * float str.Length |> int',
+        ' str[index]'
+      ]);
+      const code = functionName + ' ' + text;
+      return [code, FSharp.ORDER_FUNCTION_CALL];
+    }
+  }
+  throw Error('Unhandled option (text_charAt).');
+};
 
 // Python['text_getSubstring'] = function(block) {
 //   // Get substring.
@@ -209,37 +219,56 @@ FSharp['text_isEmpty'] = function (block) {
 //   return [code, Python.ORDER_MEMBER];
 // };
 
-// Python['text_changeCase'] = function(block) {
+// FSharp['text_changeCase'] = function (block) {
 //   // Change capitalization.
 //   const OPERATORS = {
-//     'UPPERCASE': '.upper()',
-//     'LOWERCASE': '.lower()',
+//     'UPPERCASE': '.ToUpper()',
+//     'LOWERCASE': '.ToLower()',
 //     'TITLECASE': '.title()'
 //   };
 //   const operator = OPERATORS[block.getFieldValue('CASE')];
-//   const text = Python.valueToCode(block, 'TEXT', Python.ORDER_MEMBER) || '\'\'';
+//   const text = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_MEMBER) || '\'\'';
 //   const code = text + operator;
-//   return [code, Python.ORDER_FUNCTION_CALL];
+//   return [code, FSharp.ORDER_FUNCTION_CALL];
 // };
 
-// Python['text_trim'] = function(block) {
-//   // Trim spaces.
-//   const OPERATORS = {
-//     'LEFT': '.lstrip()',
-//     'RIGHT': '.rstrip()',
-//     'BOTH': '.strip()'
-//   };
-//   const operator = OPERATORS[block.getFieldValue('MODE')];
-//   const text = Python.valueToCode(block, 'TEXT', Python.ORDER_MEMBER) || '\'\'';
-//   const code = text + operator;
-//   return [code, Python.ORDER_FUNCTION_CALL];
-// };
+FSharp['text_trim'] = function (block) {
+  // Trim spaces.
+  const OPERATORS = {
+    'LEFT': '.TrimStart()',
+    'RIGHT': '.TrimEnd()',
+    'BOTH': '.Trim()'
+  };
+  const operator = OPERATORS[block.getFieldValue('MODE')];
+  const text = Python.valueToCode(block, 'TEXT', FSharp.ORDER_MEMBER) || '\'\'';
+  const code = text + operator;
+  return [code, FSharp.ORDER_FUNCTION_CALL];
+};
 
-// Python['text_print'] = function(block) {
-//   // Print statement.
-//   const msg = Python.valueToCode(block, 'TEXT', Python.ORDER_NONE) || '\'\'';
-//   return 'print(' + msg + ')\n';
-// };
+FSharp['text_print'] = function (block) {
+  // Print statement.
+  FSharp.definitions_['open_system'] = 'open System';
+  const msg = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_NONE) || '\'\'';
+  return 'printf ' + msg + '\n';
+};
+
+FSharp['text_replace'] = function (block) {
+  const text = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_MEMBER) || '\'\'';
+  const from = FSharp.valueToCode(block, 'FROM', FSharp.ORDER_NONE) || '\'\'';
+  const to = FSharp.valueToCode(block, 'TO', FSharp.ORDER_NONE) || '\'\'';
+  const code = text + '.Replace(' + from + ', ' + to + ')';
+  return [code, FSharp.ORDER_MEMBER];
+};
+
+FSharp['text_reverse'] = function (block) {
+  const text = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_MEMBER) || '\'\'';
+  const code = text + ' |> Seq.rev |> String.Concat';
+  return [code, FSharp.ORDER_MEMBER];
+};
+
+
+
+// NOT INCLUDED
 
 // Python['text_prompt_ext'] = function(block) {
 //   // Prompt function.
@@ -270,18 +299,4 @@ FSharp['text_isEmpty'] = function (block) {
 //   const sub = Python.valueToCode(block, 'SUB', Python.ORDER_NONE) || '\'\'';
 //   const code = text + '.count(' + sub + ')';
 //   return [code, Python.ORDER_FUNCTION_CALL];
-// };
-
-// Python['text_replace'] = function(block) {
-//   const text = Python.valueToCode(block, 'TEXT', Python.ORDER_MEMBER) || '\'\'';
-//   const from = Python.valueToCode(block, 'FROM', Python.ORDER_NONE) || '\'\'';
-//   const to = Python.valueToCode(block, 'TO', Python.ORDER_NONE) || '\'\'';
-//   const code = text + '.replace(' + from + ', ' + to + ')';
-//   return [code, Python.ORDER_MEMBER];
-// };
-
-// Python['text_reverse'] = function(block) {
-//   const text = Python.valueToCode(block, 'TEXT', Python.ORDER_MEMBER) || '\'\'';
-//   const code = text + '[::-1]';
-//   return [code, Python.ORDER_MEMBER];
 // };

@@ -16,7 +16,7 @@ const { NameType } = goog.require('Blockly.Names');
 
 
 // If any new block imports any library, add that library name here.
-FSharp.addReservedWords('math,random,Number');
+FSharp.addReservedWords('System');
 
 FSharp['math_number'] = function (block) {
   // Numeric value.
