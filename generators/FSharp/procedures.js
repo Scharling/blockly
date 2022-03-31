@@ -16,114 +16,131 @@ const Variables = goog.require('Blockly.Variables');
 const { NameType } = goog.require('Blockly.Names');
 
 
-// Python['procedures_defreturn'] = function(block) {
-//   // Define a procedure with a return value.
-//   // First, add a 'global' statement for every variable that is not shadowed by
-//   // a local parameter.
-//   const globals = [];
-//   const workspace = block.workspace;
-//   const usedVariables = Variables.allUsedVarModels(workspace) || [];
-//   for (let i = 0, variable; (variable = usedVariables[i]); i++) {
-//     const varName = variable.name;
-//     if (block.getVars().indexOf(varName) === -1) {
-//       globals.push(Python.nameDB_.getName(varName, NameType.VARIABLE));
-//     }
-//   }
-//   // Add developer variables.
-//   const devVarList = Variables.allDeveloperVariables(workspace);
-//   for (let i = 0; i < devVarList.length; i++) {
-//     globals.push(
-//         Python.nameDB_.getName(devVarList[i], NameType.DEVELOPER_VARIABLE));
-//   }
+FSharp['procedures_defreturn'] = function(block) {
+  // Define a procedure with a return value.
+  // First, add a 'global' statement for every variable that is not shadowed by
+  // a local parameter.
+  const globals = [];
+  const workspace = block.workspace;
+  const usedVariables = Variables.allUsedVarModels(workspace) || [];
+  for (let i = 0, variable; (variable = usedVariables[i]); i++) {
+    const varName = variable.name;
+    if (block.getVars().indexOf(varName) === -1) {
+      globals.push(FSharp.nameDB_.getName(varName, NameType.VARIABLE));
+    }
+  }
+  // Add developer variables.
+  const devVarList = Variables.allDeveloperVariables(workspace);
+  for (let i = 0; i < devVarList.length; i++) {
+    globals.push(
+        FSharp.nameDB_.getName(devVarList[i], NameType.DEVELOPER_VARIABLE));
+  }
 
-//   const globalString = globals.length ?
-//       Python.INDENT + 'global ' + globals.join(', ') + '\n' :
-//       '';
-//   const funcName =
-//       Python.nameDB_.getName(block.getFieldValue('NAME'), NameType.PROCEDURE);
-//   let xfix1 = '';
-//   if (Python.STATEMENT_PREFIX) {
-//     xfix1 += Python.injectId(Python.STATEMENT_PREFIX, block);
-//   }
-//   if (Python.STATEMENT_SUFFIX) {
-//     xfix1 += Python.injectId(Python.STATEMENT_SUFFIX, block);
-//   }
-//   if (xfix1) {
-//     xfix1 = Python.prefixLines(xfix1, Python.INDENT);
-//   }
-//   let loopTrap = '';
-//   if (Python.INFINITE_LOOP_TRAP) {
-//     loopTrap = Python.prefixLines(
-//         Python.injectId(Python.INFINITE_LOOP_TRAP, block), Python.INDENT);
-//   }
-//   let branch = Python.statementToCode(block, 'STACK');
-//   let returnValue =
-//       Python.valueToCode(block, 'RETURN', Python.ORDER_NONE) || '';
-//   let xfix2 = '';
-//   if (branch && returnValue) {
-//     // After executing the function body, revisit this block for the return.
-//     xfix2 = xfix1;
-//   }
-//   if (returnValue) {
-//     returnValue = Python.INDENT + 'return ' + returnValue + '\n';
-//   } else if (!branch) {
-//     branch = Python.PASS;
-//   }
-//   const args = [];
-//   const variables = block.getVars();
-//   for (let i = 0; i < variables.length; i++) {
-//     args[i] = Python.nameDB_.getName(variables[i], NameType.VARIABLE);
-//   }
-//   let code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + globalString +
-//       xfix1 + loopTrap + branch + xfix2 + returnValue;
-//   code = Python.scrub_(block, code);
-//   // Add % so as not to collide with helper functions in definitions list.
-//   Python.definitions_['%' + funcName] = code;
-//   return null;
-// };
+  const globalString = globals.length ?
+      FSharp.INDENT + 'global ' + globals.join(', ') + '\n' :
+      '';
+  const funcName =
+    FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.PROCEDURE);
+  let xfix1 = '';
+  if (FSharp.STATEMENT_PREFIX) {
+    xfix1 += FSharp.injectId(FSharp.STATEMENT_PREFIX, block);
+  }
+  if (FSharp.STATEMENT_SUFFIX) {
+    xfix1 += FSharp.injectId(FSharp.STATEMENT_SUFFIX, block);
+  }
+  if (xfix1) {
+    xfix1 = FSharp.prefixLines(xfix1, FSharp.INDENT);
+  }
+  let loopTrap = '';
+  if (FSharp.INFINITE_LOOP_TRAP) {
+    loopTrap = FSharp.prefixLines(
+        FSharp.injectId(FSharp.INFINITE_LOOP_TRAP, block), FSharp.INDENT);
+  }
+  let branch = FSharp.statementToCode(block, 'STACK');
+  let returnValue =
+    FSharp.valueToCode(block, 'RETURN', FSharp.ORDER_NONE) || '';
+  let xfix2 = '';
+  if (branch && returnValue) {
+    // After executing the function body, revisit this block for the return.
+    xfix2 = xfix1;
+  }
+  if (returnValue) {
+    returnValue = FSharp.INDENT + returnValue + '\n';
+  } else if (!branch) {
+    branch = FSharp.PASS;
+  }
+  const args = [];
+  const variables = block.getVars();
+  for (let i = 0; i < variables.length; i++) {
+    args[i] = FSharp.nameDB_.getName(variables[i], NameType.VARIABLE);
+  }
+  let argsString = createArgsString(args, usedVariables);
+  console.log("args", args, variables, usedVariables, devVarList, argsString);
+  let code = 'let ' + funcName + ' ' + argsString + ' =\n' + globalString +
+      xfix1 + loopTrap + branch + xfix2 + returnValue;
+  code = FSharp.scrub_(block, code);
+  // Add % so as not to collide with helper functions in definitions list.
+  FSharp.definitions_['%' + funcName] = code;
+  return null;
+};
 
-// // Defining a procedure without a return value uses the same generator as
-// // a procedure with a return value.
-// Python['procedures_defnoreturn'] = Python['procedures_defreturn'];
+function createArgsString(args, variableModels) {
+    let str = "";
+    for (var i = 0; i < args.length; i++) {
+        let arg = args[i];
+        for (var j = 0; j < variableModels.length; j++) {
+            let varModel = variableModels[j];
+            if (varModel.name == arg) {
+                str = str + " (" + arg + " : " + varModel.type.getFSharpType() + ")"
+                break;
+            }
+        }
+    }
+    return str;
+}
 
-// Python['procedures_callreturn'] = function(block) {
-//   // Call a procedure with a return value.
-//   const funcName =
-//       Python.nameDB_.getName(block.getFieldValue('NAME'), NameType.PROCEDURE);
-//   const args = [];
-//   const variables = block.getVars();
-//   for (let i = 0; i < variables.length; i++) {
-//     args[i] = Python.valueToCode(block, 'ARG' + i, Python.ORDER_NONE) || 'None';
-//   }
-//   const code = funcName + '(' + args.join(', ') + ')';
-//   return [code, Python.ORDER_FUNCTION_CALL];
-// };
+// Defining a procedure without a return value uses the same generator as
+// a procedure with a return value.
+FSharp['procedures_defnoreturn'] = FSharp['procedures_defreturn'];
 
-// Python['procedures_callnoreturn'] = function(block) {
-//   // Call a procedure with no return value.
-//   // Generated code is for a function call as a statement is the same as a
-//   // function call as a value, with the addition of line ending.
-//   const tuple = Python['procedures_callreturn'](block);
-//   return tuple[0] + '\n';
-// };
+FSharp['procedures_callreturn'] = function(block) {
+  // Call a procedure with a return value.
+  const funcName =
+    FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.PROCEDURE);
+  const args = [];
+  const variables = block.getVars();
+  for (let i = 0; i < variables.length; i++) {
+    args[i] = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE) || 'None';
+  }
+  const code = funcName + '' + args.join(' ') + '';
+  return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
 
-// Python['procedures_ifreturn'] = function(block) {
-//   // Conditionally return value from a procedure.
-//   const condition =
-//       Python.valueToCode(block, 'CONDITION', Python.ORDER_NONE) || 'False';
-//   let code = 'if ' + condition + ':\n';
-//   if (Python.STATEMENT_SUFFIX) {
-//     // Inject any statement suffix here since the regular one at the end
-//     // will not get executed if the return is triggered.
-//     code += Python.prefixLines(
-//         Python.injectId(Python.STATEMENT_SUFFIX, block), Python.INDENT);
-//   }
-//   if (block.hasReturnValue_) {
-//     const value =
-//         Python.valueToCode(block, 'VALUE', Python.ORDER_NONE) || 'None';
-//     code += Python.INDENT + 'return ' + value + '\n';
-//   } else {
-//     code += Python.INDENT + 'return\n';
-//   }
-//   return code;
-// };
+FSharp['procedures_callnoreturn'] = function(block) {
+  // Call a procedure with no return value.
+  // Generated code is for a function call as a statement is the same as a
+  // function call as a value, with the addition of line ending.
+  const tuple = FSharp['procedures_callreturn'](block);
+  return tuple[0] + '\n';
+};
+
+FSharp['procedures_ifreturn'] = function(block) {
+  // Conditionally return value from a procedure.
+  const condition =
+    FSharp.valueToCode(block, 'CONDITION', FSharp.ORDER_NONE) || 'False';
+  let code = 'if ' + condition + ':\n';
+  if (FSharp.STATEMENT_SUFFIX) {
+    // Inject any statement suffix here since the regular one at the end
+    // will not get executed if the return is triggered.
+    code += FSharp.prefixLines(
+        FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT);
+  }
+  if (block.hasReturnValue_) {
+    const value =
+        FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || 'None';
+    code += FSharp.INDENT + 'return ' + value + '\n';
+  } else {
+    code += FSharp.INDENT + 'return\n';
+  }
+  return code;
+};

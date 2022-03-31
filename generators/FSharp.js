@@ -282,7 +282,7 @@ FSharp.scrub_ = function (block, code, opt_thisOnly) {
     let comment = block.getCommentText();
     if (comment) {
       comment = stringUtils.wrap(comment, this.COMMENT_WRAP - 3);
-      commentCode += this.prefixLines(comment + '\n', '# ');
+      commentCode += this.prefixLines(comment + '\n', '// ');
     }
     // Collect comments for all value arguments.
     // Don't collect comments for nested statements.
@@ -292,7 +292,7 @@ FSharp.scrub_ = function (block, code, opt_thisOnly) {
         if (childBlock) {
           comment = this.allNestedComments(childBlock);
           if (comment) {
-            commentCode += this.prefixLines(comment, '# ');
+            commentCode += this.prefixLines(comment, '// ');
           }
         }
       }

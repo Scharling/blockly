@@ -34,6 +34,9 @@ const createPrimitiveType = function (blockName) {
         children: [],
         getType: function () {
             return this.text_name;
+        },
+        getFSharpType() {
+            return this.getType();
         }
     }
 }
@@ -50,6 +53,9 @@ const createNullType = function () {
         children: [],
         getType: function () {
             return this.text_name;
+        },
+        getFSharpType() {
+            return "";
         }
     }
 }
@@ -72,6 +78,15 @@ const createTupleType = function (children) {
                 s = s + this.children[i].getType() + ", "
             }
             if (this.children.length > 0) s = s.slice(0, -2)
+            s = s + this.text_name_end
+            return s
+        }, 
+        getFSharpType() {
+            var s = "(";
+            for (var i = 0; i < this.children.length; i++) {
+                s = s + this.children[i].getFSharpType() + " * "
+            }
+            if (this.children.length > 0) s = s.slice(0, -3)
             s = s + this.text_name_end
             return s
         }
@@ -124,6 +139,46 @@ const createFunctionType = function (inputs, output) {
                     s += "(";
                 }
                 s = s + this.output?.getType();
+                if (this.output?.block_name === "type_function") {
+                    s += ")";
+                }
+            }
+
+            s += this.text_name_end;
+
+            return s
+        },
+        getFSharpType: function () {
+            var s = this.text_name_start;
+
+            if (this.inputs.length === 0) {
+                s += "unit";
+                s += this.text_name_middle;
+            } else {
+                for (let i = 0; i < this.inputs.length; i++) {
+                    const element = this.inputs[i];
+                    if (element.block_name === "type_function") {
+                        s += "(";
+                    }
+                    s += element.getFSharpType();
+                    if (element.block_name === "type_function") {
+                        s += ")";
+                    }
+                    if (i < this.inputs.length - 1) {
+                        s += " -> ";
+                    }
+
+                }
+                s += " " + this.text_name_middle + " ";
+            }
+
+            if (!this.output) {
+                s += "unit";
+            } else {
+                if (this.output?.block_name === "type_function") {
+                    s += "(";
+                }
+                s = s + this.output?.getFSharpType();
                 if (this.output?.block_name === "type_function") {
                     s += ")";
                 }
