@@ -77,8 +77,8 @@ exports.ProcedureBlock = ProcedureBlock;
  * @alias Blockly.Procedures.allProcedures
  */
 const allProcedures = function (root) {
-  const proceduresNoReturn =
-    root.getBlocksByType('procedures_defnoreturn', false)
+  const proceduresAnonymous =
+    root.getBlocksByType('procedures_anonymous', false)
       .map(function (block) {
         return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
       });
@@ -86,9 +86,9 @@ const allProcedures = function (root) {
     root.getBlocksByType('procedures_defreturn', false).map(function (block) {
       return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
     });
-  proceduresNoReturn.sort(procTupleComparator);
+  proceduresAnonymous.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
-  return [proceduresNoReturn, proceduresReturn];
+  return [proceduresAnonymous, proceduresReturn];
 };
 exports.allProcedures = allProcedures;
 
@@ -224,6 +224,13 @@ const flyoutCategory = function (workspace) {
     block.appendChild(nameField);
     xmlList.push(block);
   }
+  if (Blocks['procedures_anonymous']) {
+    // <block type="procedures_anonymous" gap="16"></block>
+    const block = utilsXml.createElement('block');
+    block.setAttribute('type', 'procedures_anonymous');
+    block.setAttribute('gap', 16);
+    xmlList.push(block);
+  }
   if (Blocks['procedures_ifreturn']) {
     // <block type="procedures_ifreturn" gap="16"></block>
     const block = utilsXml.createElement('block');
@@ -247,6 +254,9 @@ const flyoutCategory = function (workspace) {
     for (let i = 0; i < procedureList.length; i++) {
       const name = procedureList[i][0];
       const args = procedureList[i][1];
+      if (!procedureList[i][3]) {
+        continue;
+      }
       // <block type="procedures_callnoreturn" gap="16">
       //   <mutation name="do something">
       //     <arg name="x"></arg>
@@ -295,7 +305,7 @@ const flyoutCategory = function (workspace) {
   }
 
   const tuple = allProcedures(workspace);
-  populateProcedures(tuple[0], 'procedures_callnoreturn');
+  populateProcedures(tuple[0], 'procedures_callreturn');
   populateProcedures(tuple[1], 'procedures_callreturn');
   return xmlList;
 };
@@ -357,7 +367,7 @@ const mutatorOpenListener = function (e) {
   const workspaceId = /** @type {string} */ (e.workspaceId);
   const block = Workspace.getById(workspaceId).getBlockById(e.blockId);
   const type = block.type;
-  if (type !== 'procedures_defnoreturn' && type !== 'procedures_defreturn') {
+  if (type !== 'procedures_anonymous' && type !== 'procedures_defreturn') {
     return;
   }
   const workspace = block.mutator.getWorkspace();

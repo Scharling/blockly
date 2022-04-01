@@ -573,6 +573,7 @@ Blocks['procedures_defreturn'] = {
    *     - the name of the defined procedure,
    *     - a list of all its arguments,
    *     - that it DOES have a return value.
+   *     - that a call block shoud be created
    * @this {Block}
    */
   getProcedureDef: function () {
@@ -581,7 +582,68 @@ Blocks['procedures_defreturn'] = {
       const variable = this.workspace.getVariableMap().getVariableByName(argName);
       args.push(variable);
     });
-    return [this.getFieldValue('NAME'), args, true];
+    return [this.getFieldValue('NAME'), args, true, true];
+  },
+};
+
+Blocks['procedures_anonymous'] = {
+  ...PROCEDURE_DEF_COMMON,
+  /**
+   * Block for defining an anonymous procedure with a return value.
+   * @this {Block}
+   */
+  init: function () {
+    //const initName = Procedures.findLegalName('', this);
+    //const nameField = new FieldTextInput(initName, Procedures.rename);
+    //nameField.setSpellcheck(false);
+    this.setOutput(true, 'function');
+    this.appendDummyInput()
+      .appendField('do')
+      //.appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
+      //.appendField(nameField, 'NAME')
+      .appendField('', 'PARAMS')
+      .appendField('', 'RETURNTYPE');
+    this.appendValueInput('RETURN')
+      .setAlign(Align.RIGHT)
+      .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
+    this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
+    if ((this.workspace.options.comments ||
+      (this.workspace.options.parentWorkspace &&
+        this.workspace.options.parentWorkspace.options.comments)) &&
+      Msg['PROCEDURES_DEFRETURN_COMMENT']) {
+      this.setCommentText(Msg['PROCEDURES_DEFRETURN_COMMENT']);
+    }
+    this.setStyle('procedure_blocks');
+    this.setTooltip(Msg['PROCEDURES_DEFRETURN_TOOLTIP']);
+    this.setHelpUrl(Msg['PROCEDURES_DEFRETURN_HELPURL']);
+    this.arguments_ = [];
+    this.argumentVarModels_ = [];
+    this.returnType_ = null;
+    this.setStatements_(true);
+    this.statementConnection_ = null;
+  },
+  /**
+   * Return the signature of this procedure definition.
+   * @return {!Array} Tuple containing three elements:
+   *     - the name of the defined procedure,
+   *     - a list of all its arguments,
+   *     - that it DOES have a return value.
+   *     - whether a call block should be created
+   * @this {Block}
+   */
+  getProcedureDef: function () {
+    const args = [];
+    this.arguments_.forEach(argName => {
+      const variable = this.workspace.getVariableMap().getVariableByName(argName);
+      args.push(variable);
+    });
+    let name = this.id;
+    let createCallBlock = false;
+    if (this.parentBlock_ && this.parentBlock_.type === 'variables_set') {
+      name = this.parentBlock_.inputList[0].fieldRow[1].variable_.name;
+      createCallBlock = true;
+    }
+    return [name, args, true, createCallBlock];
   },
 };
 
@@ -1259,5 +1321,5 @@ Blocks['procedures_ifreturn'] = {
    * Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('custom_func');
    */
   // FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn'],
-  FUNCTION_TYPES: ['procedures_defreturn'],
+  FUNCTION_TYPES: ['procedures_defreturn', 'procedures_anonymous'],
 };
