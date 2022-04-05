@@ -889,8 +889,9 @@ const PROCEDURE_CALL_COMMON = {
         if (mutatorOpen && connection &&
           paramIds.indexOf(this.quarkIds_[i]) === -1) {
           // This connection should no longer be attached to this block.
-          connection.disconnect();
-          connection.getSourceBlock().bumpNeighbours();
+          // uncommented some disconnect stuff
+          //connection.disconnect();
+          //connection.getSourceBlock().bumpNeighbours();
         }
       }
     }
