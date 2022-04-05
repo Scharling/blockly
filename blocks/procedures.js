@@ -549,6 +549,9 @@ Blocks['procedures_defreturn'] = {
       .appendField('', 'PARAMS')
       .appendField('', 'RETURNTYPE');
     this.appendValueInput('RETURN')
+      .appendField('rec')
+      .appendField(new FieldCheckbox('FALSE'), 'REC')
+      .appendField('| ')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
     this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
