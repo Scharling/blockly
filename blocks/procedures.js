@@ -863,11 +863,11 @@ const PROCEDURE_CALL_COMMON = {
     }
     // Test arguments (arrays of strings) for changes. '\n' is not a valid
     // argument name character, so it is a valid delimiter here.
-    if (paramNames.join('\n') === this.arguments_.join('\n')) {
-      // No change.
-      this.quarkIds_ = paramIds;
-      return;
-    }
+    // if (paramNames.join('\n') === this.arguments_.join('\n')) {
+    //   // No change.
+    //   this.quarkIds_ = paramIds;
+    //   return;
+    // }
     if (paramIds.length !== paramNames.length) {
       throw RangeError('paramNames and paramIds must be the same length.');
     }
@@ -900,8 +900,10 @@ const PROCEDURE_CALL_COMMON = {
     if (this.type !== "args_callreturn") {
       this.argumentVarModels_ = [];
       for (let i = 0; i < this.arguments_.length; i++) {
-        const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, null, this.arguments_[i], '');
+        // const variable = Variables.getOrCreateVariablePackage(
+        //   this.workspace, null, this.arguments_[i], '');
+        const variable = this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
+        console.log(variable);
         this.argumentVarModels_.push(variable);
       }
     }
@@ -933,21 +935,69 @@ const PROCEDURE_CALL_COMMON = {
    * @this {Block}
    */
   updateShape_: function () {
-    for (let i = 0; i < this.arguments_.length; i++) {
+    // Add 'with:' if there are parameters, remove otherwise.
+    const secondRow = this.getInput('BOTTOMROW');
+    if (secondRow) {
+      if (this.arguments_.length) {
+        if (!this.getField('WITH')) {
+          secondRow.appendField("with parameters:", 'WITH');
+        }
+        if (this.getField('ARGCOUNT')) {
+          this.argCount_ = this.getFieldValue("ARGCOUNT");
+          secondRow.removeField('ARGCOUNT');
+        }
+        const options = [["all", "ALL"]];
+        for (let i = 1; i <= this.arguments_.length; i++) {
+          const element = i + "";
+          options.push([element, element]);
+        }
+        const thisBlock = this;
+        secondRow.appendField(new Blockly.FieldDropdown(options, function (newOp) {
+          this.argCount_ = newOp;
+          thisBlock.setArgInputs_(newOp);
+        }), "ARGCOUNT");
+
+        secondRow.init();
+
+        const f = this.getField("ARGCOUNT");
+        if (Number(this.argCount_) > this.arguments_.length) {
+          f.setValue("ALL");
+        } else {
+          f.setValue(this.argCount_);
+        }
+      } else {
+        if (this.getField('WITH')) {
+          secondRow.removeField('WITH');
+        }
+        if (this.getField('ARGCOUNT')) {
+          this.argCount_ = "ALL";
+          secondRow.removeField('ARGCOUNT');
+        }
+      }
+    }
+    this.setArgInputs_(this.argCount_);
+  },
+
+  setArgInputs_: function (argCount) {
+    const args = argCount === "ALL" ? this.arguments_.length : Number(argCount);
+
+    for (let i = 0; i < args; i++) {
       const argField = this.getField('ARGNAME' + i);
+      const variable = this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
+      const text = this.arguments_[i] + " (" + variable.type.getType() + ")";
       if (argField) {
         // Ensure argument name is up to date.
         // The argument name field is deterministic based on the mutation,
         // no need to fire a change event.
         Events.disable();
         try {
-          argField.setValue(this.arguments_[i]);
+          argField.setValue(text);
         } finally {
           Events.enable();
         }
       } else {
         // Add new input.
-        const newField = new FieldLabel(this.arguments_[i]);
+        const newField = new FieldLabel(text);
         const input = this.appendValueInput('ARG' + i)
           .setAlign(Align.RIGHT)
           .appendField(newField, 'ARGNAME' + i);
@@ -955,22 +1005,8 @@ const PROCEDURE_CALL_COMMON = {
       }
     }
     // Remove deleted inputs.
-    for (let i = this.arguments_.length; this.getInput('ARG' + i); i++) {
+    for (let i = args; this.getInput('ARG' + i); i++) {
       this.removeInput('ARG' + i);
-    }
-    // Add 'with:' if there are parameters, remove otherwise.
-    const topRow = this.getInput('TOPROW');
-    if (topRow) {
-      if (this.arguments_.length) {
-        if (!this.getField('WITH')) {
-          topRow.appendField(Msg['PROCEDURES_CALL_BEFORE_PARAMS'], 'WITH');
-          topRow.init();
-        }
-      } else {
-        if (this.getField('WITH')) {
-          topRow.removeField('WITH');
-        }
-      }
     }
   },
   /**
@@ -982,6 +1018,7 @@ const PROCEDURE_CALL_COMMON = {
   mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     container.setAttribute('name', this.getProcedureCall());
+    container.setAttribute('argCount', this.argCount_);
     for (let i = 0; i < this.arguments_.length; i++) {
       const parameter = xmlUtils.createElement('arg');
       parameter.setAttribute('name', this.arguments_[i]);
@@ -998,6 +1035,8 @@ const PROCEDURE_CALL_COMMON = {
   domToMutation: function (xmlElement) {
     const name = xmlElement.getAttribute('name');
     this.renameProcedure(this.getProcedureCall(), name);
+    const argCount = xmlElement.getAttribute('argCount');
+    this.argCount_ = argCount ?? 'ALL';
     const args = [];
     const paramIds = [];
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
@@ -1016,6 +1055,7 @@ const PROCEDURE_CALL_COMMON = {
   saveExtraState: function () {
     const state = Object.create(null);
     state['name'] = this.getProcedureCall();
+    state['argCount'] = this.argCount_
     if (this.arguments_.length) {
       state['params'] = this.arguments_;
     }
@@ -1028,6 +1068,7 @@ const PROCEDURE_CALL_COMMON = {
    */
   loadExtraState: function (state) {
     this.renameProcedure(this.getProcedureCall(), state['name']);
+    this.argCount_ = state['argCount'];
     const params = state['params'];
     if (params) {
       const ids = [];
@@ -1188,6 +1229,7 @@ Blocks['procedures_callreturn'] = {
    */
   init: function () {
     this.appendDummyInput('TOPROW').appendField('', 'NAME');
+    this.appendDummyInput('BOTTOMROW');
     this.setOutput(true);
     this.setStyle('procedure_blocks');
     // Tooltip is set in domToMutation.
@@ -1197,6 +1239,7 @@ Blocks['procedures_callreturn'] = {
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
     this.previousEnabledState_ = true;
+    this.argCount_ = "ALL";
   },
 
   defType_: 'procedures_defreturn',
@@ -1210,6 +1253,7 @@ Blocks['args_callreturn'] = {
    */
   init: function () {
     this.appendDummyInput('TOPROW').appendField('', 'NAME');
+    this.appendDummyInput('BOTTOMROW');
     this.setOutput(true);
     this.setStyle('procedure_blocks');
     // Tooltip is set in domToMutation.
@@ -1219,6 +1263,7 @@ Blocks['args_callreturn'] = {
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
     this.previousEnabledState_ = true;
+    this.argCount_ = "ALL";
   },
 
   //defType_: 'args_defreturn',

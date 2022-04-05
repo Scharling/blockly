@@ -16,7 +16,7 @@ const Variables = goog.require('Blockly.Variables');
 const { NameType } = goog.require('Blockly.Names');
 
 
-FSharp['procedures_defreturn'] = function(block) {
+FSharp['procedures_defreturn'] = function (block) {
   // Define a procedure with a return value.
   // First, add a 'global' statement for every variable that is not shadowed by
   // a local parameter.
@@ -33,12 +33,12 @@ FSharp['procedures_defreturn'] = function(block) {
   const devVarList = Variables.allDeveloperVariables(workspace);
   for (let i = 0; i < devVarList.length; i++) {
     globals.push(
-        FSharp.nameDB_.getName(devVarList[i], NameType.DEVELOPER_VARIABLE));
+      FSharp.nameDB_.getName(devVarList[i], NameType.DEVELOPER_VARIABLE));
   }
 
   const globalString = globals.length ?
-      FSharp.INDENT + 'global ' + globals.join(', ') + '\n' :
-      '';
+    FSharp.INDENT + 'global ' + globals.join(', ') + '\n' :
+    '';
   const funcName =
     FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.PROCEDURE);
   let xfix1 = '';
@@ -54,7 +54,7 @@ FSharp['procedures_defreturn'] = function(block) {
   let loopTrap = '';
   if (FSharp.INFINITE_LOOP_TRAP) {
     loopTrap = FSharp.prefixLines(
-        FSharp.injectId(FSharp.INFINITE_LOOP_TRAP, block), FSharp.INDENT);
+      FSharp.injectId(FSharp.INFINITE_LOOP_TRAP, block), FSharp.INDENT);
   }
   let branch = FSharp.statementToCode(block, 'STACK');
   let returnValue =
@@ -86,18 +86,18 @@ FSharp['procedures_defreturn'] = function(block) {
 };
 
 function createArgsString(args, variableModels) {
-    let str = "";
-    for (var i = 0; i < args.length; i++) {
-        let arg = args[i];
-        for (var j = 0; j < variableModels.length; j++) {
-            let varModel = variableModels[j];
-            if (varModel.name == arg) {
-                str = str + " (" + arg + " : " + varModel.type.getFSharpType() + ")"
-                break;
-            }
-        }
+  let str = "";
+  for (var i = 0; i < args.length; i++) {
+    let arg = args[i];
+    for (var j = 0; j < variableModels.length; j++) {
+      let varModel = variableModels[j];
+      if (varModel.name == arg) {
+        str = str + " (" + arg + " : " + varModel.type.getFSharpType() + ")"
+        break;
+      }
     }
-    return str;
+  }
+  return str;
 }
 
 function createRecString(block) {
@@ -121,28 +121,36 @@ function createRecString(block) {
 // a procedure with a return value.
 FSharp['procedures_defnoreturn'] = FSharp['procedures_defreturn'];
 
-FSharp['procedures_callreturn'] = function(block) {
+FSharp['procedures_callreturn'] = function (block) {
   // Call a procedure with a return value.
   const funcName =
     FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.PROCEDURE);
   const args = [];
   const variables = block.getVars();
-  for (let i = 0; i < variables.length; i++) {
-    args[i] = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE) || 'None';
+
+  const argCount = block.getFieldValue('ARGCOUNT') === 'ALL' ? variables.length : Number(block.getFieldValue('ARGCOUNT'));
+  for (let i = 0; i < argCount; i++) {
+    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE);
+    if (argtext) {
+      args[i] = argtext;
+    }
+    //args[i] = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE) || 'None';
   }
-  const code = funcName + '' + args.join(' ') + '';
+  const code = funcName + ' ' + args.join(' ');
   return [code, FSharp.ORDER_FUNCTION_APPLICATION];
 };
 
-FSharp['procedures_callnoreturn'] = function(block) {
-  // Call a procedure with no return value.
-  // Generated code is for a function call as a statement is the same as a
-  // function call as a value, with the addition of line ending.
-  const tuple = FSharp['procedures_callreturn'](block);
-  return tuple[0] + '\n';
-};
+FSharp['args_callreturn'] = FSharp['procedures_defnoreturn'];
 
-FSharp['procedures_ifreturn'] = function(block) {
+// FSharp['procedures_callnoreturn'] = function (block) {
+//   // Call a procedure with no return value.
+//   // Generated code is for a function call as a statement is the same as a
+//   // function call as a value, with the addition of line ending.
+//   const tuple = FSharp['procedures_callreturn'](block);
+//   return tuple[0] + '\n';
+// };
+
+FSharp['procedures_ifreturn'] = function (block) {
   // Conditionally return value from a procedure.
   const condition =
     FSharp.valueToCode(block, 'CONDITION', FSharp.ORDER_NONE) || 'False';
@@ -151,11 +159,11 @@ FSharp['procedures_ifreturn'] = function(block) {
     // Inject any statement suffix here since the regular one at the end
     // will not get executed if the return is triggered.
     code += FSharp.prefixLines(
-        FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT);
+      FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT);
   }
   if (block.hasReturnValue_) {
     const value =
-        FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || 'None';
+      FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || 'None';
     code += FSharp.INDENT + 'return ' + value + '\n';
   } else {
     code += FSharp.INDENT + 'return\n';
