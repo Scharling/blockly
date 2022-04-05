@@ -83,7 +83,6 @@ FSharp['procedures_defreturn'] = function (block) {
 
 
 FSharp['procedures_anonymous'] = function (block) {
-  console.log(block);
   // Define a procedure with a return value.
   // First, add a 'global' statement for every variable that is not shadowed by
   // a local parameter.
@@ -147,9 +146,7 @@ FSharp['procedures_anonymous'] = function (block) {
   code = FSharp.scrub_(block, code);
   // Add % so as not to collide with helper functions in definitions list.
   //FSharp.definitions_['%' + funcName] = code;
-  console.log(block.parentBlock_);
   if (block.parentBlock_?.type === 'procedures_callreturn' || block.parentBlock_?.type === 'args_callreturn') {
-    console.log("lol");
     code = '(' + code + ')';
   }
   return [code, FSharp.ORDER_FUNCTION_MATCH_TRY];
