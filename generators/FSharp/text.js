@@ -50,50 +50,43 @@ const forceString = function (value) {
   if (strRegExp.test(value)) {
     return [value, FSharp.ORDER_ATOMIC];
   }
-  return ['string ' + value, FSharp.ORDER_FUNCTION_CALL];
+  return ['string (' + value + ')', FSharp.ORDER_FUNCTION_CALL];
 };
 
-// FSharp['text_join'] = function (block) {
-//   // Create a string made up of any number of elements of any type.
-//   // Should we allow joining by '-' or ',' or any other characters?
-//   switch (block.itemCount_) {
-//     case 0:
-//       return ['\'\'', FSharp.ORDER_ATOMIC];
-//     case 1: {
-//       const element =
-//         FSharp.valueToCode(block, 'ADD0', FSharp.ORDER_NONE) || '\'\'';
-//       const codeAndOrder = forceString(element);
-//       return codeAndOrder;
-//     }
-//     case 2: {
-//       const element0 =
-//         FSharp.valueToCode(block, 'ADD0', FSharp.ORDER_NONE) || '\'\'';
-//       const element1 =
-//         FSharp.valueToCode(block, 'ADD1', FSharp.ORDER_NONE) || '\'\'';
-//       const code = forceString(element0)[0] + ' + ' + forceString(element1)[0];
-//       return [code, FSharp.ORDER_ADDITIVE];
-//     }
-//     default: {
-//       const elements = [];
-//       for (let i = 0; i < block.itemCount_; i++) {
-//         elements[i] =
-//           FSharp.valueToCode(block, 'ADD' + i, FSharp.ORDER_NONE) || '\'\'';
-//       }
-//       const tempVar = FSharp.nameDB_.getDistinctName('x', NameType.VARIABLE);
-//       const code = '\'\'.join([str(' + tempVar + ') for ' + tempVar + ' in [' +
-//         elements.join(', ') + ']])';
-//       return [code, FSharp.ORDER_FUNCTION_CALL];
-//     }
-//   }
-// };
-
-// FSharp['text_append'] = function (block) {
-//   // Append to a variable in place.
-//   const varName =
-//     FSharp.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
-//   const value = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_NONE) || '\'\'';
-//   return varName + ' = sting ' + varName + ' + ' + forceString(value)[0] + '\n';
-// };
+FSharp['text_join'] = function (block) {
+  // Create a string made up of any number of elements of any type.
+  // Should we allow joining by '-' or ',' or any other characters?
+  switch (block.itemCount_) {
+    case 0:
+      return ['""', FSharp.ORDER_ATOMIC];
+    case 1: {
+      const element =
+        FSharp.valueToCode(block, 'ADD0', FSharp.ORDER_NONE) || '""';
+      const codeAndOrder = forceString(element);
+      return codeAndOrder;
+    }
+    case 2: {
+      const element0 =
+        FSharp.valueToCode(block, 'ADD0', FSharp.ORDER_NONE) || '""';
+      const element1 =
+        FSharp.valueToCode(block, 'ADD1', FSharp.ORDER_NONE) || '""';
+      const code = forceString(element0)[0] + " + " + forceString(element1)[0];
+      return [code, FSharp.ORDER_ADDITIVE];
+    }
+    default: {
+      const elements = [];
+      for (let i = 0; i < block.itemCount_; i++) {
+        elements[i] =
+          FSharp.valueToCode(block, 'ADD' + i, FSharp.ORDER_NONE) || '""';
+      }
+      const tempVar = FSharp.nameDB_.getDistinctName('x', NameType.VARIABLE);
+      // const code = '"".join([str(' + tempVar + ') for ' + tempVar + ' in [' +
+      //   elements.join(', ') + ']])';
+      const code = '[' + elements.join(', ') + '] |> String.concat "+"'
+      return [code, FSharp.ORDER_FUNCTION_CALL];
+    }
+  }
+};
 
 FSharp['text_length'] = function (block) {
   // Is the string null or array empty?
@@ -108,20 +101,20 @@ FSharp['text_isEmpty'] = function (block) {
   return [code, FSharp.ORDER_RELATIONAL];
 };
 
-// Python['text_indexOf'] = function(block) {
-//   // Search the text for a substring.
-//   // Should we allow for non-case sensitive???
-//   const operator = block.getFieldValue('END') === 'FIRST' ? 'find' : 'rfind';
-//   const substring =
-//       Python.valueToCode(block, 'FIND', Python.ORDER_NONE) || '\'\'';
-//   const text =
-//       Python.valueToCode(block, 'VALUE', Python.ORDER_MEMBER) || '\'\'';
-//   const code = text + '.' + operator + '(' + substring + ')';
-//   if (block.workspace.options.oneBasedIndex) {
-//     return [code + ' + 1', Python.ORDER_ADDITIVE];
-//   }
-//   return [code, Python.ORDER_FUNCTION_CALL];
-// };
+FSharp['text_indexOf'] = function (block) {
+  // Search the text for a substring.
+  // Should we allow for non-case sensitive???
+  const operator = block.getFieldValue('END') === 'FIRST' ? 'IndexOf' : 'LastIndexOf';
+  const substring =
+    FSharp.valueToCode(block, 'FIND', FSharp.ORDER_NONE) || '\'\'';
+  const text =
+    FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_MEMBER) || '\'\'';
+  const code = text + '.' + operator + ' ' + substring;
+  if (block.workspace.options.oneBasedIndex) {
+    return [code + ' + 1', FSharp.ORDER_ADDITIVE];
+  }
+  return [code, FSharp.ORDER_FUNCTION_CALL];
+};
 
 FSharp['text_charAt'] = function (block) {
   // Get letter at index.
@@ -169,68 +162,70 @@ FSharp['text_charAt'] = function (block) {
   throw Error('Unhandled option (text_charAt).');
 };
 
-// Python['text_getSubstring'] = function(block) {
-//   // Get substring.
-//   const where1 = block.getFieldValue('WHERE1');
-//   const where2 = block.getFieldValue('WHERE2');
-//   const text =
-//       Python.valueToCode(block, 'STRING', Python.ORDER_MEMBER) || '\'\'';
-//   let at1;
-//   switch (where1) {
-//     case 'FROM_START':
-//       at1 = Python.getAdjustedInt(block, 'AT1');
-//       if (at1 === 0) {
-//         at1 = '';
-//       }
-//       break;
-//     case 'FROM_END':
-//       at1 = Python.getAdjustedInt(block, 'AT1', 1, true);
-//       break;
-//     case 'FIRST':
-//       at1 = '';
-//       break;
-//     default:
-//       throw Error('Unhandled option (text_getSubstring)');
-//   }
+FSharp['text_getSubstring'] = function (block) {
+  // Get substring.
+  const where1 = block.getFieldValue('WHERE1');
+  const where2 = block.getFieldValue('WHERE2');
+  console.log(where1);
+  console.log(where2);
+  const text =
+    FSharp.valueToCode(block, 'STRING', FSharp.ORDER_MEMBER) || '""';
+  let at1;
+  switch (where1) {
+    case 'FROM_START':
+      at1 = FSharp.getAdjustedInt(block, 'AT1');
+      if (at1 === 0) {
+        at1 = '0';
+      }
+      break;
+    // case 'FROM_END':
+    //   at1 = FSharp.getAdjustedInt(block, 'AT1', 1);
+    //   at1 = text.length + at1;
+    //   break;
+    case 'FIRST':
+      at1 = '';
+      break;
+    default:
+      throw Error('Unhandled option (text_getSubstring)');
+  }
 
-//   let at2;
-//   switch (where2) {
-//     case 'FROM_START':
-//       at2 = Python.getAdjustedInt(block, 'AT2', 1);
-//       break;
-//     case 'FROM_END':
-//       at2 = Python.getAdjustedInt(block, 'AT2', 0, true);
-//       // Ensure that if the result calculated is 0 that sub-sequence will
-//       // include all elements as expected.
-//       if (!stringUtils.isNumber(String(at2))) {
-//         Python.definitions_['import_sys'] = 'import sys';
-//         at2 += ' or sys.maxsize';
-//       } else if (at2 === 0) {
-//         at2 = '';
-//       }
-//       break;
-//     case 'LAST':
-//       at2 = '';
-//       break;
-//     default:
-//       throw Error('Unhandled option (text_getSubstring)');
-//   }
-//   const code = text + '[' + at1 + ' : ' + at2 + ']';
-//   return [code, Python.ORDER_MEMBER];
-// };
+  let at2;
+  switch (where2) {
+    case 'FROM_START':
+      at2 = FSharp.getAdjustedInt(block, 'AT2');
+      break;
+    // case 'FROM_END':
+    //   at2 = FSharp.getAdjustedInt(block, 'AT2', 0, true);
+    //   // Ensure that if the result calculated is 0 that sub-sequence will
+    //   // include all elements as expected.
+    //   if (at2 === 0) {
+    //     at2 = '';
+    //   } else {
+    //     at2 = at2;
+    //   }
+    //   break;
+    case 'LAST':
+      at2 = '';
+      break;
+    default:
+      throw Error('Unhandled option (text_getSubstring)');
+  }
+  const code = where1 === 'FIRST' && where2 === 'LAST' ? text : text + '[' + at1 + '..' + at2 + ']';
+  return [code, FSharp.ORDER_MEMBER];
+};
 
-// FSharp['text_changeCase'] = function (block) {
-//   // Change capitalization.
-//   const OPERATORS = {
-//     'UPPERCASE': '.ToUpper()',
-//     'LOWERCASE': '.ToLower()',
-//     'TITLECASE': '.title()'
-//   };
-//   const operator = OPERATORS[block.getFieldValue('CASE')];
-//   const text = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_MEMBER) || '\'\'';
-//   const code = text + operator;
-//   return [code, FSharp.ORDER_FUNCTION_CALL];
-// };
+FSharp['text_changeCase'] = function (block) {
+  // Change capitalization.
+  const OPERATORS = {
+    'UPPERCASE': '.ToUpper()',
+    'LOWERCASE': '.ToLower()',
+    //'TITLECASE': '.title()'
+  };
+  const operator = OPERATORS[block.getFieldValue('CASE')];
+  const text = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_MEMBER) || '\'\'';
+  const code = text + operator;
+  return [code, FSharp.ORDER_FUNCTION_CALL];
+};
 
 FSharp['text_trim'] = function (block) {
   // Trim spaces.
@@ -299,4 +294,13 @@ FSharp['text_reverse'] = function (block) {
 //   const sub = Python.valueToCode(block, 'SUB', Python.ORDER_NONE) || '\'\'';
 //   const code = text + '.count(' + sub + ')';
 //   return [code, Python.ORDER_FUNCTION_CALL];
+// };
+
+
+// FSharp['text_append'] = function (block) {
+//   // Append to a variable in place.
+//   const varName =
+//     FSharp.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
+//   const value = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_NONE) || '\'\'';
+//   return varName + ' = sting ' + varName + ' + ' + forceString(value)[0] + '\n';
 // };
