@@ -985,7 +985,8 @@ const PROCEDURE_CALL_COMMON = {
     for (let i = 0; i < args; i++) {
       const argField = this.getField('ARGNAME' + i);
       const variable = this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
-      const text = this.arguments_[i] + " (" + variable?.type.getType() + ")";
+      const extraType = (variable) ? " (" + variable?.type.getType() + ")" : "";
+      const text = this.arguments_[i] + extraType;
       if (argField) {
         // Ensure argument name is up to date.
         // The argument name field is deterministic based on the mutation,
