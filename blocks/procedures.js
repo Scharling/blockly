@@ -607,12 +607,12 @@ Blocks['procedures_anonymous'] = {
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
     this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
-    if ((this.workspace.options.comments ||
-      (this.workspace.options.parentWorkspace &&
-        this.workspace.options.parentWorkspace.options.comments)) &&
-      Msg['PROCEDURES_DEFRETURN_COMMENT']) {
-      this.setCommentText(Msg['PROCEDURES_DEFRETURN_COMMENT']);
-    }
+    // if ((this.workspace.options.comments ||
+    //   (this.workspace.options.parentWorkspace &&
+    //     this.workspace.options.parentWorkspace.options.comments)) &&
+    //   Msg['PROCEDURES_DEFRETURN_COMMENT']) {
+    //   this.setCommentText(Msg['PROCEDURES_DEFRETURN_COMMENT']);
+    // }
     this.setStyle('procedure_blocks');
     this.setTooltip(Msg['PROCEDURES_DEFRETURN_TOOLTIP']);
     this.setHelpUrl(Msg['PROCEDURES_DEFRETURN_HELPURL']);
@@ -981,7 +981,7 @@ const PROCEDURE_CALL_COMMON = {
     for (let i = 0; i < args; i++) {
       const argField = this.getField('ARGNAME' + i);
       const variable = this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
-      const text = this.arguments_[i] + " (" + variable.type.getType() + ")";
+      const text = this.arguments_[i] + " (" + variable?.type.getType() + ")";
       if (argField) {
         // Ensure argument name is up to date.
         // The argument name field is deterministic based on the mutation,

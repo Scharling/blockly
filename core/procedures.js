@@ -305,7 +305,7 @@ const flyoutCategory = function (workspace) {
   }
 
   const tuple = allProcedures(workspace);
-  populateProcedures(tuple[0], 'procedures_callreturn');
+  populateProcedures(tuple[0], 'args_callreturn');
   populateProcedures(tuple[1], 'procedures_callreturn');
   return xmlList;
 };
