@@ -109,9 +109,9 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   updateReturnType_: function () {
-    let returnTypeString = '';
+    let returnTypeString = 'return';
     if (!!this.returnType_) {
-      returnTypeString = "returns: " + this.returnType_.getType();
+      returnTypeString = "return: " + this.returnType_.getType();
     }
     // The return type field is deterministic based on the mutation,
     // no need to fire a change event.
@@ -547,13 +547,14 @@ Blocks['procedures_defreturn'] = {
       .appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
       .appendField(nameField, 'NAME')
       .appendField('', 'PARAMS')
-      .appendField('', 'RETURNTYPE');
     this.appendValueInput('RETURN')
       .appendField('rec')
       .appendField(new FieldCheckbox('FALSE'), 'REC')
       .appendField('| ')
+      // .appendField('', 'RETURNTYPE')
+      // .appendField(' | ')
       .setAlign(Align.RIGHT)
-      .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
+      .appendField(Msg['PROCEDURES_DEFRETURN_RETURN'], 'RETURNTYPE');
     this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
@@ -605,10 +606,10 @@ Blocks['procedures_anonymous'] = {
       //.appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
       //.appendField(nameField, 'NAME')
       .appendField('', 'PARAMS')
-      .appendField('', 'RETURNTYPE');
+    // .appendField('', 'RETURNTYPE');
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
-      .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
+      .appendField(Msg['PROCEDURES_DEFRETURN_RETURN'], 'RETURNTYPE');
     this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
     // if ((this.workspace.options.comments ||
     //   (this.workspace.options.parentWorkspace &&
@@ -904,7 +905,6 @@ const PROCEDURE_CALL_COMMON = {
         // const variable = Variables.getOrCreateVariablePackage(
         //   this.workspace, null, this.arguments_[i], '');
         const variable = this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
-        console.log(variable);
         this.argumentVarModels_.push(variable);
       }
     }
