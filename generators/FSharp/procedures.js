@@ -71,7 +71,9 @@ FSharp['procedures_defreturn'] = function (block) {
     args[i] = FSharp.nameDB_.getName(variables[i], NameType.VARIABLE);
   }
   let argsString = createArgsString(args, usedVariables);
-  let code = 'let ' + funcName + ' ' + argsString + ' =\n' +
+  let recString = createRecString(block);
+
+  let code = 'let ' + recString + funcName + ' ' + argsString + ' =\n' +
     xfix1 + loopTrap + branch + xfix2 + returnValue;
   code = FSharp.scrub_(block, code);
   // Add % so as not to collide with helper functions in definitions list.
@@ -169,6 +171,23 @@ function createArgsString(args, variableModels) {
   }
   return str;
 };
+
+function createRecString(block) {
+  for (var i = 0; i < block.inputList.length; i++) {
+    var input = block.inputList[i];
+    for (var j = 0; j < input.fieldRow.length; j++) {
+      var field = input.fieldRow[j];
+      if (field.name == "REC") {
+        if (field.value_) {
+          return "rec "
+        } else {
+          return "";
+        }
+      }
+    }
+  }
+  return "";
+}
 
 // Defining a procedure without a return value uses the same generator as
 // a procedure with a return value.

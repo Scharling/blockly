@@ -549,6 +549,9 @@ Blocks['procedures_defreturn'] = {
       .appendField('', 'PARAMS')
       .appendField('', 'RETURNTYPE');
     this.appendValueInput('RETURN')
+      .appendField('rec')
+      .appendField(new FieldCheckbox('FALSE'), 'REC')
+      .appendField('| ')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN']);
     this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
@@ -886,8 +889,9 @@ const PROCEDURE_CALL_COMMON = {
         if (mutatorOpen && connection &&
           paramIds.indexOf(this.quarkIds_[i]) === -1) {
           // This connection should no longer be attached to this block.
-          connection.disconnect();
-          connection.getSourceBlock().bumpNeighbours();
+          // uncommented some disconnect stuff
+          //connection.disconnect();
+          //connection.getSourceBlock().bumpNeighbours();
         }
       }
     }
