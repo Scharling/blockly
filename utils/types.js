@@ -259,7 +259,8 @@ const createBlockFromType = function (type) {
             const functionBlockNode = xmlUtils.createElement('block');
             functionBlockNode.setAttribute('type', type.block_name);
             const functionMutationBlock = xmlUtils.createElement('mutation');
-            functionMutationBlock.setAttribute('inputs', type.inputs.length - 1);
+            const mutationNumber = (type.inputs.length < 2) ? 0 : type.inputs.length - 1;
+            functionMutationBlock.setAttribute('inputs', mutationNumber);
             functionBlockNode.appendChild(functionMutationBlock);
             if (type.inputs.length > 0) {
                 let i = 0;
