@@ -578,6 +578,7 @@ Blocks['procedures_defreturn'] = {
    *     - a list of all its arguments,
    *     - that it DOES have a return value.
    *     - that a call block shoud be created
+   *     - return type
    * @this {Block}
    */
   getProcedureDef: function () {
@@ -586,7 +587,7 @@ Blocks['procedures_defreturn'] = {
       const variable = this.workspace.getVariableMap().getVariableByName(argName);
       args.push(variable);
     });
-    return [this.getFieldValue('NAME'), args, true, true];
+    return [this.getFieldValue('NAME'), args, true, true, this.returnType_];
   },
 };
 
@@ -633,6 +634,7 @@ Blocks['procedures_anonymous'] = {
    *     - a list of all its arguments,
    *     - that it DOES have a return value.
    *     - whether a call block should be created
+   *     - return type
    * @this {Block}
    */
   getProcedureDef: function () {
@@ -647,7 +649,7 @@ Blocks['procedures_anonymous'] = {
       name = this.parentBlock_.inputList[0].fieldRow[1].variable_.name;
       createCallBlock = true;
     }
-    return [name, args, true, createCallBlock];
+    return [name, args, true, createCallBlock, this.returnType_];
   },
 };
 
