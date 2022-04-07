@@ -191,12 +191,12 @@ defineBlocksWithJsonArray([
   },
   // Block for null data type.
   {
-    'type': 'logic_null',
-    'message0': '%{BKY_LOGIC_NULL}',
+    'type': 'logic_unit',
+    'message0': '( )',
     'output': null,
     'style': 'logic_blocks',
-    'tooltip': '%{BKY_LOGIC_NULL_TOOLTIP}',
-    'helpUrl': '%{BKY_LOGIC_NULL_HELPURL}',
+    'tooltip': 'Returns unit.',
+    'helpUrl': '',
   },
   // Block for ternary operator.
   {
