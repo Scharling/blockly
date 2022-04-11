@@ -43,6 +43,26 @@ const createPrimitiveType = function (blockName) {
 exports.createPrimitiveType = createPrimitiveType;
 
 /**
+   * Create type object for a poly type.
+   * @param typeName The name given to the type.
+   * @return Type object.
+   */
+const createPolyType = function (typeName) {
+    return {
+        block_name: "type_poly",
+        text_name: typeName,
+        children: [],
+        getType: function () {
+            return "'" + this.text_name;
+        },
+        getFSharpType() {
+            return this.getType();
+        }
+    }
+}
+exports.createPolyType = createPolyType;
+
+/**
    * Create type object for a null type.
    * @return Type object.
    */
@@ -80,7 +100,7 @@ const createTupleType = function (children) {
             if (this.children.length > 0) s = s.slice(0, -2)
             s = s + this.text_name_end
             return s
-        }, 
+        },
         getFSharpType() {
             var s = "(";
             for (var i = 0; i < this.children.length; i++) {
@@ -205,6 +225,9 @@ const createTypeFromBlock = function (block) {
         case "type_bool":
         case "type_unit":
             return createPrimitiveType(block.type);
+        case "type_poly":
+            const typeName = block.getFieldValue('NAME');
+            return createPolyType(typeName);
         case "type_tuple":
             const children = block.childBlocks_.map(b => createTypeFromBlock(b));
             return createTupleType(children);
@@ -241,6 +264,15 @@ const createBlockFromType = function (type) {
             const blockNode = xmlUtils.createElement('block');
             blockNode.setAttribute('type', type.block_name);
             return blockNode;
+        case "type_poly":
+            const polyBlockNode = xmlUtils.createElement('block');
+            polyBlockNode.setAttribute('type', type.block_name);
+            const fieldNode = xmlUtils.createElement('field');
+            fieldNode.setAttribute('name', 'NAME');
+            const typeName = xmlUtils.createTextNode(type.text_name);
+            fieldNode.appendChild(typeName);
+            polyBlockNode.appendChild(fieldNode);
+            return polyBlockNode;
         case "type_tuple":
             const tupleBlockNode = xmlUtils.createElement('block');
             tupleBlockNode.setAttribute('type', type.block_name);
@@ -328,6 +360,8 @@ const createXmlFromType = function (type, name) {
     typeXml.setAttribute('type', type.block_name);
 
     switch (type.block_name) {
+        case "type_poly":
+            typeXml.setAttribute('name', type.text_name);
         case "type_tuple":
             for (c in type.children) {
                 const childXml = createXmlFromType(type.children[c], 'child');
@@ -363,6 +397,8 @@ const createTypeFromXml = function (xmlElement) {
         case "type_bool":
         case "type_unit":
             return createPrimitiveType(type);
+        case "type_poly":
+            return createPolyType(xmlElement.getAttribute('name'));
         case "type_tuple":
             const children = [];
             for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {

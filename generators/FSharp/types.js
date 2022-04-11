@@ -20,3 +20,4 @@ FSharp['type_bool'] = FSharp['type_unit'];
 FSharp['type_unit'] = FSharp['type_unit'];
 FSharp['type_tuple'] = FSharp['type_unit'];
 FSharp['type_function'] = FSharp['type_unit'];
+FSharp['type_poly'] = FSharp['type_unit'];
