@@ -582,10 +582,11 @@ exports.appendDomToWorkspace = appendDomToWorkspace;
  * workspace.
  * @param {!Element} xmlBlock XML block element.
  * @param {!Workspace} workspace The workspace.
+ * @param {?String} procedureName The name of the procedure this block represents (or possibly mutates).
  * @return {!Block} The root block created.
  * @alias Blockly.Xml.domToBlock
  */
-const domToBlock = function(xmlBlock, workspace) {
+const domToBlock = function(xmlBlock, workspace, procedureName) {
   const {Workspace} = goog.module.get('Blockly.Workspace');
   if (xmlBlock instanceof Workspace) {
     const swap = xmlBlock;
@@ -602,7 +603,7 @@ const domToBlock = function(xmlBlock, workspace) {
   const variablesBeforeCreation = workspace.getAllVariables();
   let topBlock;
   try {
-    topBlock = domToBlockHeadless(xmlBlock, workspace);
+    topBlock = domToBlockHeadless(xmlBlock, workspace, null, null, procedureName);
     // Generate list of all blocks.
     const blocks = topBlock.getDescendants(false);
     if (workspace.rendered) {
@@ -915,10 +916,12 @@ const applyNextTagNodes = function(xmlChildren, workspace, block) {
  * @param {boolean=} connectedToParentNext Whether the provided parent
  *     connection
  *    is a next connection, rather than output or statement.
+ * @param {?string=} procedureName the name of the procedure
+ * this block might be a mutator for. Optional.
  * @return {!Block} The root block created.
  */
 const domToBlockHeadless = function(
-    xmlBlock, workspace, parentConnection, connectedToParentNext) {
+    xmlBlock, workspace, parentConnection, connectedToParentNext, procedureName) {
   let block = null;
   const prototypeName = xmlBlock.getAttribute('type');
   if (!prototypeName) {
@@ -926,7 +929,7 @@ const domToBlockHeadless = function(
   }
   const id = xmlBlock.getAttribute('id');
   block = workspace.newBlock(prototypeName, id);
-
+  block.procedureName = procedureName;
   // Preprocess childNodes so tags can be processed in a consistent order.
   const xmlChildNameMap = mapSupportedXmlTags(xmlBlock);
 

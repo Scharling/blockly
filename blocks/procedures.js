@@ -83,20 +83,28 @@ const PROCEDURE_DEF_COMMON = {
       paramString = Msg['PROCEDURES_BEFORE_PARAMS'] + ' ';
       for (var i = 0; i < this.arguments_.length; i++) {
         let arg = this.arguments_[i];
-        let variable = this.workspace.getVariableMap().getVariableByName(arg);
-        if (i > 0) {
-          paramString += ", ";
-        }
-        if (variable.type.block_name !== typeUtils.createNullType().block_name) {
-          paramString = paramString + arg + " : " + variable.type.getType();
-        } else {
-          paramString = paramString + arg;
+        let varName = this.procedureName + "." + arg;
+        
+        console.log("arg", arg, this.procedureName, varName)
+        let variable = this.workspace.getVariableMap().getVariableByName(varName);
+        
+        console.log("var", variable, this.workspace.getVariableMap())
+        if (variable) {
+          if (i > 0) {
+            paramString += ", ";
+          }
+          if (variable.type.block_name !== typeUtils.createNullType().block_name) {
+            paramString = paramString + variable.displayName + " : " + variable.type.getType();
+          } else {
+            paramString = paramString + variable.displayName;
+          } 
         }
       }
     }
     // The params field is deterministic based on the mutation,
     // no need to fire a change event.
     //Events.disable();
+    console.log("paramstring", paramString)
     try {
       this.setFieldValue(paramString, 'PARAMS');
     } finally {
@@ -140,6 +148,7 @@ const PROCEDURE_DEF_COMMON = {
       const argModel = this.argumentVarModels_[i];
       parameter.setAttribute('name', argModel.name);
       parameter.setAttribute('varid', argModel.getId());
+      parameter.setAttribute('displayName', argModel.displayName);
       if (opt_paramIds && this.paramIds_) {
         parameter.setAttribute('paramId', this.paramIds_[i]);
       }
@@ -174,7 +183,7 @@ const PROCEDURE_DEF_COMMON = {
           childNode.getAttribute('varid') || childNode.getAttribute('varId');
         this.arguments_.push(varName);
         const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, varId, varName, '');
+          this.workspace, varId, varName, '', childNode.getAttribute('displayName'));
         if (variable !== null) {
           this.argumentVarModels_.push(variable);
         } else {
@@ -223,6 +232,9 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       state['hasStatements'] = false;
     }
+    if (this.procedureName) {
+      state['procedureName'] = this.procedureName;
+    }
     return state;
   },
   /**
@@ -237,13 +249,16 @@ const PROCEDURE_DEF_COMMON = {
       for (let i = 0; i < state['params'].length; i++) {
         const param = state['params'][i];
         const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, param['id'], param['name'], param['type']);
-        this.arguments_.push(variable.name);
+          this.workspace, param['id'], param['name'], param['type'], param['displayName']);
+        this.arguments_.push(variable.displayName);
         this.argumentVarModels_.push(variable);
       }
     }
     if (state['returntype']) {
       this.returnType_ = state['returntype'];
+    }
+    if (state['procedureName']) {
+      this.procedureName = state['procedureName']
     }
     this.updateParams_();
     this.updateReturnType_();
@@ -293,8 +308,8 @@ const PROCEDURE_DEF_COMMON = {
 
       const typeNode = xmlUtils.createElement('value');
       typeNode.setAttribute('name', 'TYPE');
-
-      var variable = outerWs.getVariableMap().getVariableByName(this.arguments_[i]);
+      var varName = this.procedureName + "." + this.arguments_[i];
+      var variable = outerWs.getVariableMap().getVariableByName(varName);
       const typeBlockNode = typeUtils.createBlockFromType(variable.type);
 
       if (typeBlockNode != null) {
@@ -305,6 +320,9 @@ const PROCEDURE_DEF_COMMON = {
       node = nextNode;
     }
 
+    
+    this.procedureName = this.getFieldValue('NAME');
+    
     // Set return type block
     const returnNode = xmlUtils.createElement('value');
     returnNode.setAttribute('name', 'RETURNTYPE');
@@ -313,7 +331,7 @@ const PROCEDURE_DEF_COMMON = {
       const returnBlockNode = typeUtils.createBlockFromType(this.returnType_);
       returnNode.appendChild(returnBlockNode);
     }
-    const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
+    const containerBlock = Xml.domToBlock(containerBlockNode, workspace, this.procedureName);
     if (this.type === 'procedures_defreturn') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
     } else {
@@ -353,7 +371,10 @@ const PROCEDURE_DEF_COMMON = {
       }
       const varName = paramBlock.getFieldValue('NAME');
       this.arguments_.push(varName);
-      const variable = this.workspace.getVariable(varName, varType);
+
+      const varMapName = this.procedureName + "." + varName;
+
+      const variable = this.workspace.getVariable(varMapName, varType);
       this.argumentVarModels_.push(variable);
       this.paramIds_.push(paramBlock.id);
       paramBlock =
@@ -579,7 +600,9 @@ Blocks['procedures_defreturn'] = {
   getProcedureDef: function () {
     const args = [];
     this.arguments_.forEach(argName => {
-      const variable = this.workspace.getVariableMap().getVariableByName(argName);
+      const varName = this.procedureName + "." + argName;
+      
+      const variable = this.workspace.getVariableMap().getVariableByName(varName);
       args.push(variable);
     });
     return [this.getFieldValue('NAME'), args, true, true];
@@ -735,9 +758,14 @@ Blocks['procedures_mutatorarg'] = {
     if (!outerWs) {
       return;
     }
+    var varName = newText;
+
+    if (this.sourceBlock_ && this.sourceBlock_.parentBlock_ && this.sourceBlock_.parentBlock_.procedureName) {
+      varName = this.sourceBlock_.parentBlock_.procedureName + "." + newText;
+    }
     for (let i = 0; i < this.createdVariables_.length; i++) {
       const model = this.createdVariables_[i];
-      if (model.name !== newText) {
+      if (model.name !== varName) {
         outerWs.deleteVariableById(model.getId());
       }
     }
@@ -782,14 +810,38 @@ function validatorExternal(sourceBlock, varName, thisBlock) {
   if (sourceBlock.isInFlyout) {
     return varName;
   }
+  
+  
+  
+  var blockDBKeys = Object.keys(outerWs.blockDB_);
+  var blockDBLength = blockDBKeys.length
+  var varMapName = null;
+  for (var i = 0; i < blockDBLength; i++) {
+    var element = outerWs.blockDB_[blockDBKeys[i]];
+    if (element.mutator && element.mutator.workspace_) {
 
-  let model = outerWs.getVariable(varName, varType);
-  if (model && model.name !== varName) {
+      var elementKeys = Object.keys(element.mutator.workspace_.blockDB_);
+      var elementLength = elementKeys.length;
+
+      for (var j = 0; j < elementLength; j++) {
+        var mutatorBlock = element.mutator.workspace_.blockDB_[elementKeys[j]];
+        if (mutatorBlock.type == "procedures_mutatorcontainer") {
+          varMapName = mutatorBlock.procedureName + "." + varName;
+          console.log("found procedurename for varName (jackpot)", varMapName);
+        }
+      }
+    }
+  }
+
+  let model = outerWs.getVariable(varMapName, varType);
+
+
+  if (model && model.name !== varMapName) {
     // Rename the variable (case change)
-    outerWs.renameVariableById(model.getId(), varName);
+    outerWs.renameVariableById(model.getId(), varMapName);
   }
   if (!model) {
-    model = outerWs.createVariable(varName, varType);
+    model = outerWs.createVariable2(varMapName, varType, '', varName);
     if (model && thisBlock.createdVariables_) {
       thisBlock.createdVariables_.push(model);
     }
@@ -891,6 +943,8 @@ const PROCEDURE_CALL_COMMON = {
         }
       }
     }
+
+    console.log("about to create variables", paramNames, this)
     // Rebuild the block's arguments.
     this.arguments_ = [].concat(paramNames);
     // And rebuild the argument model list.
@@ -898,7 +952,7 @@ const PROCEDURE_CALL_COMMON = {
       this.argumentVarModels_ = [];
       for (let i = 0; i < this.arguments_.length; i++) {
         const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, null, this.arguments_[i], '');
+          this.workspace, null, this.arguments_[i], '', 'if you see this, inform oliver :)');
         this.argumentVarModels_.push(variable);
       }
     }

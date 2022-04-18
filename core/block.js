@@ -209,6 +209,14 @@ const Block = function(workspace, prototypeName, opt_id) {
    */
   this.statementInputCount = 0;
 
+
+  /**
+   * Name of the procedure
+   * @type {string|undefined}
+   */
+  this.procedureName = undefined;
+
+
   // Copy the type-specific functions and data from the prototype.
   if (prototypeName) {
     /** @type {string} */

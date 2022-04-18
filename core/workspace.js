@@ -432,6 +432,22 @@ Workspace.prototype.createVariable = function(name, opt_type, opt_id) {
 };
 
 /**
+ * Create a variable with a given name, optional type, and optional ID.
+ * @param {string} name The name of the variable. This must be unique across
+ *     variables and procedures.
+ * @param {?string=} opt_type The type of the variable like 'int' or 'string'.
+ *     Does not need to be unique. Field_variable can filter variables based on
+ *     their type. This will default to '' which is a specific type.
+ * @param {?string=} opt_id The unique ID of the variable. This will default to
+ *     a UUID.
+ * @param {?string=} displayName The displayName of the variable.
+ * @return {!VariableModel} The newly created variable.
+ */
+ Workspace.prototype.createVariable2 = function(name, opt_type, opt_id, displayName) {
+  return this.variableMap_.createVariable(name, opt_type, opt_id, displayName);
+};
+
+/**
  * Find all the uses of the given variable, which is identified by ID.
  * @param {string} id ID of the variable to find.
  * @return {!Array<!Block>} Array of block usages.

@@ -461,10 +461,10 @@ exports.generateVariableFieldDom = generateVariableFieldDom;
  *     or name + type combination.
  * @alias Blockly.Variables.getOrCreateVariablePackage
  */
-const getOrCreateVariablePackage = function(workspace, id, opt_name, opt_type) {
+const getOrCreateVariablePackage = function(workspace, id, opt_name, opt_type, displayName) {
   let variable = getVariable(workspace, id, opt_name, opt_type);
   if (!variable) {
-    variable = createVariable(workspace, id, opt_name, opt_type);
+    variable = createVariable(workspace, id, opt_name, opt_type, displayName);
   }
   return variable;
 };

@@ -38,7 +38,7 @@ goog.require('Blockly.Events.VarCreate');
  * @constructor
  * @alias Blockly.VariableModel
  */
-const VariableModel = function(workspace, name, opt_type, opt_id) {
+const VariableModel = function(workspace, name, opt_type, opt_id, displayName) {
   /**
    * The workspace the variable is in.
    * @type {!Workspace}
@@ -46,11 +46,16 @@ const VariableModel = function(workspace, name, opt_type, opt_id) {
   this.workspace = workspace;
 
   /**
-   * The name of the variable, typically defined by the user.  It may be
-   * changed by the user.
+   * The name of the variable, typically defined by the user, prefixed by the procedure name. 
    * @type {string}
    */
   this.name = name;
+  /**
+   * The name of the variable, typically defined by the user.
+   * @type {string}
+   */
+  this.displayName = displayName;
+
 
   /**
    * The type of the variable, such as 'int' or 'sound_effect'. This may be

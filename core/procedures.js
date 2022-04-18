@@ -266,7 +266,7 @@ const flyoutCategory = function (workspace) {
       const mutation = createCallMutation(name);
       block.appendChild(mutation);
       for (let j = 0; j < args.length; j++) {
-        const arg = createCallArg(args[j].name);
+        const arg = createCallArg(args[j].displayName);
         mutation.appendChild(arg);
         const type = args[j].type;
         if (type.block_name === "type_function") {

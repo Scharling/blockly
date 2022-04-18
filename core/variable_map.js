@@ -173,8 +173,9 @@ VariableMap.prototype.renameVariableWithConflict_ = function(
  *     a UUID.
  * @return {!VariableModel} The newly created variable.
  */
-VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
-  console.log("createVariable called", name, opt_type, opt_id);
+VariableMap.prototype.createVariable = function(name, opt_type, opt_id, displayName) {
+  console.log("createVariable called", name, opt_type, opt_id, displayName);
+  console.trace();
   let variable = this.getVariable(name, opt_type);
   if (variable) {
     if (opt_id && variable.getId() !== opt_id) {
@@ -196,7 +197,7 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id) {
   }
   const id = opt_id || idGenerator.genUid();
   const type = opt_type || typeUtils.createNullType();
-  variable = new VariableModel(this.workspace, name, type, id);
+  variable = new VariableModel(this.workspace, name, type, id, displayName);
   console.log(type);
   const variables = this.variableMap_[type.getType()] || [];
   variables.push(variable);
@@ -238,7 +239,7 @@ VariableMap.prototype.deleteVariableById = function(id) {
   const variable = this.getVariableById(id);
   if (variable) {
     // Check whether this variable is a function parameter before deleting.
-    const variableName = variable.name;
+    const variableName = variable.displayName;
     const uses = this.getVariableUsesById(id);
     for (let i = 0, block; (block = uses[i]); i++) {
       if (block.type === 'procedures_defnoreturn' ||
