@@ -17,6 +17,7 @@ goog.module('Blockly.Procedures');
 
 /* eslint-disable-next-line no-unused-vars */
 const Abstract = goog.requireType('Blockly.Events.Abstract');
+const AlgebraicDatatypes = goog.require('Blockly.AlgebraicDatatypes');
 const Variables = goog.require('Blockly.Variables');
 const Xml = goog.require('Blockly.Xml');
 const eventUtils = goog.require('Blockly.Events.utils');
@@ -27,6 +28,7 @@ const { Block } = goog.requireType('Blockly.Block');
 /* eslint-disable-next-line no-unused-vars */
 const { Field } = goog.requireType('Blockly.Field');
 const { Msg } = goog.require('Blockly.Msg');
+const { Mutator } = goog.require('Blockly.Mutator');
 const { Names } = goog.require('Blockly.Names');
 /* eslint-disable-next-line no-unused-vars */
 const { WorkspaceSvg } = goog.requireType('Blockly.WorkspaceSvg');
@@ -343,12 +345,28 @@ const updateMutatorFlyout = function (workspace) {
     xmlElement.appendChild(createTypeBlock(t));
   });
 
+  const outerWs = Mutator.findParentWs(workspace);
+  const algebraicDatatypes = AlgebraicDatatypes.allDatatypes(outerWs);
+  for (let i = 0; i < algebraicDatatypes.length; i++) {
+    const def = algebraicDatatypes[i];
+    const typeBlock = utilsXml.createElement('block');
+    typeBlock.setAttribute('type', 'datatype');
+    typeBlock.setAttribute('gap', 10);
+
+    const typeMutation = utilsXml.createElement('mutation');
+    typeMutation.setAttribute('name', def[0]);
+    typeMutation.setAttribute('items', def[1]);
+    typeBlock.appendChild(typeMutation);
+    xmlElement.appendChild(typeBlock);
+  }
+
   workspace.updateToolbox(xmlElement);
 };
 
 function createTypeBlock(type) {
   const typeBlock = utilsXml.createElement('block');
   typeBlock.setAttribute('type', type);
+  typeBlock.setAttribute('gap', 10);
   return typeBlock;
 }
 

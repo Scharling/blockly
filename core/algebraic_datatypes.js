@@ -53,10 +53,9 @@ exports.DatatypeBlock = DatatypeBlock;
 /**
  * Find all user-created algebraic datatype definitions in a workspace.
  * @param {!Workspace} root Root workspace.
- * @return {!Array<!Array>} Pair of arrays, the
- *     first contains procedures without return variables, the second with.
- *     Each procedure is defined by a three-element list of name, parameter
- *     list, and return value boolean.
+ * @return {!Array<!Array>} Array wtih type definitions.
+ *      Each type is defined by a three-element list of name,
+ *      number of types inputs, and list of cases.
  * @alias Blockly.AlgebraicDatatypes.allDatatypes
  */
 const allDatatypes = function (root) {
