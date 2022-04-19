@@ -15,7 +15,6 @@ FSharp['type_unit'] = function (block) {
 
 
 FSharp['type_tuple'] = function (block) {
-    const type = typeUtils.createTypeFromBlock(block);
     var args = [];
     for (var i = 0; i < block.childBlocks_.length; i++) {
         args.push(FSharp.valueToCode(block, getTupleIndexName(i), FSharp.ORDER_ATOMIC))
@@ -37,7 +36,6 @@ function getTupleIndexName(index) {
 
 
 FSharp['type_function'] = function (block) {
-    const type = typeUtils.createTypeFromBlock(block);
     var args = [];
     for (var i = 0; i < block.inputList.length; i++) {
         var element = block.inputList[i];

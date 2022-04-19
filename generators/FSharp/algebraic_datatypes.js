@@ -38,6 +38,24 @@ FSharp['casewithouttype'] = function (block) {
   return code;
 }
 
+FSharp['case'] = function (block) {
+  console.log("case", block);
+
+  var inputs = block.inputList.slice(1);
+
+  var args = [];
+  for (var i = 0; i < inputs.length; i++) {
+    var element = inputs[i];
+    args.push(FSharp.valueToCode(block, element.name, FSharp.ORDER_OF))
+  }
+
+  const caseName =
+    FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
+    
+  const code = '| ' + caseName + " of " + args.join(" * ") + '\n';
+  return code;
+}
+
 FSharp['casewithtype'] = function (block) {
   const caseName =
     FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
