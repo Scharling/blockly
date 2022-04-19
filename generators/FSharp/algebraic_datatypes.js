@@ -21,8 +21,18 @@ FSharp['typedefinition'] = function (block) {
   
   const typeName =
     FSharp.nameDB_.getName(block.getFieldValue('TYPENAME'), NameType.ALGEBRAIC_DATATYPE);
-  const polyArgs = "";
-  
+  var polyArgs = "";
+
+  if (block.itemCount_ > 0) {
+    var args = [];
+    for (var i = 0; i < block.itemCount_; i++) {
+        args.push(getPolyType(i));
+    }
+    polyArgs = "<" + args.join(", ") + ">";
+  } 
+
+
+  console.log("typedef", block, polyArgs);
   let branch = FSharp.statementToCode(block, 'CASES');
   let code = "type " + typeName + polyArgs + " =\n" + branch;
   

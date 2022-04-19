@@ -141,11 +141,17 @@ Blockly.Blocks['typedefinition'] = {
      * @this {Block}
      */
     updateShape_: function () {
+        var output = "";
         if (this.itemCount_ > 0) {
-            this.setFieldValue('of ' + this.itemCount_ + '', 'PARAMS');
-        } else {
-            this.setFieldValue('', 'PARAMS');
-        }
+            var args = [];
+            for (var i = 0; i < this.itemCount_; i++) {
+                args.push(getPolyType(i));
+            }
+            output = 'of ' + args.join(", ");
+        } 
+
+        this.setFieldValue(output, 'PARAMS');
+
     },
     getCases: function () {
         const cases = [];
@@ -187,6 +193,11 @@ Blockly.Blocks['typedefinition'] = {
         return this.getFieldValue('TYPENAME');
     },
 };
+
+const alphabet = "abcdefghijklmnopqrstuvwxyz"
+function getPolyType(polyCounter) {
+  return "'" + alphabet.charAt(polyCounter);
+}
 
 Blockly.Blocks['typedefinition_create_with_container'] = {
     /**
