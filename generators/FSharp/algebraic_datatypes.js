@@ -66,7 +66,6 @@ FSharp['casewithtype'] = function (block) {
 }
 
 FSharp['datatype'] = function (block) {
-  console.log("datatype", block)
   const datatypeName =
     FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
 
@@ -91,4 +90,25 @@ FSharp['datatype'] = function (block) {
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
 function getPolyType(polyCounter) {
   return "'" + alphabet.charAt(polyCounter);
+}
+
+
+FSharp['type_builder'] = function (block) {
+  const builderName =
+    FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
+
+  var inputs = block.inputList.slice(1);
+
+  var args = [];
+  var aCounter = 0;
+  for (var i = 0; i < inputs.length; i++) {
+    var element = inputs[i];
+    var arg = FSharp.valueToCode(block, element.name, FSharp.ORDER_OF);
+    if (arg != "") {
+      args.push(arg);
+    }
+  }
+
+  const code = builderName + "(" + args.join(", ") + ")";
+  return [code, FSharp.ORDER_ATOMIC];
 }
