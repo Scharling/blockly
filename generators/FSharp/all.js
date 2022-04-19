@@ -8,6 +8,7 @@
 goog.module('Blockly.FSharp.all');
 
 //goog.require('Blockly.FSharp.lists'); ?????
+goog.require('Blockly.FSharp.algebraicDatatypes');
 goog.require('Blockly.FSharp.logic');
 goog.require('Blockly.FSharp.math');
 goog.require('Blockly.FSharp.procedures');

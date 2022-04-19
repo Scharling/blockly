@@ -62,6 +62,7 @@ const NameType = {
   DEVELOPER_VARIABLE: 'DEVELOPER_VARIABLE',
   VARIABLE: 'VARIABLE',
   PROCEDURE: 'PROCEDURE',
+  ALGEBRAIC_DATATYPE: 'ALGEBRAIC_DATATYPE'
 };
 exports.NameType = NameType;
 
@@ -138,6 +139,18 @@ Names.prototype.populateProcedures = function(workspace) {
   procedures = procedures[0].concat(procedures[1]);
   for (let i = 0; i < procedures.length; i++) {
     this.getName(procedures[i][0], NameType.PROCEDURE);
+  }
+};
+
+/**
+ * Generate names for algebraic datatypes.
+ * @param {!Workspace} workspace Workspace to generate algebraic datatypes from.
+ */
+ Names.prototype.populateAlgebraicDatatypes = function(workspace) {
+  let algebraicDatatypes =
+      goog.module.get('Blockly.AlgebraicDatatypes').allDatatypes(workspace);
+  for (let i = 0; i < algebraicDatatypes.length; i++) {
+    this.getName(algebraicDatatypes[i][0], NameType.ALGEBRAIC_DATATYPE);
   }
 };
 

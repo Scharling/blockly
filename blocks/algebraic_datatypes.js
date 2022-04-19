@@ -45,7 +45,7 @@ Blockly.Blocks['typedefinition'] = {
             .appendField(nameField, "TYPENAME")
             .appendField("of")
             .setCheck("type");
-        this.appendStatementInput("Cases")
+        this.appendStatementInput("CASES")
             .setCheck("String");
         this.setInputsInline(true);
         this.setColour(180);
@@ -103,6 +103,9 @@ Blockly.Blocks['datatype'] = {
         this.setHelpUrl("");
     },
     defType_: 'typedefinition',
+    getFSharpType() {
+        return this.getDatatypeName();
+    },
     /**
    * Returns the name of the algebraic datatype this block refers.
    * @return {string} Datatype name.
