@@ -45,7 +45,7 @@ exports.CATEGORY_NAME = CATEGORY_NAME;
  *    renameType: function(string,string),
  *    getDatatypeDef: function():!Array
  * }}
- * @alias Blockly.Procedures.ProcedureBlock
+ * @alias Blockly.AlgebraicDatatypes.DatatypeBlock
  */
 let DatatypeBlock;
 exports.DatatypeBlock = DatatypeBlock;
@@ -92,8 +92,8 @@ const rename = function (name) {
     // Strip leading and trailing whitespace.  Beyond this, all names are legal.
     name = name.trim();
 
-     const legalName = findLegalName(
-       name,
+    const legalName = findLegalName(
+        name,
          /** @type {!Block} */(this.getSourceBlock()));
     //const legalName = name;
     const oldName = this.getValue();
@@ -121,37 +121,37 @@ exports.rename = rename;
  * @return {string} Non-colliding name.
  * @alias Blockly.AlgebraicDatatypes.findLegalName
  */
- const findLegalName = function (name, block) {
+const findLegalName = function (name, block) {
     if (block.isInFlyout) {
-      // Flyouts can have multiple procedures called 'do something'.
-      return name;
+        // Flyouts can have multiple procedures called 'do something'.
+        return name;
     }
     name = name || Msg['UNNAMED_KEY'] || 'unnamed';
     while (!isLegalName(name, block.workspace, block)) {
-      // Collision with another procedure.
-      const r = name.match(/^(.*?)(\d+)$/);
-      if (!r) {
-        name += '2';
-      } else {
-        name = r[1] + (parseInt(r[2], 10) + 1);
-      }
+        // Collision with another procedure.
+        const r = name.match(/^(.*?)(\d+)$/);
+        if (!r) {
+            name += '2';
+        } else {
+            name = r[1] + (parseInt(r[2], 10) + 1);
+        }
     }
     return name;
-  };
-  exports.findLegalName = findLegalName;
+};
+exports.findLegalName = findLegalName;
 
-  /**
- * Does this algebraic datatype have a legal name?  Illegal names include names of
- * algebraic datatypes already defined.
- * @param {string} name The questionable name.
- * @param {!Workspace} workspace The workspace to scan for collisions.
- * @param {Block=} opt_exclude Optional block to exclude from
- *     comparisons (one doesn't want to collide with oneself).
- * @return {boolean} True if the name is legal.
- */
+/**
+* Does this algebraic datatype have a legal name?  Illegal names include names of
+* algebraic datatypes already defined.
+* @param {string} name The questionable name.
+* @param {!Workspace} workspace The workspace to scan for collisions.
+* @param {Block=} opt_exclude Optional block to exclude from
+*     comparisons (one doesn't want to collide with oneself).
+* @return {boolean} True if the name is legal.
+*/
 const isLegalName = function (name, workspace, opt_exclude) {
     return !isNameUsed(name, workspace, opt_exclude);
-  };
+};
 
 /**
  * Return if the given name is already a algebraic datatype name.
@@ -162,24 +162,24 @@ const isLegalName = function (name, workspace, opt_exclude) {
  * @return {boolean} True if the name is used, otherwise return false.
  * @alias Blockly.AlgebraicDatatypes.isNameUsed
  */
- const isNameUsed = function (name, workspace, opt_exclude) {
+const isNameUsed = function (name, workspace, opt_exclude) {
     const blocks = workspace.getAllBlocks(false);
     // Iterate through every block and check the name.
     for (let i = 0; i < blocks.length; i++) {
-      if (blocks[i] === opt_exclude) {
-        continue;
-      }
-      if (blocks[i].getDatatypeDef) {
-        const datatypeBlock = /** @type {!DatatypeBlock} */ (blocks[i]);
-        const datatypeName = datatypeBlock.getDatatypeDef();
-        if (Names.equals(datatypeName[0], name)) {
-          return true;
+        if (blocks[i] === opt_exclude) {
+            continue;
         }
-      }
+        if (blocks[i].getDatatypeDef) {
+            const datatypeBlock = /** @type {!DatatypeBlock} */ (blocks[i]);
+            const datatypeName = datatypeBlock.getDatatypeDef();
+            if (Names.equals(datatypeName[0], name)) {
+                return true;
+            }
+        }
     }
     return false;
-  };
-  exports.isNameUsed = isNameUsed;
+};
+exports.isNameUsed = isNameUsed;
 
 /**
  * Construct the blocks required by the flyout for the
@@ -190,8 +190,6 @@ const isLegalName = function (name, workspace, opt_exclude) {
  */
 const flyoutCategory = function (workspace) {
     let xmlList = [];
-    console.log("flyoutCategory bhyf");
-
     if (Blocks['typedefinition']) {
         // <block type="typedefinition" gap="16"></block>
         const block = utilsXml.createElement('block');
@@ -234,7 +232,7 @@ const flyoutCategory = function (workspace) {
 
             const mutation = utilsXml.createElement('mutation');
             mutation.setAttribute('name', name);
-            mutation.setAttribute('typeNumber', typeNumber);
+            mutation.setAttribute('items', typeNumber);
             block.appendChild(mutation);
             xmlList.push(block);
 
@@ -246,7 +244,7 @@ const flyoutCategory = function (workspace) {
 
                 const caseMutation = utilsXml.createElement('mutation');
                 caseMutation.setAttribute('name', cases[j][0]);
-                caseMutation.setAttribute('typeNumber', cases[j][1].length);
+                caseMutation.setAttribute('items', cases[j][1].length);
                 caseBlock.appendChild(caseMutation);
                 xmlList.push(caseBlock);
             }
@@ -258,3 +256,61 @@ const flyoutCategory = function (workspace) {
     return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
+
+
+
+/**
+ * Find all the usages of a type.
+ * @param {string} name Name of type.
+ * @param {!Workspace} workspace The workspace to find usages in.
+ * @return {!Array<!Block>} Array of usage blocks.
+ * @alias Blockly.AlgebraicDatatypes.getUsages
+ */
+const getUsages = function (name, workspace) {
+    const usages = [];
+    const blocks = workspace.getAllBlocks(false);
+    // Iterate through every block and check the name.
+    for (let i = 0; i < blocks.length; i++) {
+        if (blocks[i].getUsageName) {
+            const typeBlock = /** @type {!DatatypeBlock} */ (blocks[i]);
+            const typeName = typeBlock.getUsageName();
+            // Procedure name may be null if the block is only half-built.
+            if (typeName && Names.equals(typeName, name)) {
+                usages.push(blocks[i]);
+            }
+        }
+    }
+    return usages;
+};
+exports.getUsages = getUsages;
+
+/**
+ * When a type/case definition changes its type inputs, find and edit all its
+ * usages.
+ * @param {!Block} defBlock Type/case definition block.
+ * @alias Blockly.AlgebraicDatatypes.mutateUsers
+ */
+const mutateUsers = function (defBlock) {
+    const oldRecordUndo = eventUtils.getRecordUndo();
+    const typeBlock = /** @type {!DatatypeBlock} */ (defBlock);
+    const name = typeBlock.getDatatypeName();
+    const xmlElement = defBlock.mutationToDom(true);
+    const users = getUsages(name, defBlock.workspace);
+    for (let i = 0, user; (user = users[i]); i++) {
+        const oldMutationDom = user.mutationToDom();
+        const oldMutation = oldMutationDom && Xml.domToText(oldMutationDom);
+        user.domToMutation(xmlElement);
+        const newMutationDom = user.mutationToDom();
+        const newMutation = newMutationDom && Xml.domToText(newMutationDom);
+        if (oldMutation !== newMutation) {
+            // Fire a mutation on every caller block.  But don't record this as an
+            // undo action since it is deterministically tied to the procedure's
+            // definition mutation.
+            eventUtils.setRecordUndo(false);
+            eventUtils.fire(new (eventUtils.get(eventUtils.BLOCK_CHANGE))(
+                user, 'mutation', null, oldMutation, newMutation));
+            eventUtils.setRecordUndo(oldRecordUndo);
+        }
+    }
+};
+exports.mutateUsers = mutateUsers;

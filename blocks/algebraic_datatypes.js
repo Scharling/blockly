@@ -73,6 +73,7 @@ Blockly.Blocks['typedefinition'] = {
     domToMutation: function (xmlElement) {
         this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
         this.updateShape_();
+        AlgebraicDatatypes.mutateUsers(this);
     },
     /**
      * Returns the state of this block as a JSON serializable object.
@@ -90,6 +91,7 @@ Blockly.Blocks['typedefinition'] = {
     loadExtraState: function (state) {
         this.itemCount_ = state['itemCount'];
         this.updateShape_();
+        AlgebraicDatatypes.mutateUsers(this);
     },
     /**
      * Populate the mutator's dialog with this block's components.
@@ -107,6 +109,7 @@ Blockly.Blocks['typedefinition'] = {
             connection.connect(itemBlock.previousConnection);
             connection = itemBlock.nextConnection;
         }
+        AlgebraicDatatypes.mutateUsers(this);
         return containerBlock;
     },
     /**
@@ -125,6 +128,7 @@ Blockly.Blocks['typedefinition'] = {
         }
         this.itemCount_ = connections.length;
         this.updateShape_();
+        AlgebraicDatatypes.mutateUsers(this);
     },
     /**
      * Modify this block to have the correct number of inputs.
@@ -144,8 +148,6 @@ Blockly.Blocks['typedefinition'] = {
 
         let caseBlock = this.childBlocks_[0];
         while (caseBlock && !caseBlock.isInsertionMarker()) {
-            console.log(caseBlock);
-            console.log(caseBlock.itemCount_);
             // try {
             //     validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'), this);
             // } catch (error) {
@@ -167,15 +169,17 @@ Blockly.Blocks['typedefinition'] = {
         return cases;
     },
     /**
-   * Return the definition of this algebraic datatype.
-   * @return {!Array} Tuple containing three elements:
-   *     - the name of the data type
-   * @this {Block}
-   */
+     * Return the definition of this algebraic datatype.
+     * @return {!Array} Tuple containing three elements:
+     *     - the name of the data type
+     * @this {Block}
+     */
     getDatatypeDef: function () {
         const cases = this.getCases();
-        console.log("getDatatypeDef", cases);
         return [this.getFieldValue('TYPENAME'), this.itemCount_, cases];
+    },
+    getDatatypeName: function () {
+        return this.getFieldValue('TYPENAME');
     },
 };
 
@@ -245,6 +249,7 @@ Blockly.Blocks['case'] = {
     domToMutation: function (xmlElement) {
         this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
         this.updateShape_();
+        AlgebraicDatatypes.mutateUsers(this);
     },
     /**
      * Returns the state of this block as a JSON serializable object.
@@ -262,6 +267,7 @@ Blockly.Blocks['case'] = {
     loadExtraState: function (state) {
         this.itemCount_ = state['itemCount'];
         this.updateShape_();
+        AlgebraicDatatypes.mutateUsers(this);
     },
     /**
      * Populate the mutator's dialog with this block's components.
@@ -279,6 +285,7 @@ Blockly.Blocks['case'] = {
             connection.connect(itemBlock.previousConnection);
             connection = itemBlock.nextConnection;
         }
+        AlgebraicDatatypes.mutateUsers(this);
         return containerBlock;
     },
     /**
@@ -304,6 +311,7 @@ Blockly.Blocks['case'] = {
         }
         this.itemCount_ = connections.length;
         this.updateShape_();
+        AlgebraicDatatypes.mutateUsers(this);
         // Reconnect any child blocks.
         for (let i = 0; i < this.itemCount_; i++) {
             Blockly.Mutator.reconnect(connections[i], this, 'ADD' + i);
@@ -350,6 +358,9 @@ Blockly.Blocks['case'] = {
             this.removeInput('ADD' + i);
         }
     },
+    getDatatypeName: function () {
+        return this.getFieldValue('NAME');
+    },
 };
 
 Blockly.Blocks['case_create_with_container'] = {
@@ -388,7 +399,7 @@ const COMMON = {
      * @return {string} Datatype name.
      * @this {Block}
      */
-    getName: function () {
+    getUsageName: function () {
         // The NAME field is guaranteed to exist, null will never be returned.
         return /** @type {string} */ (this.getFieldValue('NAME'));
     },
@@ -400,7 +411,7 @@ const COMMON = {
      * @this {Block}
      */
     rename: function (oldName, newName) {
-        if (Names.equals(oldName, this.getName())) {
+        if (Names.equals(oldName, this.getUsageName())) {
             this.setFieldValue(newName, 'NAME');
         }
     },
@@ -412,8 +423,8 @@ const COMMON = {
    */
     mutationToDom: function () {
         const container = xmlUtils.createElement('mutation');
-        container.setAttribute('name', this.getName());
-        container.setAttribute('typeNumber', this.itemCount_);
+        container.setAttribute('name', this.getUsageName());
+        container.setAttribute('items', this.itemCount_);
         return container;
     },
     /**
@@ -424,8 +435,8 @@ const COMMON = {
      */
     domToMutation: function (xmlElement) {
         const name = xmlElement.getAttribute('name');
-        this.rename(this.getName(), name);
-        const itemCount = xmlElement.getAttribute('typeNumber');
+        this.rename(this.getUsageName(), name);
+        const itemCount = xmlElement.getAttribute('items');
         this.itemCount_ = itemCount;
         this.updateShape_();
     },
@@ -436,8 +447,8 @@ const COMMON = {
      */
     saveExtraState: function () {
         const state = Object.create(null);
-        state['name'] = this.getName();
-        state['typeNumber'] = this.itemCount_;
+        state['name'] = this.getUsageName();
+        state['items'] = this.itemCount_;
         return state;
     },
     /**
@@ -446,8 +457,8 @@ const COMMON = {
      *     procedure name.
      */
     loadExtraState: function (state) {
-        this.rename(this.getName(), state['name']);
-        this.itemCount_ = state['typeNumber'];
+        this.rename(this.getUsageName(), state['name']);
+        this.itemCount_ = state['items'];
         this.updateShape_();
     },
 }
