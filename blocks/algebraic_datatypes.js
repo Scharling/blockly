@@ -49,7 +49,6 @@ const DEFS_COMMON = {
         container.setAttribute('items', this.itemCount_);
         return container;
     },
-
     /**
      * Parse XML to restore the type inputs.
      * Backwards compatible serialization implementation.
@@ -58,6 +57,24 @@ const DEFS_COMMON = {
      */
     domToMutation: function (xmlElement) {
         this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+        this.updateShape_();
+        AlgebraicDatatypes.mutateUsers(this);
+    },
+    /**
+     * Returns the state of this block as a JSON serializable object.
+     * @return {{itemCount: number}} The state of this block, ie the item count.
+     */
+    saveExtraState: function () {
+        return {
+            'itemCount': this.itemCount_,
+        };
+    },
+    /**
+     * Applies the given state to this block.
+     * @param {*} state The state to apply to this block, ie the item count.
+     */
+    loadExtraState: function (state) {
+        this.itemCount_ = state['itemCount'];
         this.updateShape_();
         AlgebraicDatatypes.mutateUsers(this);
     },
