@@ -555,7 +555,7 @@ Blocks['procedures_defreturn'] = {
       // .appendField(' | ')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN'], 'RETURNTYPE');
-    this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
+    this.setMutator(new Mutator(['procedures_mutatorarg', ...types, 'datatype']));
     if ((this.workspace.options.comments ||
       (this.workspace.options.parentWorkspace &&
         this.workspace.options.parentWorkspace.options.comments)) &&
@@ -611,7 +611,7 @@ Blocks['procedures_anonymous'] = {
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN'], 'RETURNTYPE');
-    this.setMutator(new Mutator(['procedures_mutatorarg', ...types]));
+    this.setMutator(new Mutator(['procedures_mutatorarg', ...types, 'datatype']));
     // if ((this.workspace.options.comments ||
     //   (this.workspace.options.parentWorkspace &&
     //     this.workspace.options.parentWorkspace.options.comments)) &&
