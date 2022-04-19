@@ -101,9 +101,9 @@ const rename = function (name) {
         // Rename any references.
         const blocks = this.getSourceBlock().workspace.getAllBlocks(false);
         for (let i = 0; i < blocks.length; i++) {
-            if (blocks[i].renameType) {
+            if (blocks[i].rename) {
                 const datatypeBlock = /** @type {!DatatypeBlock} */ (blocks[i]);
-                datatypeBlock.renameType(
+                datatypeBlock.rename(
               /** @type {string} */(oldName), legalName);
             }
         }
@@ -199,17 +199,10 @@ const flyoutCategory = function (workspace) {
         block.setAttribute('gap', 16);
         xmlList.push(block);
     }
-    if (Blocks['casewithouttype']) {
+    if (Blocks['case']) {
         // <block type="casewithouttype" gap="16"></block>
         const block = utilsXml.createElement('block');
-        block.setAttribute('type', 'casewithouttype');
-        block.setAttribute('gap', 16);
-        xmlList.push(block);
-    }
-    if (Blocks['casewithtype']) {
-        // <block type="casewithtype" gap="16"></block>
-        const block = utilsXml.createElement('block');
-        block.setAttribute('type', 'casewithtype');
+        block.setAttribute('type', 'case');
         block.setAttribute('gap', 16);
         xmlList.push(block);
     }
@@ -228,14 +221,10 @@ const flyoutCategory = function (workspace) {
     function populateDatatypes(datatypeList, templateName) {
         for (let i = 0; i < datatypeList.length; i++) {
             const name = datatypeList[i][0];
-            console.log(name, datatypeList);
-            // const args = procedureList[i][1];
-            // if (!procedureList[i][3]) {
-            //     continue;
-            // }
+            const typeNumber = datatypes[i][1];
 
             // <block type="datatype" gap="16">
-            //   <mutation name="name">
+            //   <mutation name="name" typeNumer=0>
             //   </mutation>
             // </block>
 
@@ -245,33 +234,22 @@ const flyoutCategory = function (workspace) {
 
             const mutation = utilsXml.createElement('mutation');
             mutation.setAttribute('name', name);
+            mutation.setAttribute('typeNumber', typeNumber);
             block.appendChild(mutation);
-
-            // const nameField = utilsXml.createElement('field');
-            // nameField.setAttribute('name', 'NAME');
-            // const nameNode = utilsXml.createTextNode(name);
-            // nameField.appendChild(nameNode);
-            // block.appendChild(nameField);
-
-            // const mutation = createCallMutation(name);
-            // block.appendChild(mutation);
-            // for (let j = 0; j < args.length; j++) {
-            //     const arg = createCallArg(args[j].name);
-            //     mutation.appendChild(arg);
-            //     const type = args[j].type;
-            //     if (type.block_name === "type_function") {
-            //         const argNum = type.inputs.length;
-            //         const subBlock = createCallBlock("args_callreturn");
-            //         const subMutation = createCallMutation(args[j].name);
-            //         subBlock.appendChild(subMutation);
-            //         for (let k = 0; k < argNum; k++) {
-            //             const subArg = createCallArg(("a" + k + " (" + type.inputs[k].getType() + ")"));
-            //             subMutation.appendChild(subArg);
-            //         }
-            //         xmlList.push(subBlock);
-            //     }
-            // }
             xmlList.push(block);
+
+            const cases = datatypes[i][2];
+            for (let j = 0; j < cases.length; j++) {
+                const caseBlock = utilsXml.createElement('block');
+                caseBlock.setAttribute('type', 'type_builder');
+                caseBlock.setAttribute('gap', 16);
+
+                const caseMutation = utilsXml.createElement('mutation');
+                caseMutation.setAttribute('name', cases[j][0]);
+                caseMutation.setAttribute('typeNumber', cases[j][1].length);
+                caseBlock.appendChild(caseMutation);
+                xmlList.push(caseBlock);
+            }
         }
     }
 

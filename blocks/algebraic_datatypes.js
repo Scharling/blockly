@@ -40,17 +40,131 @@ const typeUtils = goog.require('Blockly.extra.utils.types');
 Blockly.Blocks['typedefinition'] = {
     init: function () {
         const nameField = new FieldTextInput('typeName', AlgebraicDatatypes.rename);
-        this.appendValueInput("TYPE")
+        this.appendDummyInput()
             .appendField("Define Type")
             .appendField(nameField, "TYPENAME")
-            .appendField("of")
-            .setCheck("type");
+            .appendField('', 'PARAMS');
         this.appendStatementInput("CASES")
             .setCheck("String");
         this.setInputsInline(true);
         this.setColour(180);
         this.setTooltip("");
         this.setHelpUrl("");
+        this.itemCount_ = 0;
+        this.updateShape_();
+        this.setMutator(new Blockly.Mutator(['typedefinition_create_with_item']));
+    },/**
+    * Create XML to represent type inputs.
+    * Backwards compatible serialization implementation.
+    * @return {!Element} XML storage element.
+    * @this {Block}
+    */
+    mutationToDom: function () {
+        const container = Blockly.utils.xml.createElement('mutation');
+        container.setAttribute('items', this.itemCount_);
+        return container;
+    },
+    /**
+     * Parse XML to restore the type inputs.
+     * Backwards compatible serialization implementation.
+     * @param {!Element} xmlElement XML storage element.
+     * @this {Block}
+     */
+    domToMutation: function (xmlElement) {
+        this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+        this.updateShape_();
+    },
+    /**
+     * Returns the state of this block as a JSON serializable object.
+     * @return {{itemCount: number}} The state of this block, ie the item count.
+     */
+    saveExtraState: function () {
+        return {
+            'itemCount': this.itemCount_,
+        };
+    },
+    /**
+     * Applies the given state to this block.
+     * @param {*} state The state to apply to this block, ie the item count.
+     */
+    loadExtraState: function (state) {
+        this.itemCount_ = state['itemCount'];
+        this.updateShape_();
+    },
+    /**
+     * Populate the mutator's dialog with this block's components.
+     * @param {!Workspace} workspace Mutator's workspace.
+     * @return {!Block} Root block in mutator.
+     * @this {Block}
+     */
+    decompose: function (workspace) {
+        const containerBlock = workspace.newBlock('typedefinition_create_with_container');
+        containerBlock.initSvg();
+        let connection = containerBlock.getInput('STACK').connection;
+        for (let i = 0; i < this.itemCount_; i++) {
+            const itemBlock = workspace.newBlock('typedefinition_create_with_item');
+            itemBlock.initSvg();
+            connection.connect(itemBlock.previousConnection);
+            connection = itemBlock.nextConnection;
+        }
+        return containerBlock;
+    },
+    /**
+     * Reconfigure this block based on the mutator dialog's components.
+     * @param {!Block} containerBlock Root block in mutator.
+     * @this {Block}
+     */
+    compose: function (containerBlock) {
+        let itemBlock = containerBlock.getInputTargetBlock('STACK');
+        // Count number of inputs.
+        const connections = [];
+        while (itemBlock && !itemBlock.isInsertionMarker()) {
+            connections.push(itemBlock.valueConnection_);
+            itemBlock =
+                itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+        }
+        this.itemCount_ = connections.length;
+        this.updateShape_();
+    },
+    /**
+     * Modify this block to have the correct number of inputs.
+     * @private
+     * @this {Block}
+     */
+    updateShape_: function () {
+        if (this.itemCount_ > 0) {
+            this.setFieldValue('of ' + this.itemCount_ + '', 'PARAMS');
+        } else {
+            this.setFieldValue('', 'PARAMS');
+        }
+    },
+    getCases: function () {
+        const cases = [];
+        if (this.childBlocks_.length < 1) return cases;
+
+        let caseBlock = this.childBlocks_[0];
+        while (caseBlock && !caseBlock.isInsertionMarker()) {
+            console.log(caseBlock);
+            console.log(caseBlock.itemCount_);
+            // try {
+            //     validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'), this);
+            // } catch (error) {
+            //     console.log(error);
+            // }
+            var types = [];//typeUtils.createNullType();
+            for (var i = 0; i < caseBlock.childBlocks_.length; i++) {
+                if (caseBlock.childBlocks_[i] && caseBlock.childBlocks_[i].type != null && (caseBlock.childBlocks_[i].type.startsWith("type_") || caseBlock.childBlocks_[i].type === "datatype")) {
+                    const typedBlock = caseBlock.childBlocks_[i];
+                    const type = typeUtils.createTypeFromBlock(typedBlock);
+                    types.push(type);
+                }
+            }
+            const caseName = caseBlock.getFieldValue('NAME');
+            cases.push([caseName, types]);
+            caseBlock =
+                caseBlock.nextConnection && caseBlock.nextConnection.targetBlock();
+        }
+        return cases;
     },
     /**
    * Return the definition of this algebraic datatype.
@@ -59,59 +173,223 @@ Blockly.Blocks['typedefinition'] = {
    * @this {Block}
    */
     getDatatypeDef: function () {
-        return [this.getFieldValue('TYPENAME')];
+        const cases = this.getCases();
+        console.log("getDatatypeDef", cases);
+        return [this.getFieldValue('TYPENAME'), this.itemCount_, cases];
     },
 };
 
-Blockly.Blocks['casewithouttype'] = {
+Blockly.Blocks['typedefinition_create_with_container'] = {
+    /**
+     * Mutator block for type definition container.
+     * @this {Block}
+     */
     init: function () {
+        //this.setStyle('list_blocks');
+        this.setColour(180);
+        this.appendDummyInput().appendField("polymorphic types");
+        this.appendStatementInput('STACK');
+        this.setTooltip("Add or remove polymorphic types to be used in the type definition.");
+        this.contextMenu = false;
+    },
+};
+
+Blockly.Blocks['typedefinition_create_with_item'] = {
+    /**
+     * Mutator block for adding items.
+     * @this {Block}
+     */
+    init: function () {
+        this.setColour(180);
+        this.appendDummyInput().appendField("item");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setTooltip("Add a polymorphic type to be used in the type definition");
+        this.contextMenu = false;
+    },
+};
+
+Blockly.Blocks['case'] = {
+    init: function () {
+        const nameField = new FieldTextInput('name', AlgebraicDatatypes.rename);
         this.appendDummyInput()
             .appendField("case")
-            .appendField(new Blockly.FieldTextInput("name"), "NAME");
+            .appendField(nameField, "NAME")
+            .appendField('', 'OF');
         this.setInputsInline(true);
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(180);
         this.setTooltip("");
         this.setHelpUrl("");
-    }
-};
-
-Blockly.Blocks['casewithtype'] = {
-    init: function () {
-        this.appendValueInput("TYPE")
-            .setCheck("type")
-            .appendField("case")
-            .appendField(new Blockly.FieldTextInput("name"), "NAME")
-            .appendField("of");
-        this.setInputsInline(true);
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setColour(180);
-        this.setTooltip("");
-        this.setHelpUrl("");
-    }
-};
-
-Blockly.Blocks['datatype'] = {
-    init: function () {
-        this.appendDummyInput().appendField('', 'NAME');
-        this.setInputsInline(true);
-        this.setOutput(true, null);
-        this.setColour(180);
-        this.setTooltip("");
-        this.setHelpUrl("");
-    },
-    defType_: 'typedefinition',
-    getFSharpType() {
-        return this.getDatatypeName();
+        this.itemCount_ = 0;
+        this.updateShape_();
+        this.setMutator(new Blockly.Mutator(['case_create_with_item']));
+    },/**
+    * Create XML to represent case inputs.
+    * Backwards compatible serialization implementation.
+    * @return {!Element} XML storage element.
+    * @this {Block}
+    */
+    mutationToDom: function () {
+        const container = Blockly.utils.xml.createElement('mutation');
+        container.setAttribute('items', this.itemCount_);
+        return container;
     },
     /**
-   * Returns the name of the algebraic datatype this block refers.
-   * @return {string} Datatype name.
-   * @this {Block}
-   */
-    getDatatypeName: function () {
+     * Parse XML to restore the case inputs.
+     * Backwards compatible serialization implementation.
+     * @param {!Element} xmlElement XML storage element.
+     * @this {Block}
+     */
+    domToMutation: function (xmlElement) {
+        this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+        this.updateShape_();
+    },
+    /**
+     * Returns the state of this block as a JSON serializable object.
+     * @return {{itemCount: number}} The state of this block, ie the item count.
+     */
+    saveExtraState: function () {
+        return {
+            'itemCount': this.itemCount_,
+        };
+    },
+    /**
+     * Applies the given state to this block.
+     * @param {*} state The state to apply to this block, ie the item count.
+     */
+    loadExtraState: function (state) {
+        this.itemCount_ = state['itemCount'];
+        this.updateShape_();
+    },
+    /**
+     * Populate the mutator's dialog with this block's components.
+     * @param {!Workspace} workspace Mutator's workspace.
+     * @return {!Block} Root block in mutator.
+     * @this {Block}
+     */
+    decompose: function (workspace) {
+        const containerBlock = workspace.newBlock('case_create_with_container');
+        containerBlock.initSvg();
+        let connection = containerBlock.getInput('STACK').connection;
+        for (let i = 0; i < this.itemCount_; i++) {
+            const itemBlock = workspace.newBlock('case_create_with_item');
+            itemBlock.initSvg();
+            connection.connect(itemBlock.previousConnection);
+            connection = itemBlock.nextConnection;
+        }
+        return containerBlock;
+    },
+    /**
+     * Reconfigure this block based on the mutator dialog's components.
+     * @param {!Block} containerBlock Root block in mutator.
+     * @this {Block}
+     */
+    compose: function (containerBlock) {
+        let itemBlock = containerBlock.getInputTargetBlock('STACK');
+        // Count number of inputs.
+        const connections = [];
+        while (itemBlock && !itemBlock.isInsertionMarker()) {
+            connections.push(itemBlock.valueConnection_);
+            itemBlock =
+                itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+        }
+        // Disconnect any children that don't belong.
+        for (let i = 0; i < this.itemCount_; i++) {
+            const connection = this.getInput('ADD' + i).connection.targetConnection;
+            if (connection && connections.indexOf(connection) === -1) {
+                connection.disconnect();
+            }
+        }
+        this.itemCount_ = connections.length;
+        this.updateShape_();
+        // Reconnect any child blocks.
+        for (let i = 0; i < this.itemCount_; i++) {
+            Blockly.Mutator.reconnect(connections[i], this, 'ADD' + i);
+        }
+    },
+    /**
+     * Store pointers to any connected child blocks.
+     * @param {!Block} containerBlock Root block in mutator.
+     * @this {Block}
+     */
+    saveConnections: function (containerBlock) {
+        let itemBlock = containerBlock.getInputTargetBlock('STACK');
+        let i = 0;
+        while (itemBlock) {
+            const input = this.getInput('ADD' + i);
+            itemBlock.valueConnection_ = input && input.connection.targetConnection;
+            itemBlock =
+                itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+            i++;
+        }
+    },
+    /**
+     * Modify this block to have the correct number of inputs.
+     * @private
+     * @this {Block}
+     */
+    updateShape_: function () {
+        if (this.itemCount_ > 0) {
+            this.setFieldValue('of', 'OF');
+        } else {
+            this.setFieldValue('', 'OF');
+        }
+        // Add new inputs.
+        for (let i = 0; i < this.itemCount_; i++) {
+            if (!this.getInput('ADD' + i)) {
+                const input = this.appendValueInput('ADD' + i);
+                if (i > 0 && i < this.itemCount_) {
+                    input.appendField("*");
+                }
+            }
+        }
+        // Remove deleted inputs.
+        for (let i = this.itemCount_; this.getInput('ADD' + i); i++) {
+            this.removeInput('ADD' + i);
+        }
+    },
+};
+
+Blockly.Blocks['case_create_with_container'] = {
+    /**
+     * Mutator block for type definition container.
+     * @this {Block}
+     */
+    init: function () {
+        //this.setStyle('list_blocks');
+        this.setColour(180);
+        this.appendDummyInput().appendField("Types for case");
+        this.appendStatementInput('STACK');
+        this.setTooltip("Add or remove types to the case.");
+        this.contextMenu = false;
+    },
+};
+
+Blockly.Blocks['case_create_with_item'] = {
+    /**
+     * Mutator block for adding items.
+     * @this {Block}
+     */
+    init: function () {
+        this.setColour(180);
+        this.appendDummyInput().appendField("type");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setTooltip("Add a type to the case");
+        this.contextMenu = false;
+    },
+    defType_: 'typedefinition'
+};
+
+const COMMON = {
+    /**
+     * Returns the name of the algebraic datatype this block refers.
+     * @return {string} Datatype name.
+     * @this {Block}
+     */
+    getName: function () {
         // The NAME field is guaranteed to exist, null will never be returned.
         return /** @type {string} */ (this.getFieldValue('NAME'));
     },
@@ -122,8 +400,8 @@ Blockly.Blocks['datatype'] = {
      * @param {string} newName Renamed datatype.
      * @this {Block}
      */
-    renameType: function (oldName, newName) {
-        if (Names.equals(oldName, this.getDatatypeName())) {
+    rename: function (oldName, newName) {
+        if (Names.equals(oldName, this.getName())) {
             this.setFieldValue(newName, 'NAME');
         }
     },
@@ -135,13 +413,8 @@ Blockly.Blocks['datatype'] = {
    */
     mutationToDom: function () {
         const container = xmlUtils.createElement('mutation');
-        container.setAttribute('name', this.getDatatypeName());
-        // container.setAttribute('argCount', this.argCount_);
-        // for (let i = 0; i < this.arguments_.length; i++) {
-        //   const parameter = xmlUtils.createElement('arg');
-        //   parameter.setAttribute('name', this.arguments_[i]);
-        //   container.appendChild(parameter);
-        // }
+        container.setAttribute('name', this.getName());
+        container.setAttribute('typeNumber', this.itemCount_);
         return container;
     },
     /**
@@ -152,18 +425,10 @@ Blockly.Blocks['datatype'] = {
      */
     domToMutation: function (xmlElement) {
         const name = xmlElement.getAttribute('name');
-        this.renameType(this.getDatatypeName(), name);
-        // const argCount = xmlElement.getAttribute('argCount');
-        // this.argCount_ = argCount ?? 'ALL';
-        // const args = [];
-        // const paramIds = [];
-        // for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
-        //   if (childNode.nodeName.toLowerCase() === 'arg') {
-        //     args.push(childNode.getAttribute('name'));
-        //     paramIds.push(childNode.getAttribute('paramId'));
-        //   }
-        // }
-        // this.setProcedureParameters_(args, paramIds);
+        this.rename(this.getName(), name);
+        const itemCount = xmlElement.getAttribute('typeNumber');
+        this.itemCount_ = itemCount;
+        this.updateShape_();
     },
     /**
      * Returns the state of this block as a JSON serializable object.
@@ -172,11 +437,8 @@ Blockly.Blocks['datatype'] = {
      */
     saveExtraState: function () {
         const state = Object.create(null);
-        state['name'] = this.getDatatypeName();
-        // state['argCount'] = this.argCount_
-        // if (this.arguments_.length) {
-        //     state['params'] = this.arguments_;
-        // }
+        state['name'] = this.getName();
+        state['typeNumber'] = this.itemCount_;
         return state;
     },
     /**
@@ -185,14 +447,81 @@ Blockly.Blocks['datatype'] = {
      *     procedure name.
      */
     loadExtraState: function (state) {
-        this.renameType(this.getDatatypeName(), state['name']);
-        // this.argCount_ = state['argCount'];
-        // const params = state['params'];
-        // if (params) {
-        //     const ids = [];
-        //     ids.length = params.length;
-        //     ids.fill(null);
-        //     this.setProcedureParameters_(params, ids);
-        // }
+        this.rename(this.getName(), state['name']);
+        this.itemCount_ = state['typeNumber'];
+        this.updateShape_();
+    },
+}
+
+
+Blockly.Blocks['datatype'] = {
+    ...COMMON,
+    init: function () {
+        this.appendDummyInput().appendField('', 'NAME').appendField('', 'OF');
+        this.setInputsInline(true);
+        this.setOutput(true, null);
+        this.setColour(60);
+        this.setTooltip("");
+        this.setHelpUrl("");
+        this.itemCount_ = 0;
+    },
+    defType_: 'typedefinition',
+    /**
+   * Modify this block to have the correct number of arguments.
+   * @private
+   * @this {Block}
+   */
+    updateShape_: function () {
+        if (this.itemCount_ > 0) {
+            this.setFieldValue('of', 'OF');
+        } else {
+            this.setFieldValue('', 'OF');
+        }
+        // Add new inputs.
+        for (let i = 0; i < this.itemCount_; i++) {
+            if (!this.getInput('ADD' + i)) {
+                const input = this.appendValueInput('ADD' + i);
+                if (i > 0 && i < this.itemCount_) {
+                    input.appendField(",");
+                }
+            }
+        }
+        // Remove deleted inputs.
+        for (let i = this.itemCount_; this.getInput('ADD' + i); i++) {
+            this.removeInput('ADD' + i);
+        }
+    },
+};
+
+Blockly.Blocks['type_builder'] = {
+    ...COMMON,
+    init: function () {
+        this.appendDummyInput().appendField('', 'NAME');
+        this.setInputsInline(true);
+        this.setOutput(true, null);
+        this.setColour(180);
+        this.setTooltip("");
+        this.setHelpUrl("");
+        this.itemCount_ = 0;
+    },
+    /**
+   * Modify this block to have the correct number of arguments.
+   * @private
+   * @this {Block}
+   */
+    updateShape_: function () {
+        // Add new inputs.
+        for (let i = 0; i < this.itemCount_; i++) {
+            if (!this.getInput('ADD' + i)) {
+                const input = this.appendValueInput('ADD' + i);
+                if (i > 0 && i < this.itemCount_) {
+                    input.appendField(",");
+                }
+            }
+        }
+        // Remove deleted inputs.
+        for (let i = this.itemCount_; this.getInput('ADD' + i); i++) {
+            this.removeInput('ADD' + i);
+        }
     },
 };
