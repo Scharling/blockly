@@ -42,7 +42,7 @@ goog.require('Blockly.Comment');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Warning');
 
-const typeUtils = goog.require('Blockly.extra.utils.types')
+const typeUtils = goog.require('Blockly.extra.utils.types');
 
 const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
 
