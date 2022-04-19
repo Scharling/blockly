@@ -216,48 +216,39 @@ const flyoutCategory = function (workspace) {
    *     value boolean.
    * @param {string} templateName The type of the block to generate.
    */
-    function populateDatatypes(datatypeList, templateName) {
+    function populateDatatypes(datatypeList) {
         for (let i = 0; i < datatypeList.length; i++) {
-            const name = datatypeList[i][0];
-            const typeNumber = datatypes[i][1];
 
-            // <block type="datatype" gap="16">
-            //   <mutation name="name" typeNumer=0>
-            //   </mutation>
-            // </block>
-
-            const block = utilsXml.createElement('block');
-            block.setAttribute('type', templateName);
-            block.setAttribute('gap', 16);
-
-            const mutation = utilsXml.createElement('mutation');
-            mutation.setAttribute('name', name);
-            mutation.setAttribute('items', typeNumber);
-            block.appendChild(mutation);
-            xmlList.push(block);
+            xmlList.push(createBlock('datatype', datatypeList[i][0], datatypes[i][1]));
 
             const cases = datatypes[i][2];
             for (let j = 0; j < cases.length; j++) {
-                const caseBlock = utilsXml.createElement('block');
-                caseBlock.setAttribute('type', 'type_builder');
-                caseBlock.setAttribute('gap', 16);
-
-                const caseMutation = utilsXml.createElement('mutation');
-                caseMutation.setAttribute('name', cases[j][0]);
-                caseMutation.setAttribute('items', cases[j][1].length);
-                caseBlock.appendChild(caseMutation);
-                xmlList.push(caseBlock);
+                xmlList.push(createBlock('type_builder', cases[j][0], cases[j][1].length));
             }
         }
     }
 
+    function createBlock(templateName, name, typeNumber) {
+        // <block type="datatype" gap="16">
+        //   <mutation name="name" items=0></mutation>
+        // </block>
+
+        const block = utilsXml.createElement('block');
+        block.setAttribute('type', templateName);
+        block.setAttribute('gap', 16);
+
+        const mutation = utilsXml.createElement('mutation');
+        mutation.setAttribute('name', name);
+        mutation.setAttribute('items', typeNumber);
+        block.appendChild(mutation);
+        return block;
+    }
+
     const datatypes = allDatatypes(workspace);
-    populateDatatypes(datatypes, 'datatype');
+    populateDatatypes(datatypes);
     return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
-
-
 
 /**
  * Find all the usages of a type.
