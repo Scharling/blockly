@@ -66,8 +66,29 @@ FSharp['casewithtype'] = function (block) {
 }
 
 FSharp['datatype'] = function (block) {
+  console.log("datatype", block)
   const datatypeName =
     FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
-  const code = datatypeName;
+
+  var inputs = block.inputList.slice(1);
+
+  var args = [];
+  var polyCounter = 0;
+  for (var i = 0; i < inputs.length; i++) {
+    var element = inputs[i];
+    var arg = FSharp.valueToCode(block, element.name, FSharp.ORDER_OF);
+    if (arg == "") {
+      arg = getPolyType(polyCounter++);
+    }
+    args.push(arg);
+  }
+
+  const code = datatypeName + "<" + args.join(", ") + ">";
   return [code, FSharp.ORDER_ATOMIC];
+}
+
+
+const alphabet = "abcdefghijklmnopqrstuvwxyz"
+function getPolyType(polyCounter) {
+  return "'" + alphabet.charAt(polyCounter);
 }
