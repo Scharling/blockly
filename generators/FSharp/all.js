@@ -14,4 +14,5 @@ goog.require('Blockly.FSharp.procedures');
 goog.require('Blockly.FSharp.texts');
 goog.require('Blockly.FSharp.variables');
 goog.require('Blockly.FSharp.variablesDynamic');
+goog.require('Blockly.FSharp.types');
 

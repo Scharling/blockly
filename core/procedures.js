@@ -305,7 +305,7 @@ const flyoutCategory = function (workspace) {
   }
 
   const tuple = allProcedures(workspace);
-  populateProcedures(tuple[0], 'procedures_callreturn');
+  populateProcedures(tuple[0], 'args_callreturn');
   populateProcedures(tuple[1], 'procedures_callreturn');
   return xmlList;
 };
@@ -338,7 +338,7 @@ const updateMutatorFlyout = function (workspace) {
   xmlElement.appendChild(argBlock);
 
   // Our custom mutator blocks
-  const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function'];
+  const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
   types.forEach(t => {
     xmlElement.appendChild(createTypeBlock(t));
   });

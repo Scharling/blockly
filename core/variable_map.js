@@ -21,12 +21,12 @@ const eventUtils = goog.require('Blockly.Events.utils');
 const idGenerator = goog.require('Blockly.utils.idGenerator');
 const object = goog.require('Blockly.utils.object');
 /* eslint-disable-next-line no-unused-vars */
-const {Block} = goog.requireType('Blockly.Block');
-const {Msg} = goog.require('Blockly.Msg');
-const {Names} = goog.require('Blockly.Names');
-const {VariableModel} = goog.require('Blockly.VariableModel');
+const { Block } = goog.requireType('Blockly.Block');
+const { Msg } = goog.require('Blockly.Msg');
+const { Names } = goog.require('Blockly.Names');
+const { VariableModel } = goog.require('Blockly.VariableModel');
 /* eslint-disable-next-line no-unused-vars */
-const {Workspace} = goog.requireType('Blockly.Workspace');
+const { Workspace } = goog.requireType('Blockly.Workspace');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.VarDelete');
 /** @suppress {extraRequire} */
@@ -42,7 +42,7 @@ const typeUtils = goog.require('Blockly.extra.utils.types')
  * @constructor
  * @alias Blockly.VariableMap
  */
-const VariableMap = function(workspace) {
+const VariableMap = function (workspace) {
   /**
    * A map from variable type to list of variable names.  The lists contain all
    * of the named variables in the workspace, including variables
@@ -62,7 +62,7 @@ const VariableMap = function(workspace) {
 /**
  * Clear the variable map.
  */
-VariableMap.prototype.clear = function() {
+VariableMap.prototype.clear = function () {
   this.variableMap_ = Object.create(null);
 };
 
@@ -74,7 +74,7 @@ VariableMap.prototype.clear = function() {
  * @param {string} newName New variable name.
  * @package
  */
-VariableMap.prototype.renameVariable = function(variable, newName) {
+VariableMap.prototype.renameVariable = function (variable, newName) {
   const type = variable.type;
   const conflictVar = this.getVariable(newName, type);
   const blocks = this.workspace.getAllBlocks(false);
@@ -97,7 +97,7 @@ VariableMap.prototype.renameVariable = function(variable, newName) {
  * @param {string} id ID of the variable to rename.
  * @param {string} newName New variable name.
  */
-VariableMap.prototype.renameVariableById = function(id, newName) {
+VariableMap.prototype.renameVariableById = function (id, newName) {
   const variable = this.getVariableById(id);
   if (!variable) {
     throw Error('Tried to rename a variable that didn\'t exist. ID: ' + id);
@@ -115,10 +115,10 @@ VariableMap.prototype.renameVariableById = function(id, newName) {
  *     workspace.
  * @private
  */
-VariableMap.prototype.renameVariableAndUses_ = function(
-    variable, newName, blocks) {
+VariableMap.prototype.renameVariableAndUses_ = function (
+  variable, newName, blocks) {
   eventUtils.fire(
-      new (eventUtils.get(eventUtils.VAR_RENAME))(variable, newName));
+    new (eventUtils.get(eventUtils.VAR_RENAME))(variable, newName));
   variable.name = newName;
   for (let i = 0; i < blocks.length; i++) {
     blocks[i].updateVarName(variable);
@@ -138,8 +138,8 @@ VariableMap.prototype.renameVariableAndUses_ = function(
  *     workspace.
  * @private
  */
-VariableMap.prototype.renameVariableWithConflict_ = function(
-    variable, newName, conflictVar, blocks) {
+VariableMap.prototype.renameVariableWithConflict_ = function (
+  variable, newName, conflictVar, blocks) {
   const type = variable.type;
   const oldCase = conflictVar.name;
 
@@ -180,9 +180,9 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id, displayN
   if (variable) {
     if (opt_id && variable.getId() !== opt_id) {
       throw Error(
-          'Variable "' + name + '" is already in use and its id is "' +
-          variable.getId() + '" which conflicts with the passed in ' +
-          'id, "' + opt_id + '".');
+        'Variable "' + name + '" is already in use and its id is "' +
+        variable.getId() + '" which conflicts with the passed in ' +
+        'id, "' + opt_id + '".');
     }
     // The variable already exists and has the same ID.
     return variable;
@@ -192,7 +192,6 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id, displayN
   }
   if (opt_type && this.getVariableByName(name)) {
     const variableToDelete = this.getVariableByName(name);
-    console.log("variable to delete", variableToDelete)
     this.deleteVariable(variableToDelete)
   }
   const id = opt_id || idGenerator.genUid();
@@ -206,8 +205,6 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id, displayN
   // This is used so the toolbox's set block is set to the most recent variable.
   delete this.variableMap_[type.getType()];
   this.variableMap_[type.getType()] = variables;
-  console.log("created variable", variable);
-  console.log("varMap", this.variableMap_);
   return variable;
 };
 
@@ -217,7 +214,7 @@ VariableMap.prototype.createVariable = function(name, opt_type, opt_id, displayN
  * Delete a variable.
  * @param {!VariableModel} variable Variable to delete.
  */
-VariableMap.prototype.deleteVariable = function(variable) {
+VariableMap.prototype.deleteVariable = function (variable) {
   const variableId = variable.getId();
   const variableList = this.variableMap_[variable.type.getType()];
   for (let i = 0; i < variableList.length; i++) {
@@ -235,7 +232,7 @@ VariableMap.prototype.deleteVariable = function(variable) {
  * workspace. May prompt the user for confirmation.
  * @param {string} id ID of variable to delete.
  */
-VariableMap.prototype.deleteVariableById = function(id) {
+VariableMap.prototype.deleteVariableById = function (id) {
   const variable = this.getVariableById(id);
   if (variable) {
     // Check whether this variable is a function parameter before deleting.
@@ -243,11 +240,11 @@ VariableMap.prototype.deleteVariableById = function(id) {
     const uses = this.getVariableUsesById(id);
     for (let i = 0, block; (block = uses[i]); i++) {
       if (block.type === 'procedures_defnoreturn' ||
-          block.type === 'procedures_defreturn') {
+        block.type === 'procedures_defreturn') {
         const procedureName = String(block.getFieldValue('NAME'));
         const deleteText = Msg['CANNOT_DELETE_VARIABLE_PROCEDURE']
-                               .replace('%1', variableName)
-                               .replace('%2', procedureName);
+          .replace('%1', variableName)
+          .replace('%2', procedureName);
         dialog.alert(deleteText);
         return;
       }
@@ -257,9 +254,9 @@ VariableMap.prototype.deleteVariableById = function(id) {
     if (uses.length > 1) {
       // Confirm before deleting multiple blocks.
       const confirmText = Msg['DELETE_VARIABLE_CONFIRMATION']
-                              .replace('%1', String(uses.length))
-                              .replace('%2', variableName);
-      dialog.confirm(confirmText, function(ok) {
+        .replace('%1', String(uses.length))
+        .replace('%2', variableName);
+      dialog.confirm(confirmText, function (ok) {
         if (ok && variable) {
           map.deleteVariableInternal(variable, uses);
         }
@@ -280,7 +277,7 @@ VariableMap.prototype.deleteVariableById = function(id) {
  * @param {!Array<!Block>} uses An array of uses of the variable.
  * @package
  */
-VariableMap.prototype.deleteVariableInternal = function(variable, uses) {
+VariableMap.prototype.deleteVariableInternal = function (variable, uses) {
   const existingGroup = eventUtils.getGroup();
   if (!existingGroup) {
     eventUtils.setGroup(true);
@@ -308,12 +305,9 @@ VariableMap.prototype.deleteVariableInternal = function(variable, uses) {
  * @return {?VariableModel} The variable with the given name, or null if
  *     it was not found.
  */
-VariableMap.prototype.getVariable = function(name, opt_type) {
-  console.log("get_variable", name, opt_type);
+VariableMap.prototype.getVariable = function (name, opt_type) {
   const type = opt_type || typeUtils.createNullType();
   const list = this.variableMap_[type.getType()];
-  console.log("list", list);
-  console.log("this.variableMap_", this.variableMap_);
   if (list) {
     for (let j = 0, variable; (variable = list[j]); j++) {
       if (Names.equals(variable.name, name)) {
@@ -332,11 +326,8 @@ VariableMap.prototype.getVariable = function(name, opt_type) {
  * @return {?VariableModel} The variable with the given name, or null if
  *     it was not found.
  */
- VariableMap.prototype.getVariableByTypeName = function(name, type_name) {
-  console.log("get_variableByTypeName", name, type_name);
+VariableMap.prototype.getVariableByTypeName = function (name, type_name) {
   const list = this.variableMap_[type_name];
-  console.log("list", list);
-  console.log("this.variableMap_", this.variableMap_);
   if (list) {
     for (let j = 0, variable; (variable = list[j]); j++) {
       if (Names.equals(variable.name, name)) {
@@ -352,7 +343,7 @@ VariableMap.prototype.getVariable = function(name, opt_type) {
  * @param {string} id The ID to check for.
  * @return {?VariableModel} The variable with the given ID.
  */
-VariableMap.prototype.getVariableById = function(id) {
+VariableMap.prototype.getVariableById = function (id) {
   const keys = Object.keys(this.variableMap_);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -370,12 +361,11 @@ VariableMap.prototype.getVariableById = function(id) {
  * @param {string} name The name to check for.
  * @return {?VariableModel} The variable with the given name.
  */
- VariableMap.prototype.getVariableByName = function(name) {
+VariableMap.prototype.getVariableByName = function (name) {
   const keys = Object.keys(this.variableMap_);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     for (let j = 0, variable; (variable = this.variableMap_[key][j]); j++) {
-      console.log("finding variable: ", name, " == ", variable);
       if (variable.name === name) {
         return variable;
       }
@@ -391,7 +381,7 @@ VariableMap.prototype.getVariableById = function(id) {
  * @return {!Array<!VariableModel>} The sought after variables of the
  *     passed in type. An empty array if none are found.
  */
-VariableMap.prototype.getVariablesOfType = function(type) {
+VariableMap.prototype.getVariablesOfType = function (type) {
   type = type || typeUtils.createNullType();
   const variableList = this.variableMap_[type.getType()];
   if (variableList) {
@@ -409,7 +399,7 @@ VariableMap.prototype.getVariablesOfType = function(type) {
  * @return {!Array<string>} List of variable types.
  * @package
  */
-VariableMap.prototype.getVariableTypes = function(ws) {
+VariableMap.prototype.getVariableTypes = function (ws) {
   const variableMap = {};
   object.mixin(variableMap, this.variableMap_);
   if (ws && ws.getPotentialVariableMap()) {
@@ -432,7 +422,7 @@ VariableMap.prototype.getVariableTypes = function(ws) {
  * Return all variables of all types.
  * @return {!Array<!VariableModel>} List of variable models.
  */
-VariableMap.prototype.getAllVariables = function() {
+VariableMap.prototype.getAllVariables = function () {
   let allVariables = [];
   for (const key in this.variableMap_) {
     allVariables = allVariables.concat(this.variableMap_[key]);
@@ -444,7 +434,7 @@ VariableMap.prototype.getAllVariables = function() {
  * Returns all of the variable names of all types.
  * @return {!Array<string>} All of the variable names of all types.
  */
-VariableMap.prototype.getAllVariableNames = function() {
+VariableMap.prototype.getAllVariableNames = function () {
   const allNames = [];
   for (const key in this.variableMap_) {
     const variables = this.variableMap_[key];
@@ -460,7 +450,7 @@ VariableMap.prototype.getAllVariableNames = function() {
  * @param {string} id ID of the variable to find.
  * @return {!Array<!Block>} Array of block usages.
  */
-VariableMap.prototype.getVariableUsesById = function(id) {
+VariableMap.prototype.getVariableUsesById = function (id) {
   const uses = [];
   const blocks = this.workspace.getAllBlocks(false);
   // Iterate through every block and check the name.
