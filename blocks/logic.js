@@ -47,7 +47,7 @@ defineBlocksWithJsonArray([
         ],
       },
     ],
-    'output': 'Boolean',
+    'output': 'BooleanValue',
     'style': 'logic_blocks',
     'tooltip': '%{BKY_LOGIC_BOOLEAN_TOOLTIP}',
     'helpUrl': '%{BKY_LOGIC_BOOLEAN_HELPURL}',
@@ -151,7 +151,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'A',
-        'check': 'Boolean',
+        'check': ['Boolean', 'BooleanValue'],
       },
       {
         'type': 'field_dropdown',
@@ -164,7 +164,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'B',
-        'check': 'Boolean',
+        'check': ['Boolean', 'BooleanValue'],
       },
     ],
     'inputsInline': true,
@@ -181,7 +181,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'BOOL',
-        'check': 'Boolean',
+        'check': ['Boolean', 'BooleanValue'],
       },
     ],
     'output': 'Boolean',
@@ -191,12 +191,12 @@ defineBlocksWithJsonArray([
   },
   // Block for null data type.
   {
-    'type': 'logic_null',
-    'message0': '%{BKY_LOGIC_NULL}',
+    'type': 'logic_unit',
+    'message0': '( )',
     'output': null,
     'style': 'logic_blocks',
-    'tooltip': '%{BKY_LOGIC_NULL_TOOLTIP}',
-    'helpUrl': '%{BKY_LOGIC_NULL_HELPURL}',
+    'tooltip': 'Returns unit.',
+    'helpUrl': '',
   },
   // Block for ternary operator.
   {
@@ -206,7 +206,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'IF',
-        'check': 'Boolean',
+        'check': ['Boolean', 'BooleanValue'],
       },
     ],
     'message1': '%{BKY_LOGIC_TERNARY_IF_TRUE} %1',
@@ -223,7 +223,7 @@ defineBlocksWithJsonArray([
         'name': 'ELSE',
       },
     ],
-    'output': null,
+    'output': 'Value',
     'style': 'logic_blocks',
     'tooltip': '%{BKY_LOGIC_TERNARY_TOOLTIP}',
     'helpUrl': '%{BKY_LOGIC_TERNARY_HELPURL}',

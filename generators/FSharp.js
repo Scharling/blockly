@@ -103,14 +103,15 @@ FSharp.ORDER_AND = 15;                 // &, &&
 FSharp.ORDER_OR = 16;                  // or, ||
 FSharp.ORDER_COMMA = 17;               // ,
 FSharp.ORDER_FUNCTION_ARROW = 18;      // ->
-FSharp.ORDER_NOT = 19;                 // not
-FSharp.ORDER_IF = 20;                  // if
-FSharp.ORDER_FUNCTION_MATCH_TRY = 21;  // function, fun, match, try
-FSharp.ORDER_LET = 22;                 // let
-FSharp.ORDER_SEMI_COLON = 23;          // ;
-FSharp.ORDER_PIPE = 24;                // |
-FSharp.ORDER_WHEN = 25;                // when
-FSharp.ORDER_AS = 26;                  // as
+FSharp.ORDER_OF = 19;                  // of
+FSharp.ORDER_NOT = 20;                 // not
+FSharp.ORDER_IF = 21;                  // if
+FSharp.ORDER_FUNCTION_MATCH_TRY = 22;  // function, fun, match, try
+FSharp.ORDER_LET = 23;                 // let
+FSharp.ORDER_SEMI_COLON = 24;          // ;
+FSharp.ORDER_PIPE = 25;                // |
+FSharp.ORDER_WHEN = 26;                // when
+FSharp.ORDER_AS = 27;                  // as
 FSharp.ORDER_NONE = 99;                // (...)
 
 /**
@@ -169,6 +170,7 @@ FSharp.init = function (workspace) {
   this.nameDB_.setVariableMap(workspace.getVariableMap());
   this.nameDB_.populateVariables(workspace);
   this.nameDB_.populateProcedures(workspace);
+  this.nameDB_.populateAlgebraicDatatypes(workspace);
 
   const defvars = [];
   // Add developer variables (not created or named by the user).
@@ -238,15 +240,14 @@ FSharp.quote_ = function (string) {
   // Can't use goog.string.quote since % must also be escaped.
   string = string.replace(/\\/g, '\\\\').replace(/\n/g, '\\\n');
 
-  // Follow the CPython behaviour of repr() for a non-byte string.
-  let quote = '\'';
-  if (string.indexOf('\'') !== -1) {
-    if (string.indexOf('"') === -1) {
-      quote = '"';
-    } else {
-      string = string.replace(/'/g, '\\\'');
-    }
-  }
+  let quote = '"';
+  // if (string.indexOf('\'') !== -1) {
+  //   if (string.indexOf('"') === -1) {
+  //     quote = '"';
+  //   } else {
+  //     string = string.replace(/'/g, '\\\'');
+  //   }
+  // }
   return quote + string + quote;
 };
 

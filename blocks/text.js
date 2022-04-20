@@ -13,21 +13,21 @@
 goog.module('Blockly.blocks.texts');
 
 const Extensions = goog.require('Blockly.Extensions');
-const {Msg} = goog.require('Blockly.Msg');
+const { Msg } = goog.require('Blockly.Msg');
 /* eslint-disable-next-line no-unused-vars */
 const xmlUtils = goog.require('Blockly.utils.xml');
-const {Align} = goog.require('Blockly.Input');
+const { Align } = goog.require('Blockly.Input');
 /* eslint-disable-next-line no-unused-vars */
-const {Block} = goog.requireType('Blockly.Block');
-const {Blocks} = goog.require('Blockly.blocks');
-const {ConnectionType} = goog.require('Blockly.ConnectionType');
-const {FieldDropdown} = goog.require('Blockly.FieldDropdown');
-const {FieldImage} = goog.require('Blockly.FieldImage');
-const {FieldTextInput} = goog.require('Blockly.FieldTextInput');
-const {Mutator} = goog.require('Blockly.Mutator');
+const { Block } = goog.requireType('Blockly.Block');
+const { Blocks } = goog.require('Blockly.blocks');
+const { ConnectionType } = goog.require('Blockly.ConnectionType');
+const { FieldDropdown } = goog.require('Blockly.FieldDropdown');
+const { FieldImage } = goog.require('Blockly.FieldImage');
+const { FieldTextInput } = goog.require('Blockly.FieldTextInput');
+const { Mutator } = goog.require('Blockly.Mutator');
 /* eslint-disable-next-line no-unused-vars */
-const {Workspace} = goog.requireType('Blockly.Workspace');
-const {defineBlocksWithJsonArray} = goog.require('Blockly.common');
+const { Workspace } = goog.requireType('Blockly.Workspace');
+const { defineBlocksWithJsonArray } = goog.require('Blockly.common');
 /** @suppress {extraRequire} */
 goog.require('Blockly.FieldMultilineInput');
 /** @suppress {extraRequire} */
@@ -44,7 +44,7 @@ defineBlocksWithJsonArray([
       'name': 'TEXT',
       'text': '',
     }],
-    'output': 'String',
+    'output': 'StringValue',
     'style': 'text_blocks',
     'helpUrl': '%{BKY_TEXT_TEXT_HELPURL}',
     'tooltip': '%{BKY_TEXT_TEXT_TOOLTIP}',
@@ -60,15 +60,15 @@ defineBlocksWithJsonArray([
       {
         'type': 'field_image',
         'src':
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAARCAYAAADpP' +
-            'U2iAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAdhgAAHYYBXaITgQAAABh0RVh0' +
-            'U29mdHdhcmUAcGFpbnQubmV0IDQuMS42/U4J6AAAAP1JREFUOE+Vks0KQUEYhjm' +
-            'RIja4ABtZ2dm5A3t3Ia6AUm7CylYuQRaUhZSlLZJiQbFAyRnPN33y01HOW08z88' +
-            '73zpwzM4F3GWOCruvGIE4/rLaV+Nq1hVGMBqzhqlxgCys4wJA65xnogMHsQ5luj' +
-            'nYHTejBBCK2mE4abjCgMGhNxHgDFWjDSG07kdfVa2pZMf4ZyMAdWmpZMfYOsLiD' +
-            'MYMjlMB+K613QISRhTnITnsYg5yUd0DETmEoMlkFOeIT/A58iyK5E18BuTBfgYX' +
-            'fwNJv4P9/oEBerLylOnRhygmGdPpTTBZAPkde61lbQe4moWUvYUZYLfUNftIY4z' +
-            'wA5X2Z9AYnQrEAAAAASUVORK5CYII=',
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAARCAYAAADpP' +
+          'U2iAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAdhgAAHYYBXaITgQAAABh0RVh0' +
+          'U29mdHdhcmUAcGFpbnQubmV0IDQuMS42/U4J6AAAAP1JREFUOE+Vks0KQUEYhjm' +
+          'RIja4ABtZ2dm5A3t3Ia6AUm7CylYuQRaUhZSlLZJiQbFAyRnPN33y01HOW08z88' +
+          '73zpwzM4F3GWOCruvGIE4/rLaV+Nq1hVGMBqzhqlxgCys4wJA65xnogMHsQ5luj' +
+          'nYHTejBBCK2mE4abjCgMGhNxHgDFWjDSG07kdfVa2pZMf4ZyMAdWmpZMfYOsLiD' +
+          'MYMjlMB+K613QISRhTnITnsYg5yUd0DETmEoMlkFOeIT/A58iyK5E18BuTBfgYX' +
+          'fwNJv4P9/oEBerLylOnRhygmGdPpTTBZAPkde61lbQe4moWUvYUZYLfUNftIY4z' +
+          'wA5X2Z9AYnQrEAAAAASUVORK5CYII=',
         'width': 12,
         'height': 17,
         'alt': '\u00B6',
@@ -150,7 +150,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': ['String', 'Array'],
+        'check': ['String', 'Array', 'StringValue'],
       },
     ],
     'output': 'Number',
@@ -165,7 +165,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': ['String', 'Array'],
+        'check': ['String', 'Array', 'StringValue'],
       },
     ],
     'output': 'Boolean',
@@ -180,7 +180,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': 'String',
+        'check': ['String', 'StringValue'],
       },
       {
         'type': 'field_dropdown',
@@ -199,7 +199,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'FIND',
-        'check': 'String',
+        'check': ['String', 'StringValue'],
       },
     ],
     'output': 'Number',
@@ -217,7 +217,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': 'String',
+        'check': ['String', 'StringValue'],
       },
       {
         'type': 'field_dropdown',
@@ -244,21 +244,21 @@ Blocks['text_getSubstring'] = {
    * Block for getting substring.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     this['WHERE_OPTIONS_1'] = [
       [Msg['TEXT_GET_SUBSTRING_START_FROM_START'], 'FROM_START'],
-      [Msg['TEXT_GET_SUBSTRING_START_FROM_END'], 'FROM_END'],
+      //[Msg['TEXT_GET_SUBSTRING_START_FROM_END'], 'FROM_END'],
       [Msg['TEXT_GET_SUBSTRING_START_FIRST'], 'FIRST'],
     ];
     this['WHERE_OPTIONS_2'] = [
       [Msg['TEXT_GET_SUBSTRING_END_FROM_START'], 'FROM_START'],
-      [Msg['TEXT_GET_SUBSTRING_END_FROM_END'], 'FROM_END'],
+      //[Msg['TEXT_GET_SUBSTRING_END_FROM_END'], 'FROM_END'],
       [Msg['TEXT_GET_SUBSTRING_END_LAST'], 'LAST'],
     ];
     this.setHelpUrl(Msg['TEXT_GET_SUBSTRING_HELPURL']);
     this.setStyle('text_blocks');
-    this.appendValueInput('STRING').setCheck('String').appendField(
-        Msg['TEXT_GET_SUBSTRING_INPUT_IN_TEXT']);
+    this.appendValueInput('STRING').setCheck(['String', 'StringValue']).appendField(
+      Msg['TEXT_GET_SUBSTRING_INPUT_IN_TEXT']);
     this.appendDummyInput('AT1');
     this.appendDummyInput('AT2');
     if (Msg['TEXT_GET_SUBSTRING_TAIL']) {
@@ -276,7 +276,7 @@ Blocks['text_getSubstring'] = {
    * @return {!Element} XML storage element.
    * @this {Block}
    */
-  mutationToDom: function() {
+  mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     const isAt1 = this.getInput('AT1').type === ConnectionType.INPUT_VALUE;
     container.setAttribute('at1', isAt1);
@@ -290,7 +290,7 @@ Blocks['text_getSubstring'] = {
    * @param {!Element} xmlElement XML storage element.
    * @this {Block}
    */
-  domToMutation: function(xmlElement) {
+  domToMutation: function (xmlElement) {
     const isAt1 = (xmlElement.getAttribute('at1') === 'true');
     const isAt2 = (xmlElement.getAttribute('at2') === 'true');
     this.updateAt_(1, isAt1);
@@ -310,17 +310,17 @@ Blocks['text_getSubstring'] = {
    * @private
    * @this {Block}
    */
-  updateAt_: function(n, isAt) {
+  updateAt_: function (n, isAt) {
     // Create or delete an input for the numeric index.
     // Destroy old 'AT' and 'ORDINAL' inputs.
     this.removeInput('AT' + n);
     this.removeInput('ORDINAL' + n, true);
     // Create either a value 'AT' input or a dummy input.
     if (isAt) {
-      this.appendValueInput('AT' + n).setCheck('Number');
+      this.appendValueInput('AT' + n).setCheck(['Number', 'NumberValue']);
       if (Msg['ORDINAL_NUMBER_SUFFIX']) {
         this.appendDummyInput('ORDINAL' + n)
-            .appendField(Msg['ORDINAL_NUMBER_SUFFIX']);
+          .appendField(Msg['ORDINAL_NUMBER_SUFFIX']);
       }
     } else {
       this.appendDummyInput('AT' + n);
@@ -331,27 +331,27 @@ Blocks['text_getSubstring'] = {
       this.appendDummyInput('TAIL').appendField(Msg['TEXT_GET_SUBSTRING_TAIL']);
     }
     const menu = new FieldDropdown(
-        this['WHERE_OPTIONS_' + n],
-        /**
-         * @param {*} value The input value.
-         * @this {FieldDropdown}
-         * @returns {null|undefined} Null if the field has been replaced;
-         *     otherwise undefined.
-         */
-        function(value) {
-          const newAt = (value === 'FROM_START') || (value === 'FROM_END');
-          // The 'isAt' variable is available due to this function being a
-          // closure.
-          if (newAt !== isAt) {
-            const block = this.getSourceBlock();
-            block.updateAt_(n, newAt);
-            // This menu has been destroyed and replaced.
-            // Update the replacement.
-            block.setFieldValue(value, 'WHERE' + n);
-            return null;
-          }
-          return undefined;
-        });
+      this['WHERE_OPTIONS_' + n],
+      /**
+       * @param {*} value The input value.
+       * @this {FieldDropdown}
+       * @returns {null|undefined} Null if the field has been replaced;
+       *     otherwise undefined.
+       */
+      function (value) {
+        const newAt = (value === 'FROM_START') || (value === 'FROM_END');
+        // The 'isAt' variable is available due to this function being a
+        // closure.
+        if (newAt !== isAt) {
+          const block = this.getSourceBlock();
+          block.updateAt_(n, newAt);
+          // This menu has been destroyed and replaced.
+          // Update the replacement.
+          block.setFieldValue(value, 'WHERE' + n);
+          return null;
+        }
+        return undefined;
+      });
 
     this.getInput('AT' + n).appendField(menu, 'WHERE' + n);
     if (n === 1) {
@@ -368,16 +368,16 @@ Blocks['text_changeCase'] = {
    * Block for changing capitalization.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     const OPERATORS = [
       [Msg['TEXT_CHANGECASE_OPERATOR_UPPERCASE'], 'UPPERCASE'],
       [Msg['TEXT_CHANGECASE_OPERATOR_LOWERCASE'], 'LOWERCASE'],
-      [Msg['TEXT_CHANGECASE_OPERATOR_TITLECASE'], 'TITLECASE'],
+      //[Msg['TEXT_CHANGECASE_OPERATOR_TITLECASE'], 'TITLECASE'],
     ];
     this.setHelpUrl(Msg['TEXT_CHANGECASE_HELPURL']);
     this.setStyle('text_blocks');
-    this.appendValueInput('TEXT').setCheck('String').appendField(
-        new FieldDropdown(OPERATORS), 'CASE');
+    this.appendValueInput('TEXT').setCheck(['String', 'StringValue']).appendField(
+      new FieldDropdown(OPERATORS), 'CASE');
     this.setOutput(true, 'String');
     this.setTooltip(Msg['TEXT_CHANGECASE_TOOLTIP']);
   },
@@ -388,7 +388,7 @@ Blocks['text_trim'] = {
    * Block for trimming spaces.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     const OPERATORS = [
       [Msg['TEXT_TRIM_OPERATOR_BOTH'], 'BOTH'],
       [Msg['TEXT_TRIM_OPERATOR_LEFT'], 'LEFT'],
@@ -396,8 +396,8 @@ Blocks['text_trim'] = {
     ];
     this.setHelpUrl(Msg['TEXT_TRIM_HELPURL']);
     this.setStyle('text_blocks');
-    this.appendValueInput('TEXT').setCheck('String').appendField(
-        new FieldDropdown(OPERATORS), 'MODE');
+    this.appendValueInput('TEXT').setCheck(['String', 'StringValue']).appendField(
+      new FieldDropdown(OPERATORS), 'MODE');
     this.setOutput(true, 'String');
     this.setTooltip(Msg['TEXT_TRIM_TOOLTIP']);
   },
@@ -408,7 +408,7 @@ Blocks['text_print'] = {
    * Block for print statement.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
       'message0': Msg['TEXT_PRINT_TITLE'],
       'args0': [
@@ -438,8 +438,8 @@ const TEXT_PROMPT_COMMON = {
    * @private
    * @this {Block}
    */
-  updateType_: function(newOp) {
-    this.outputConnection.setCheck(newOp === 'NUMBER' ? 'Number' : 'String');
+  updateType_: function (newOp) {
+    this.outputConnection.setCheck(newOp === 'NUMBER' ? ['Number', 'NumberValue'] : ['String', 'StringValue']);
   },
   /**
    * Create XML to represent the output type.
@@ -447,7 +447,7 @@ const TEXT_PROMPT_COMMON = {
    * @return {!Element} XML storage element.
    * @this {Block}
    */
-  mutationToDom: function() {
+  mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     container.setAttribute('type', this.getFieldValue('TYPE'));
     return container;
@@ -458,7 +458,7 @@ const TEXT_PROMPT_COMMON = {
    * @param {!Element} xmlElement XML storage element.
    * @this {Block}
    */
-  domToMutation: function(xmlElement) {
+  domToMutation: function (xmlElement) {
     this.updateType_(xmlElement.getAttribute('type'));
   },
 };
@@ -469,7 +469,7 @@ Blocks['text_prompt_ext'] = {
    * Block for prompt function (external message).
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     const TYPES = [
       [Msg['TEXT_PROMPT_TYPE_TEXT'], 'TEXT'],
       [Msg['TEXT_PROMPT_TYPE_NUMBER'], 'NUMBER'],
@@ -478,15 +478,15 @@ Blocks['text_prompt_ext'] = {
     this.setStyle('text_blocks');
     // Assign 'this' to a variable for use in the closures below.
     const thisBlock = this;
-    const dropdown = new FieldDropdown(TYPES, function(newOp) {
+    const dropdown = new FieldDropdown(TYPES, function (newOp) {
       thisBlock.updateType_(newOp);
     });
     this.appendValueInput('TEXT').appendField(dropdown, 'TYPE');
     this.setOutput(true, 'String');
-    this.setTooltip(function() {
+    this.setTooltip(function () {
       return (thisBlock.getFieldValue('TYPE') === 'TEXT') ?
-          Msg['TEXT_PROMPT_TOOLTIP_TEXT'] :
-          Msg['TEXT_PROMPT_TOOLTIP_NUMBER'];
+        Msg['TEXT_PROMPT_TOOLTIP_TEXT'] :
+        Msg['TEXT_PROMPT_TOOLTIP_NUMBER'];
     });
   },
 
@@ -503,7 +503,7 @@ Blocks['text_prompt'] = {
    * The 'text_prompt_ext' block is preferred as it is more flexible.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     this.mixin(QUOTE_IMAGE_MIXIN);
     const TYPES = [
       [Msg['TEXT_PROMPT_TYPE_TEXT'], 'TEXT'],
@@ -514,19 +514,19 @@ Blocks['text_prompt'] = {
     const thisBlock = this;
     this.setHelpUrl(Msg['TEXT_PROMPT_HELPURL']);
     this.setStyle('text_blocks');
-    const dropdown = new FieldDropdown(TYPES, function(newOp) {
+    const dropdown = new FieldDropdown(TYPES, function (newOp) {
       thisBlock.updateType_(newOp);
     });
     this.appendDummyInput()
-        .appendField(dropdown, 'TYPE')
-        .appendField(this.newQuote_(true))
-        .appendField(new FieldTextInput(''), 'TEXT')
-        .appendField(this.newQuote_(false));
+      .appendField(dropdown, 'TYPE')
+      .appendField(this.newQuote_(true))
+      .appendField(new FieldTextInput(''), 'TEXT')
+      .appendField(this.newQuote_(false));
     this.setOutput(true, 'String');
-    this.setTooltip(function() {
+    this.setTooltip(function () {
       return (thisBlock.getFieldValue('TYPE') === 'TEXT') ?
-          Msg['TEXT_PROMPT_TOOLTIP_TEXT'] :
-          Msg['TEXT_PROMPT_TOOLTIP_NUMBER'];
+        Msg['TEXT_PROMPT_TOOLTIP_TEXT'] :
+        Msg['TEXT_PROMPT_TOOLTIP_NUMBER'];
     });
   },
 };
@@ -536,19 +536,19 @@ Blocks['text_count'] = {
    * Block for counting how many times one string appears within another string.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
       'message0': Msg['TEXT_COUNT_MESSAGE0'],
       'args0': [
         {
           'type': 'input_value',
           'name': 'SUB',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
         {
           'type': 'input_value',
           'name': 'TEXT',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
       ],
       'output': 'Number',
@@ -565,24 +565,24 @@ Blocks['text_replace'] = {
    * Block for replacing one string with another in the text.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
       'message0': Msg['TEXT_REPLACE_MESSAGE0'],
       'args0': [
         {
           'type': 'input_value',
           'name': 'FROM',
-          'check': 'String',
+          'check': ['String', 'StringValue']
         },
         {
           'type': 'input_value',
           'name': 'TO',
-          'check': 'String',
+          'check': ['String', 'StringValue']
         },
         {
           'type': 'input_value',
           'name': 'TEXT',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
       ],
       'output': 'String',
@@ -599,14 +599,14 @@ Blocks['text_reverse'] = {
    * Block for reversing a string.
    * @this {Block}
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
       'message0': Msg['TEXT_REVERSE_MESSAGE0'],
       'args0': [
         {
           'type': 'input_value',
           'name': 'TEXT',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
       ],
       'output': 'String',
@@ -630,22 +630,22 @@ const QUOTE_IMAGE_MIXIN = {
    * @readonly
    */
   QUOTE_IMAGE_LEFT_DATAURI:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAQAAAAqJXdxAAAA' +
-      'n0lEQVQI1z3OMa5BURSF4f/cQhAKjUQhuQmFNwGJEUi0RKN5rU7FHKhpjEH3TEMtkdBSCY' +
-      '1EIv8r7nFX9e29V7EBAOvu7RPjwmWGH/VuF8CyN9/OAdvqIXYLvtRaNjx9mMTDyo+NjAN1' +
-      'HNcl9ZQ5oQMM3dgDUqDo1l8DzvwmtZN7mnD+PkmLa+4mhrxVA9fRowBWmVBhFy5gYEjKMf' +
-      'z9AylsaRRgGzvZAAAAAElFTkSuQmCC',
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAQAAAAqJXdxAAAA' +
+    'n0lEQVQI1z3OMa5BURSF4f/cQhAKjUQhuQmFNwGJEUi0RKN5rU7FHKhpjEH3TEMtkdBSCY' +
+    '1EIv8r7nFX9e29V7EBAOvu7RPjwmWGH/VuF8CyN9/OAdvqIXYLvtRaNjx9mMTDyo+NjAN1' +
+    'HNcl9ZQ5oQMM3dgDUqDo1l8DzvwmtZN7mnD+PkmLa+4mhrxVA9fRowBWmVBhFy5gYEjKMf' +
+    'z9AylsaRRgGzvZAAAAAElFTkSuQmCC',
   /**
    * Image data URI of an LTR closing double quote (same as RTL opening double
    * quote).
    * @readonly
    */
   QUOTE_IMAGE_RIGHT_DATAURI:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAQAAAAqJXdxAAAA' +
-      'qUlEQVQI1z3KvUpCcRiA8ef9E4JNHhI0aFEacm1o0BsI0Slx8wa8gLauoDnoBhq7DcfWhg' +
-      'gONDmJJgqCPA7neJ7p934EOOKOnM8Q7PDElo/4x4lFb2DmuUjcUzS3URnGib9qaPNbuXvB' +
-      'O3sGPHJDRG6fGVdMSeWDP2q99FQdFrz26Gu5Tq7dFMzUvbXy8KXeAj57cOklgA+u1B5Aos' +
-      'lLtGIHQMaCVnwDnADZIFIrXsoXrgAAAABJRU5ErkJggg==',
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAQAAAAqJXdxAAAA' +
+    'qUlEQVQI1z3KvUpCcRiA8ef9E4JNHhI0aFEacm1o0BsI0Slx8wa8gLauoDnoBhq7DcfWhg' +
+    'gONDmJJgqCPA7neJ7p934EOOKOnM8Q7PDElo/4x4lFb2DmuUjcUzS3URnGib9qaPNbuXvB' +
+    'O3sGPHJDRG6fGVdMSeWDP2q99FQdFrz26Gu5Tq7dFMzUvbXy8KXeAj57cOklgA+u1B5Aos' +
+    'lLtGIHQMaCVnwDnADZIFIrXsoXrgAAAABJRU5ErkJggg==',
   /**
    * Pixel width of QUOTE_IMAGE_LEFT_DATAURI and QUOTE_IMAGE_RIGHT_DATAURI.
    * @readonly
@@ -662,7 +662,7 @@ const QUOTE_IMAGE_MIXIN = {
    * @param {string} fieldName The name of the field to wrap with quotes.
    * @this {Block}
    */
-  quoteField_: function(fieldName) {
+  quoteField_: function (fieldName) {
     for (let i = 0, input; (input = this.inputList[i]); i++) {
       for (let j = 0, field; (field = input.fieldRow[j]); j++) {
         if (fieldName === field.name) {
@@ -673,7 +673,7 @@ const QUOTE_IMAGE_MIXIN = {
       }
     }
     console.warn(
-        'field named "' + fieldName + '" not found in ' + this.toDevString());
+      'field named "' + fieldName + '" not found in ' + this.toDevString());
   },
 
   /**
@@ -684,13 +684,13 @@ const QUOTE_IMAGE_MIXIN = {
    * @return {!FieldImage} The new field.
    * @this {Block}
    */
-  newQuote_: function(open) {
+  newQuote_: function (open) {
     const isLeft = this.RTL ? !open : open;
     const dataUri =
-        isLeft ? this.QUOTE_IMAGE_LEFT_DATAURI : this.QUOTE_IMAGE_RIGHT_DATAURI;
+      isLeft ? this.QUOTE_IMAGE_LEFT_DATAURI : this.QUOTE_IMAGE_RIGHT_DATAURI;
     return new FieldImage(
-        dataUri, this.QUOTE_IMAGE_WIDTH, this.QUOTE_IMAGE_HEIGHT,
-        isLeft ? '\u201C' : '\u201D');
+      dataUri, this.QUOTE_IMAGE_WIDTH, this.QUOTE_IMAGE_HEIGHT,
+      isLeft ? '\u201C' : '\u201D');
   },
 };
 
@@ -698,7 +698,7 @@ const QUOTE_IMAGE_MIXIN = {
  * Wraps TEXT field with images of double quote characters.
  * @this {Block}
  */
-const TEXT_QUOTES_EXTENSION = function() {
+const TEXT_QUOTES_EXTENSION = function () {
   this.mixin(QUOTE_IMAGE_MIXIN);
   this.quoteField_('TEXT');
 };
@@ -716,7 +716,7 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * @return {!Element} XML storage element.
    * @this {Block}
    */
-  mutationToDom: function() {
+  mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     container.setAttribute('items', this.itemCount_);
     return container;
@@ -727,7 +727,7 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * @param {!Element} xmlElement XML storage element.
    * @this {Block}
    */
-  domToMutation: function(xmlElement) {
+  domToMutation: function (xmlElement) {
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     this.updateShape_();
   },
@@ -735,7 +735,7 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * Returns the state of this block as a JSON serializable object.
    * @return {{itemCount: number}} The state of this block, ie the item count.
    */
-  saveExtraState: function() {
+  saveExtraState: function () {
     return {
       'itemCount': this.itemCount_,
     };
@@ -744,7 +744,7 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * Applies the given state to this block.
    * @param {*} state The state to apply to this block, ie the item count.
    */
-  loadExtraState: function(state) {
+  loadExtraState: function (state) {
     this.itemCount_ = state['itemCount'];
     this.updateShape_();
   },
@@ -754,7 +754,7 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * @return {!Block} Root block in mutator.
    * @this {Block}
    */
-  decompose: function(workspace) {
+  decompose: function (workspace) {
     const containerBlock = workspace.newBlock('text_create_join_container');
     containerBlock.initSvg();
     let connection = containerBlock.getInput('STACK').connection;
@@ -771,14 +771,14 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * @param {!Block} containerBlock Root block in mutator.
    * @this {Block}
    */
-  compose: function(containerBlock) {
+  compose: function (containerBlock) {
     let itemBlock = containerBlock.getInputTargetBlock('STACK');
     // Count number of inputs.
     const connections = [];
     while (itemBlock && !itemBlock.isInsertionMarker()) {
       connections.push(itemBlock.valueConnection_);
       itemBlock =
-          itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+        itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
     }
     // Disconnect any children that don't belong.
     for (let i = 0; i < this.itemCount_; i++) {
@@ -799,14 +799,14 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * @param {!Block} containerBlock Root block in mutator.
    * @this {Block}
    */
-  saveConnections: function(containerBlock) {
+  saveConnections: function (containerBlock) {
     let itemBlock = containerBlock.getInputTargetBlock('STACK');
     let i = 0;
     while (itemBlock) {
       const input = this.getInput('ADD' + i);
       itemBlock.valueConnection_ = input && input.connection.targetConnection;
       itemBlock =
-          itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+        itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
       i++;
     }
   },
@@ -815,13 +815,13 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
    * @private
    * @this {Block}
    */
-  updateShape_: function() {
+  updateShape_: function () {
     if (this.itemCount_ && this.getInput('EMPTY')) {
       this.removeInput('EMPTY');
     } else if (!this.itemCount_ && !this.getInput('EMPTY')) {
       this.appendDummyInput('EMPTY')
-          .appendField(this.newQuote_(true))
-          .appendField(this.newQuote_(false));
+        .appendField(this.newQuote_(true))
+        .appendField(this.newQuote_(false));
     }
     // Add new inputs.
     for (let i = 0; i < this.itemCount_; i++) {
@@ -843,7 +843,7 @@ const TEXT_JOIN_MUTATOR_MIXIN = {
  * Performs final setup of a text_join block.
  * @this {Block}
  */
-const TEXT_JOIN_EXTENSION = function() {
+const TEXT_JOIN_EXTENSION = function () {
   // Add the quote mixin for the itemCount_ = 0 case.
   this.mixin(QUOTE_IMAGE_MIXIN);
   // Initialize the mutator values.
@@ -855,19 +855,19 @@ const TEXT_JOIN_EXTENSION = function() {
 
 // Update the tooltip of 'text_append' block to reference the variable.
 Extensions.register(
-    'text_append_tooltip',
-    Extensions.buildTooltipWithFieldText('%{BKY_TEXT_APPEND_TOOLTIP}', 'VAR'));
+  'text_append_tooltip',
+  Extensions.buildTooltipWithFieldText('%{BKY_TEXT_APPEND_TOOLTIP}', 'VAR'));
 
 /**
  * Update the tooltip of 'text_append' block to reference the variable.
  * @this {Block}
  */
-const TEXT_INDEXOF_TOOLTIP_EXTENSION = function() {
+const TEXT_INDEXOF_TOOLTIP_EXTENSION = function () {
   // Assign 'this' to a variable for use in the tooltip closure below.
   const thisBlock = this;
-  this.setTooltip(function() {
+  this.setTooltip(function () {
     return Msg['TEXT_INDEXOF_TOOLTIP'].replace(
-        '%1', thisBlock.workspace.options.oneBasedIndex ? '0' : '-1');
+      '%1', thisBlock.workspace.options.oneBasedIndex ? '0' : '-1');
   });
 };
 
@@ -884,7 +884,7 @@ const TEXT_CHARAT_MUTATOR_MIXIN = {
    * @return {!Element} XML storage element.
    * @this {Block}
    */
-  mutationToDom: function() {
+  mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     container.setAttribute('at', !!this.isAt_);
     return container;
@@ -895,7 +895,7 @@ const TEXT_CHARAT_MUTATOR_MIXIN = {
    * @param {!Element} xmlElement XML storage element.
    * @this {Block}
    */
-  domToMutation: function(xmlElement) {
+  domToMutation: function (xmlElement) {
     // Note: Until January 2013 this block did not have mutations,
     // so 'at' defaults to true.
     const isAt = (xmlElement.getAttribute('at') !== 'false');
@@ -913,16 +913,16 @@ const TEXT_CHARAT_MUTATOR_MIXIN = {
    * @private
    * @this {Block}
    */
-  updateAt_: function(isAt) {
+  updateAt_: function (isAt) {
     // Destroy old 'AT' and 'ORDINAL' inputs.
     this.removeInput('AT', true);
     this.removeInput('ORDINAL', true);
     // Create either a value 'AT' input or a dummy input.
     if (isAt) {
-      this.appendValueInput('AT').setCheck('Number');
+      this.appendValueInput('AT').setCheck(['Number', 'NumberValue']);
       if (Msg['ORDINAL_NUMBER_SUFFIX']) {
         this.appendDummyInput('ORDINAL').appendField(
-            Msg['ORDINAL_NUMBER_SUFFIX']);
+          Msg['ORDINAL_NUMBER_SUFFIX']);
       }
     }
     if (Msg['TEXT_CHARAT_TAIL']) {
@@ -938,34 +938,34 @@ const TEXT_CHARAT_MUTATOR_MIXIN = {
  * Does the initial mutator update of text_charAt and adds the tooltip
  * @this {Block}
  */
-const TEXT_CHARAT_EXTENSION = function() {
+const TEXT_CHARAT_EXTENSION = function () {
   const dropdown = this.getField('WHERE');
   dropdown.setValidator(
-      /**
-       * @param {*} value The input value.
-       * @this {FieldDropdown}
-       */
-      function(value) {
-        const newAt = (value === 'FROM_START') || (value === 'FROM_END');
-        if (newAt !== this.isAt_) {
-          const block = this.getSourceBlock();
-          block.updateAt_(newAt);
-        }
-      });
+    /**
+     * @param {*} value The input value.
+     * @this {FieldDropdown}
+     */
+    function (value) {
+      const newAt = (value === 'FROM_START') || (value === 'FROM_END');
+      if (newAt !== this.isAt_) {
+        const block = this.getSourceBlock();
+        block.updateAt_(newAt);
+      }
+    });
   this.updateAt_(true);
   // Assign 'this' to a variable for use in the tooltip closure below.
   const thisBlock = this;
-  this.setTooltip(function() {
+  this.setTooltip(function () {
     const where = thisBlock.getFieldValue('WHERE');
     let tooltip = Msg['TEXT_CHARAT_TOOLTIP'];
     if (where === 'FROM_START' || where === 'FROM_END') {
       const msg = (where === 'FROM_START') ?
-          Msg['LISTS_INDEX_FROM_START_TOOLTIP'] :
-          Msg['LISTS_INDEX_FROM_END_TOOLTIP'];
+        Msg['LISTS_INDEX_FROM_START_TOOLTIP'] :
+        Msg['LISTS_INDEX_FROM_END_TOOLTIP'];
       if (msg) {
         tooltip += '  ' +
-            msg.replace(
-                '%1', thisBlock.workspace.options.oneBasedIndex ? '#1' : '#0');
+          msg.replace(
+            '%1', thisBlock.workspace.options.oneBasedIndex ? '#1' : '#0');
       }
     }
     return tooltip;
@@ -977,7 +977,7 @@ Extensions.register('text_indexOf_tooltip', TEXT_INDEXOF_TOOLTIP_EXTENSION);
 Extensions.register('text_quotes', TEXT_QUOTES_EXTENSION);
 
 Extensions.registerMutator(
-    'text_join_mutator', TEXT_JOIN_MUTATOR_MIXIN, TEXT_JOIN_EXTENSION);
+  'text_join_mutator', TEXT_JOIN_MUTATOR_MIXIN, TEXT_JOIN_EXTENSION);
 
 Extensions.registerMutator(
-    'text_charAt_mutator', TEXT_CHARAT_MUTATOR_MIXIN, TEXT_CHARAT_EXTENSION);
+  'text_charAt_mutator', TEXT_CHARAT_MUTATOR_MIXIN, TEXT_CHARAT_EXTENSION);

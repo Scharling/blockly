@@ -17,6 +17,7 @@ goog.module('Blockly.Procedures');
 
 /* eslint-disable-next-line no-unused-vars */
 const Abstract = goog.requireType('Blockly.Events.Abstract');
+const AlgebraicDatatypes = goog.require('Blockly.AlgebraicDatatypes');
 const Variables = goog.require('Blockly.Variables');
 const Xml = goog.require('Blockly.Xml');
 const eventUtils = goog.require('Blockly.Events.utils');
@@ -27,6 +28,7 @@ const { Block } = goog.requireType('Blockly.Block');
 /* eslint-disable-next-line no-unused-vars */
 const { Field } = goog.requireType('Blockly.Field');
 const { Msg } = goog.require('Blockly.Msg');
+const { Mutator } = goog.require('Blockly.Mutator');
 const { Names } = goog.require('Blockly.Names');
 /* eslint-disable-next-line no-unused-vars */
 const { WorkspaceSvg } = goog.requireType('Blockly.WorkspaceSvg');
@@ -305,7 +307,7 @@ const flyoutCategory = function (workspace) {
   }
 
   const tuple = allProcedures(workspace);
-  populateProcedures(tuple[0], 'procedures_callreturn');
+  populateProcedures(tuple[0], 'args_callreturn');
   populateProcedures(tuple[1], 'procedures_callreturn');
   return xmlList;
 };
@@ -338,10 +340,25 @@ const updateMutatorFlyout = function (workspace) {
   xmlElement.appendChild(argBlock);
 
   // Our custom mutator blocks
-  const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function'];
+  const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
   types.forEach(t => {
     xmlElement.appendChild(createTypeBlock(t));
   });
+
+  const outerWs = Mutator.findParentWs(workspace);
+  const algebraicDatatypes = AlgebraicDatatypes.allDatatypes(outerWs);
+  for (let i = 0; i < algebraicDatatypes.length; i++) {
+    const def = algebraicDatatypes[i];
+    const typeBlock = utilsXml.createElement('block');
+    typeBlock.setAttribute('type', 'datatype');
+    typeBlock.setAttribute('gap', 10);
+
+    const typeMutation = utilsXml.createElement('mutation');
+    typeMutation.setAttribute('name', def[0]);
+    typeMutation.setAttribute('items', def[1]);
+    typeBlock.appendChild(typeMutation);
+    xmlElement.appendChild(typeBlock);
+  }
 
   workspace.updateToolbox(xmlElement);
 };
@@ -349,6 +366,7 @@ const updateMutatorFlyout = function (workspace) {
 function createTypeBlock(type) {
   const typeBlock = utilsXml.createElement('block');
   typeBlock.setAttribute('type', type);
+  typeBlock.setAttribute('gap', 10);
   return typeBlock;
 }
 

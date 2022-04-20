@@ -96,7 +96,7 @@ FSharp['logic_boolean'] = function (block) {
   return [code, FSharp.ORDER_ATOMIC];
 };
 
-FSharp['logic_null'] = function (block) {
+FSharp['logic_unit'] = function (block) {
   // Null data type.
   return ['()', FSharp.ORDER_ATOMIC];
 };
