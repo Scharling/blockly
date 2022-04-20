@@ -41,13 +41,6 @@ FSharp['typedefinition'] = function (block) {
   return null;
 }
 
-FSharp['casewithouttype'] = function (block) {
-  const caseName =
-    FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
-  const code = '| ' + caseName + '\n';
-  return code;
-}
-
 FSharp['case'] = function (block) {
   console.log("case", block);
 
@@ -62,16 +55,9 @@ FSharp['case'] = function (block) {
   const caseName =
     FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
     
-  const code = '| ' + caseName + " of " + args.join(" * ") + '\n';
-  return code;
-}
+  const ofString = (args.length == 0) ? "" : " of ";
 
-FSharp['casewithtype'] = function (block) {
-  const caseName =
-    FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
-  const blockValue = FSharp.valueToCode(block, 'TYPE', FSharp.ORDER_OF)
-    
-  const code = '| ' + caseName + " of " + blockValue + '\n';
+  const code = '| ' + caseName + ofString + args.join(" * ") + '\n';
   return code;
 }
 
@@ -119,6 +105,8 @@ FSharp['type_builder'] = function (block) {
     }
   }
 
-  const code = builderName + "(" + args.join(", ") + ")";
+  const argsString = (args.length == 0) ? "" : "(" + args.join(", ") + ")";
+
+  const code = builderName + argsString;
   return [code, FSharp.ORDER_ATOMIC];
 }
