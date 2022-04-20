@@ -20,17 +20,17 @@ FSharp['match'] = function (block) {
   let matchingBlock = FSharp.valueToCode(block, "VARIABLE", FSharp.ORDER_ATOMIC);
 
   let branch = FSharp.statementToCode(block, 'CASES');
-  let code = "\nmatch " + matchingBlock + " with\n" + branch;
+  let code = "\nmatch " + matchingBlock + " with" + branch;
 
   return [code, FSharp.ORDER_ATOMIC];
 }
 
 FSharp['matchcase'] = function (block) {
 
-  const patternBlock = FSharp.valueToCode(block, "PATTERN", FSharp.ORDER_ATOMIC);
-  const thenBlock = FSharp.valueToCode(block, "THEN", FSharp.ORDER_ATOMIC);
+  const patternBlock = FSharp.valueToCode(block, "PATTERN", FSharp.ORDER_PIPE_PATTERN_MATCH);
+  const thenBlock = FSharp.valueToCode(block, "THEN", FSharp.ORDER_FUNCTION_ARROW);
 
-  const code = '\n| ' + patternBlock + ' -> ' + thenBlock;
+  const code = '\n  | ' + patternBlock + ' -> ' + thenBlock;
   return code;
 }
 
