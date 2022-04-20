@@ -22,15 +22,15 @@ const internalConstants = goog.require('Blockly.internalConstants');
 const object = goog.require('Blockly.utils.object');
 const parsing = goog.require('Blockly.utils.parsing');
 /* eslint-disable-next-line no-unused-vars */
-const {Block} = goog.requireType('Blockly.Block');
-const {FieldDropdown} = goog.require('Blockly.FieldDropdown');
+const { Block } = goog.requireType('Blockly.Block');
+const { FieldDropdown } = goog.require('Blockly.FieldDropdown');
 /* eslint-disable-next-line no-unused-vars */
-const {MenuItem} = goog.requireType('Blockly.MenuItem');
+const { MenuItem } = goog.requireType('Blockly.MenuItem');
 /* eslint-disable-next-line no-unused-vars */
-const {Menu} = goog.requireType('Blockly.Menu');
-const {Msg} = goog.require('Blockly.Msg');
-const {Size} = goog.require('Blockly.utils.Size');
-const {VariableModel} = goog.require('Blockly.VariableModel');
+const { Menu } = goog.requireType('Blockly.Menu');
+const { Msg } = goog.require('Blockly.Msg');
+const { Size } = goog.require('Blockly.utils.Size');
+const { VariableModel } = goog.require('Blockly.VariableModel');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.BlockChange');
 const typeUtils = goog.require('Blockly.extra.utils.types')
@@ -55,8 +55,8 @@ const typeUtils = goog.require('Blockly.extra.utils.types')
  * @constructor
  * @alias Blockly.FieldVariable
  */
-const FieldVariable = function(
-    varName, opt_validator, opt_variableTypes, opt_defaultType, opt_config) {
+const FieldVariable = function (
+  varName, opt_validator, opt_variableTypes, opt_defaultType, opt_config) {
   // The FieldDropdown constructor expects the field's initial value to be
   // the first entry in the menu generator, which it may or may not be.
   // Just do the relevant parts of the constructor.
@@ -104,7 +104,7 @@ object.inherits(FieldVariable, FieldDropdown);
  * @package
  * @nocollapse
  */
-FieldVariable.fromJson = function(options) {
+FieldVariable.fromJson = function (options) {
   const varName = parsing.replaceMessageReferences(options['variable']);
   // `this` might be a subclass of FieldVariable if that class doesn't override
   // the static fromJson method.
@@ -123,7 +123,7 @@ FieldVariable.prototype.SERIALIZABLE = true;
  * @param {!Object} config A map of options to configure the field based on.
  * @protected
  */
-FieldVariable.prototype.configure_ = function(config) {
+FieldVariable.prototype.configure_ = function (config) {
   FieldVariable.superClass_.configure_.call(this, config);
   this.setTypes_(config['variableTypes'], config['defaultType']);
 };
@@ -134,13 +134,13 @@ FieldVariable.prototype.configure_ = function(config) {
  * variable rather than let the value be invalid.
  * @package
  */
-FieldVariable.prototype.initModel = function() {
+FieldVariable.prototype.initModel = function () {
   if (this.variable_) {
     return;  // Initialization already happened.
   }
   const variable = Variables.getOrCreateVariablePackage(
-      this.sourceBlock_.workspace, null, this.defaultVariableName,
-      this.defaultType_);
+    this.sourceBlock_.workspace, null, this.defaultVariableName,
+    this.defaultType_);
 
   // Don't call setValue because we don't want to cause a rerender.
   this.doValueUpdate_(variable.getId());
@@ -149,10 +149,10 @@ FieldVariable.prototype.initModel = function() {
 /**
  * @override
  */
-FieldVariable.prototype.shouldAddBorderRect_ = function() {
+FieldVariable.prototype.shouldAddBorderRect_ = function () {
   return FieldVariable.superClass_.shouldAddBorderRect_.call(this) &&
-      (!this.getConstants().FIELD_DROPDOWN_NO_BORDER_RECT_SHADOW ||
-       this.sourceBlock_.type !== 'variables_get');
+    (!this.getConstants().FIELD_DROPDOWN_NO_BORDER_RECT_SHADOW ||
+      this.sourceBlock_.type !== 'variables_get');
 };
 
 /**
@@ -160,24 +160,24 @@ FieldVariable.prototype.shouldAddBorderRect_ = function() {
  * @param {!Element} fieldElement The element containing information about the
  *    variable field's state.
  */
-FieldVariable.prototype.fromXml = function(fieldElement) {
+FieldVariable.prototype.fromXml = function (fieldElement) {
   const id = fieldElement.getAttribute('id');
   const variableName = fieldElement.textContent;
   // 'variabletype' should be lowercase, but until July 2019 it was sometimes
   // recorded as 'variableType'.  Thus we need to check for both.
   const variableType = fieldElement.getAttribute('variabletype') ||
-      fieldElement.getAttribute('variableType') || typeUtils.createNullType();
+    fieldElement.getAttribute('variableType') || typeUtils.createNullType();
   const variable = Variables.getOrCreateVariablePackage(
-      this.sourceBlock_.workspace, id, variableName, variableType);
+    this.sourceBlock_.workspace, id, variableName, variableType);
   const variableTypeType = (variableType.getType != null) ? variableType.getType() : variableType;
   console.log("variableTypeType", variableTypeType)
   // This should never happen :)
   if (variableType !== null && variableTypeType !== variable.type.getType()) {
     throw Error(
-        'Serialized variable type with id \'' + variable.getId() +
-        '\' had type ' + variable.getType() + ', and ' +
-        'does not match variable field that references it: ' +
-        Xml.domToText(fieldElement) + '.');
+      'Serialized variable type with id \'' + variable.getId() +
+      '\' had type ' + variable.getType() + ', and ' +
+      'does not match variable field that references it: ' +
+      Xml.domToText(fieldElement) + '.');
   }
 
   this.setValue(variable.getId());
@@ -189,14 +189,14 @@ FieldVariable.prototype.fromXml = function(fieldElement) {
  *    field's state.
  * @return {!Element} The element containing info about the field's state.
  */
-FieldVariable.prototype.toXml = function(fieldElement) {
+FieldVariable.prototype.toXml = function (fieldElement) {
   // Make sure the variable is initialized.
   this.initModel();
 
   fieldElement.id = this.variable_.getId();
   fieldElement.textContent = this.variable_.name;
   if (this.variable_.type) {
-    fieldElement.setAttribute('variabletype', this.variable_.type);
+    fieldElement.setAttribute('variabletype', this.variable_.type.getType());
   }
   return fieldElement;
 };
@@ -210,14 +210,14 @@ FieldVariable.prototype.toXml = function(fieldElement) {
  * @override
  * @package
  */
-FieldVariable.prototype.saveState = function(doFullSerialization) {
+FieldVariable.prototype.saveState = function (doFullSerialization) {
   const legacyState = this.saveLegacyState(FieldVariable);
   if (legacyState !== null) {
     return legacyState;
   }
   // Make sure the variable is initialized.
   this.initModel();
-  const state = {'id': this.variable_.getId()};
+  const state = { 'id': this.variable_.getId() };
   if (doFullSerialization) {
     state['name'] = this.variable_.name;
     state['type'] = this.variable_.type;
@@ -231,14 +231,14 @@ FieldVariable.prototype.saveState = function(doFullSerialization) {
  * @override
  * @package
  */
-FieldVariable.prototype.loadState = function(state) {
+FieldVariable.prototype.loadState = function (state) {
   if (this.loadLegacyState(FieldVariable, state)) {
     return;
   }
   // This is necessary so that blocks in the flyout can have custom var names.
   const variable = Variables.getOrCreateVariablePackage(
-      this.sourceBlock_.workspace, state['id'] || null, state['name'],
-      state['type'] || '');
+    this.sourceBlock_.workspace, state['id'] || null, state['name'],
+    state['type'] || '');
   this.setValue(variable.getId());
 };
 
@@ -246,7 +246,7 @@ FieldVariable.prototype.loadState = function(state) {
  * Attach this field to a block.
  * @param {!Block} block The block containing this field.
  */
-FieldVariable.prototype.setSourceBlock = function(block) {
+FieldVariable.prototype.setSourceBlock = function (block) {
   if (block.isShadow()) {
     throw Error('Variable fields are not allowed to exist on shadow blocks.');
   }
@@ -257,7 +257,7 @@ FieldVariable.prototype.setSourceBlock = function(block) {
  * Get the variable's ID.
  * @return {string} Current variable's ID.
  */
-FieldVariable.prototype.getValue = function() {
+FieldVariable.prototype.getValue = function () {
   return this.variable_ ? this.variable_.getId() : null;
 };
 
@@ -266,7 +266,7 @@ FieldVariable.prototype.getValue = function() {
  * @return {string} The selected variable's name, or the empty string if no
  *     variable is selected.
  */
-FieldVariable.prototype.getText = function() {
+FieldVariable.prototype.getText = function () {
   return this.variable_ ? this.variable_.name : '';
 };
 
@@ -278,7 +278,7 @@ FieldVariable.prototype.getText = function() {
  *     selected.
  * @package
  */
-FieldVariable.prototype.getVariable = function() {
+FieldVariable.prototype.getVariable = function () {
   return this.variable_;
 };
 
@@ -289,7 +289,7 @@ FieldVariable.prototype.getVariable = function() {
  * a block and workspace at that point.
  * @return {?Function} Validation function, or null.
  */
-FieldVariable.prototype.getValidator = function() {
+FieldVariable.prototype.getValidator = function () {
   // Validators shouldn't operate on the initial setValue call.
   // Normally this is achieved by calling setValidator after setValue, but
   // this is not a possibility with variable fields.
@@ -305,7 +305,7 @@ FieldVariable.prototype.getValidator = function() {
  * @return {?string} The validated ID, or null if invalid.
  * @protected
  */
-FieldVariable.prototype.doClassValidation_ = function(opt_newValue) {
+FieldVariable.prototype.doClassValidation_ = function (opt_newValue) {
   if (opt_newValue === null) {
     return null;
   }
@@ -313,8 +313,8 @@ FieldVariable.prototype.doClassValidation_ = function(opt_newValue) {
   const variable = Variables.getVariable(this.sourceBlock_.workspace, newId);
   if (!variable) {
     console.warn(
-        'Variable id doesn\'t point to a real variable! ' +
-        'ID was ' + newId);
+      'Variable id doesn\'t point to a real variable! ' +
+      'ID was ' + newId);
     return null;
   }
   // Type Checks.
@@ -334,9 +334,9 @@ FieldVariable.prototype.doClassValidation_ = function(opt_newValue) {
  * @param {*} newId The value to be saved.
  * @protected
  */
-FieldVariable.prototype.doValueUpdate_ = function(newId) {
+FieldVariable.prototype.doValueUpdate_ = function (newId) {
   this.variable_ = Variables.getVariable(
-      this.sourceBlock_.workspace, /** @type {string} */ (newId));
+    this.sourceBlock_.workspace, /** @type {string} */(newId));
   FieldVariable.superClass_.doValueUpdate_.call(this, newId);
 };
 
@@ -346,7 +346,7 @@ FieldVariable.prototype.doValueUpdate_ = function(newId) {
  * @return {boolean} True if the type is in the list of allowed types.
  * @private
  */
-FieldVariable.prototype.typeIsAllowed_ = function(type) {
+FieldVariable.prototype.typeIsAllowed_ = function (type) {
   const typeList = this.getVariableTypes_();
   if (!typeList) {
     return true;  // If it's null, all types are valid.
@@ -365,7 +365,7 @@ FieldVariable.prototype.typeIsAllowed_ = function(type) {
  * @throws {Error} if variableTypes is an empty array.
  * @private
  */
-FieldVariable.prototype.getVariableTypes_ = function() {
+FieldVariable.prototype.getVariableTypes_ = function () {
   // TODO (#1513): Try to avoid calling this every time the field is edited.
   let variableTypes = this.variableTypes;
   if (variableTypes === null) {
@@ -379,7 +379,7 @@ FieldVariable.prototype.getVariableTypes_ = function() {
     // Throw an error if variableTypes is an empty list.
     const name = this.getText();
     throw Error(
-        '\'variableTypes\' of field variable ' + name + ' was an empty list');
+      '\'variableTypes\' of field variable ' + name + ' was an empty list');
   }
   return variableTypes;
 };
@@ -394,8 +394,8 @@ FieldVariable.prototype.getVariableTypes_ = function() {
  *     field's value is not explicitly set.  Defaults to ''.
  * @private
  */
-FieldVariable.prototype.setTypes_ = function(
-    opt_variableTypes, opt_defaultType) {
+FieldVariable.prototype.setTypes_ = function (
+  opt_variableTypes, opt_defaultType) {
   // If you expected that the default type would be the same as the only entry
   // in the variable types array, tell the Blockly team by commenting on #1499.
   const defaultType = opt_defaultType || '';
@@ -414,13 +414,13 @@ FieldVariable.prototype.setTypes_ = function(
     }
     if (!isInArray) {
       throw Error(
-          'Invalid default type \'' + defaultType + '\' in ' +
-          'the definition of a FieldVariable');
+        'Invalid default type \'' + defaultType + '\' in ' +
+        'the definition of a FieldVariable');
     }
   } else {
     throw Error(
-        '\'variableTypes\' was not an array in the definition of ' +
-        'a FieldVariable');
+      '\'variableTypes\' was not an array in the definition of ' +
+      'a FieldVariable');
   }
   // Only update the field once all checks pass.
   this.defaultType_ = defaultType;
@@ -433,7 +433,7 @@ FieldVariable.prototype.setTypes_ = function(
  * be called by the block.
  * @package
  */
-FieldVariable.prototype.refreshVariableName = function() {
+FieldVariable.prototype.refreshVariableName = function () {
   this.forceRerender();
 };
 
@@ -443,11 +443,11 @@ FieldVariable.prototype.refreshVariableName = function() {
  * @return {!Array<!Array>} Array of variable names/id tuples.
  * @this {FieldVariable}
  */
-FieldVariable.dropdownCreate = function() {
+FieldVariable.dropdownCreate = function () {
   if (!this.variable_) {
     throw Error(
-        'Tried to call dropdownCreate on a variable field with no' +
-        ' variable selected.');
+      'Tried to call dropdownCreate on a variable field with no' +
+      ' variable selected.');
   }
   const name = this.getText();
   let variableModelList = [];
@@ -492,7 +492,7 @@ FieldVariable.dropdownCreate = function() {
  * @param {!MenuItem} menuItem The MenuItem selected within menu.
  * @protected
  */
-FieldVariable.prototype.onItemSelected_ = function(menu, menuItem) {
+FieldVariable.prototype.onItemSelected_ = function (menu, menuItem) {
   const id = menuItem.getValue();
   // Handle special cases.
   if (this.sourceBlock_ && this.sourceBlock_.workspace) {
@@ -516,7 +516,7 @@ FieldVariable.prototype.onItemSelected_ = function(menu, menuItem) {
  * @package
  * @override
  */
-FieldVariable.prototype.referencesVariables = function() {
+FieldVariable.prototype.referencesVariables = function () {
   return true;
 };
 

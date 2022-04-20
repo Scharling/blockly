@@ -30,3 +30,26 @@ FSharp['variables_set'] = function (block) {
     FSharp.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
   return 'let ' + varName + ' = ' + argument0 + '\n';
 };
+
+FSharp['value_tuple'] = function (block) {
+  var args = [];
+  for (var i = 0; i < block.childBlocks_.length; i++) {
+    args.push(FSharp.valueToCode(block, getTupleIndexName(i), FSharp.ORDER_ATOMIC))
+  }
+  let code = args.join(", ");
+
+  if (code.length > 0) code = "(" + code + ")";
+
+  return [code, FSharp.ORDER_ATOMIC];
+};
+
+function getTupleIndexName(index) {
+  switch (index) {
+    case 0:
+      return "FST"
+    case 1:
+      return "SND"
+    default:
+      return "ADD" + (index - 2)
+  }
+}

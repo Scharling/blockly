@@ -136,8 +136,16 @@ const flyoutCategory = function (workspace) {
 
   xmlList.push(button);
 
+  if (Blocks['value_tuple']) {
+    const tupleBlock = utilsXml.createElement('block');
+    tupleBlock.setAttribute('type', 'value_tuple');
+    tupleBlock.setAttribute('gap', 16);
+    xmlList.push(tupleBlock);
+  }
+
   const blockList = flyoutCategoryBlocks(workspace);
   xmlList = xmlList.concat(blockList);
+
   return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
