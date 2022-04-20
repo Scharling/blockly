@@ -44,7 +44,7 @@ goog.require('Blockly.Warning');
 
 const typeUtils = goog.require('Blockly.extra.utils.types');
 
-const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
+const types = ['type_int', 'type_float', 'type_string', 'type_char', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
 
 /**
  * Common properties for the procedure_defnoreturn and
