@@ -118,11 +118,12 @@ exports.createTupleType = createTupleType;
    * @param children The items of the tuple.
    * @return Type object.
    */
- const createDatatypeType = function (children, blockName) {
+const createDatatypeType = function (children, blockName) {
     return {
         block_name: "type_datatype",
         text_name_start: "<",
         text_name_end: ">",
+        name: blockName,
         children,
         getType: function () {
             var s = blockName + this.text_name_start;
@@ -280,13 +281,13 @@ const createTypeFromBlock = function (block) {
             const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
             return createFunctionType(inputs, output);
         case "datatype":
-            console.log("createType", block);
             const name = block.getFieldValue('NAME');
             const dtChildren = [];
-            block.childBlocks_.forEach(b => 
-                {if(b.type) {
+            block.childBlocks_.forEach(b => {
+                if (b.type) {
                     dtChildren.push(createTypeFromBlock(b));
-                }});
+                }
+            });
             return createDatatypeType(dtChildren, name);
     }
     return null;
@@ -353,6 +354,21 @@ const createBlockFromType = function (type) {
                 functionBlockNode.appendChild(outputValueBlock);
             }
             return functionBlockNode;
+        case "type_datatype":
+            const typeBlockNode = xmlUtils.createElement('block');
+            typeBlockNode.setAttribute('type', 'datatype');
+
+            const typeMutationBlock = xmlUtils.createElement('mutation');
+            typeMutationBlock.setAttribute('name', type.name);
+            typeMutationBlock.setAttribute('items', type.children.length);
+            typeBlockNode.appendChild(typeMutationBlock);
+            let j = 0;
+            type.children.forEach(element => {
+                const valueBlock = createValueBlock("ADD" + j, element);
+                typeBlockNode.appendChild(valueBlock);
+                i++;
+            });
+            return typeBlockNode;
         case "type_null":
             return null;
     }
@@ -420,6 +436,13 @@ const createXmlFromType = function (type, name) {
             const output = type.output ? createXmlFromType(type.output, 'output') : null;
             if (output) typeXml.appendChild(output);
             break;
+        case "type_datatype":
+            typeXml.setAttribute('name', type.name);
+            for (c in type.children) {
+                const childXml = createXmlFromType(type.children[c], 'child');
+                typeXml.appendChild(childXml);
+            }
+            break;
         default:
             break;
     }
@@ -452,7 +475,6 @@ const createTypeFromXml = function (xmlElement) {
                 }
             }
             return createTupleType(children);
-
         case "type_function":
             let input = null;
             let output = null;
@@ -465,6 +487,15 @@ const createTypeFromXml = function (xmlElement) {
                 }
             }
             return createFunctionType(input, output);
+        case "type_datatype":
+            const typeChildren = [];
+            for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
+                if (childNode.nodeName.toLowerCase() === 'child') {
+                    const childType = createTypeFromXml(childNode);
+                    typeChildren.push(childType);
+                }
+            }
+            return createDatatypeType(typeChildren, xmlElement.getAttribute('name'));
     }
 }
 exports.createTypeFromXml = createTypeFromXml;
