@@ -148,7 +148,7 @@ Blockly.Blocks['typedefinition'] = {
                 args.push(getPolyType(i));
             }
             output = 'of ' + args.join(", ");
-        } 
+        }
 
         this.setFieldValue(output, 'PARAMS');
 
@@ -196,7 +196,7 @@ Blockly.Blocks['typedefinition'] = {
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
 function getPolyType(polyCounter) {
-  return "'" + alphabet.charAt(polyCounter);
+    return "'" + alphabet.charAt(polyCounter);
 }
 
 Blockly.Blocks['typedefinition_create_with_container'] = {
@@ -334,6 +334,38 @@ Blockly.Blocks['case'] = {
         // Remove deleted inputs.
         for (let i = this.itemCount_; this.getInput('ADD' + i); i++) {
             this.removeInput('ADD' + i);
+        }
+    },
+    /**
+     * Called whenever anything on the workspace changes.
+     * Add warning if this case block is not nested inside a type definition block.
+     * @param {!AbstractEvent} _e Change event.
+     * @this {Block}
+     */
+    onchange: function (_e) {
+        if (this.workspace.isDragging && this.workspace.isDragging()) {
+            return;  // Don't change state at the start of a drag.
+        }
+        let legal = false;
+        // Is the block nested in a procedure?
+        let block = this;
+        do {
+            if (block.type === 'typedefinition') {
+                legal = true;
+                break;
+            }
+            block = block.getSurroundParent();
+        } while (block);
+        if (legal) {
+            this.setWarningText(null);
+            if (!this.isInFlyout) {
+                this.setEnabled(true);
+            }
+        } else {
+            this.setWarningText('Warning: This block may be used only within a type definition.');
+            if (!this.isInFlyout && !this.getInheritedDisabled()) {
+                this.setEnabled(false);
+            }
         }
     },
     getDatatypeName: function () {
