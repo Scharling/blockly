@@ -344,9 +344,8 @@ const PROCEDURE_DEF_COMMON = {
       }
       var varType = typeUtils.createNullType();
       for (var i = 0; i < paramBlock.childBlocks_.length; i++) {
-        if (paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && paramBlock.childBlocks_[i].type.startsWith("type_")) {
+        if (isTypedBlock(paramBlock, i)) {
           const typedBlock = paramBlock.childBlocks_[i];
-
           varType = typeUtils.createTypeFromBlock(typedBlock);
           break;
         }
@@ -750,12 +749,15 @@ Blocks['procedures_mutatorarg'] = {
   },
 };
 
+function isTypedBlock(paramBlock, i) {
+  return paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && (paramBlock.childBlocks_[i].type.startsWith("type_") || paramBlock.childBlocks_[i].type.startsWith("datatype"))
+}
+
 function validatorExternal(sourceBlock, varName, thisBlock) {
   var varType = typeUtils.createNullType();
 
   for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
-    if (sourceBlock.childBlocks_[i] && sourceBlock.childBlocks_[i].type != null && sourceBlock.childBlocks_[i].type.startsWith("type_")) {
-
+    if (isTypedBlock(sourceBlock, i)) {
       varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[i]);
       break;
     }

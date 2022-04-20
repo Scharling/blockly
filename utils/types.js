@@ -102,17 +102,51 @@ const createTupleType = function (children) {
             return s
         },
         getFSharpType() {
-            var s = "(";
+            var args = []
             for (var i = 0; i < this.children.length; i++) {
-                s = s + this.children[i].getFSharpType() + " * "
+                args.push(this.children[i].getFSharpType());
             }
-            if (this.children.length > 0) s = s.slice(0, -3)
-            s = s + this.text_name_end
-            return s
+            return args.join(" * ")
         }
     }
 }
 exports.createTupleType = createTupleType;
+
+
+/**
+   * Create type object for a tuple type.
+   * @param children The items of the tuple.
+   * @return Type object.
+   */
+ const createDatatypeType = function (children, blockName) {
+    return {
+        block_name: "type_datatype",
+        text_name_start: "<",
+        text_name_end: ">",
+        children,
+        getType: function () {
+            var s = blockName + this.text_name_start;
+            var args = []
+            for (var i = 0; i < this.children.length; i++) {
+                args.push(this.children[i]?.getType())
+            }
+            s = s + args.join(", ")
+            s = s + this.text_name_end;
+            return s
+        },
+        getFSharpType() {
+            var s = blockName + this.text_name_start;
+            var args = []
+            for (var i = 0; i < this.children.length; i++) {
+                args.push(this.children[i]?.getFSharpType())
+            }
+            s = s + args.join(", ")
+            s = s + this.text_name_end;
+            return s
+        }
+    }
+}
+exports.createDatatypeType = createDatatypeType;
 
 /**
    * Create type object for a function type.
@@ -245,7 +279,17 @@ const createTypeFromBlock = function (block) {
             const inputs = inputBlocks.map(i => createTypeFromBlock(i));
             const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
             return createFunctionType(inputs, output);
+        case "datatype":
+            console.log("createType", block);
+            const name = block.getFieldValue('NAME');
+            const dtChildren = [];
+            block.childBlocks_.forEach(b => 
+                {if(b.type) {
+                    dtChildren.push(createTypeFromBlock(b));
+                }});
+            return createDatatypeType(dtChildren, name);
     }
+    return null;
 }
 exports.createTypeFromBlock = createTypeFromBlock;
 
