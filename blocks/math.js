@@ -39,7 +39,7 @@ defineBlocksWithJsonArray([
       'name': 'NUM',
       'value': 0,
     }],
-    'output': 'Number',
+    'output': 'NumberValue',
     'helpUrl': '%{BKY_MATH_NUMBER_HELPURL}',
     'style': 'math_blocks',
     'tooltip': '%{BKY_MATH_NUMBER_TOOLTIP}',
@@ -54,7 +54,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'A',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
       {
         'type': 'field_dropdown',
@@ -70,7 +70,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'B',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'inputsInline': true,
@@ -101,7 +101,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'NUM',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'output': 'Number',
@@ -130,7 +130,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'NUM',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'output': 'Number',
@@ -151,13 +151,13 @@ defineBlocksWithJsonArray([
           ['\u03c0', 'PI'],
           ['e', 'E'],
           ['\u03c6', 'GOLDEN_RATIO'],
-          ['sqrt(2)', 'SQRT2'],
-          ['sqrt(\u00bd)', 'SQRT1_2'],
+          // ['sqrt(2)', 'SQRT2'],
+          // ['sqrt(\u00bd)', 'SQRT1_2'],
           ['\u221e', 'INFINITY'],
         ],
       },
     ],
-    'output': 'Number',
+    'output': 'NumberValue',
     'style': 'math_blocks',
     'tooltip': '%{BKY_MATH_CONSTANT_TOOLTIP}',
     'helpUrl': '%{BKY_MATH_CONSTANT_HELPURL}',
@@ -172,7 +172,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'NUMBER_TO_CHECK',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
       {
         'type': 'field_dropdown',
@@ -235,7 +235,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'NUM',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'output': 'Number',
@@ -285,12 +285,12 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'DIVIDEND',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
       {
         'type': 'input_value',
         'name': 'DIVISOR',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'inputsInline': true,
@@ -308,17 +308,17 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
       {
         'type': 'input_value',
         'name': 'LOW',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
       {
         'type': 'input_value',
         'name': 'HIGH',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'inputsInline': true,
@@ -336,12 +336,12 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'FROM',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
       {
         'type': 'input_value',
         'name': 'TO',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'inputsInline': true,
@@ -369,12 +369,12 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'X',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
       {
         'type': 'input_value',
         'name': 'Y',
-        'check': 'Number',
+        'check': ['Number', 'Value', 'NumberValue'],
       },
     ],
     'inputsInline': true,
@@ -480,7 +480,7 @@ const IS_DIVISIBLEBY_MUTATOR_MIXIN = {
     const inputExists = this.getInput('DIVISOR');
     if (divisorInput) {
       if (!inputExists) {
-        this.appendValueInput('DIVISOR').setCheck('Number');
+        this.appendValueInput('DIVISOR').setCheck(['Number', 'Value', 'NumberValue']);
       }
     } else if (inputExists) {
       this.removeInput('DIVISOR');

@@ -479,7 +479,7 @@ Blockly.Blocks['datatype'] = {
     init: function () {
         this.appendDummyInput().appendField('', 'NAME').appendField('', 'OF');
         this.setInputsInline(true);
-        this.setOutput(true, null);
+        this.setOutput(true, "type");
         this.setColour(60);
         this.setTooltip("");
         this.setHelpUrl("");
@@ -522,6 +522,7 @@ Blockly.Blocks['type_builder'] = {
         this.setColour(180);
         this.setTooltip("");
         this.setHelpUrl("");
+        this.setOutput(true, "type_value")
         this.itemCount_ = 0;
     },
     /**
