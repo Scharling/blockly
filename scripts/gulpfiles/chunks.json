@@ -335,10 +335,7 @@
     "./generators/dart.js",
     "./generators/dart/colour.js",
     "./generators/dart/all.js",
-<<<<<<< HEAD
-=======
     "./generators/FSharp/types.js",
->>>>>>> master
     "./generators/FSharp/variables_dynamic.js",
     "./generators/FSharp/variables.js",
     "./generators/FSharp/text.js",
