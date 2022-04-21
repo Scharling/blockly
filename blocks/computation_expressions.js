@@ -48,25 +48,25 @@ goog.require('Blockly.Warning');
 // };
 
 Blockly.Blocks['comp_builder'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("Computation expression")
-        .appendField(new Blockly.FieldTextInput("name", ComputationExpressions.rename), "NAME");
-    this.appendValueInput("BIND")
-        .setCheck(null)
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Bind(m, f)");
-    this.appendValueInput("RETURN")
-        .setCheck(null)
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Return(x)");
-    this.setColour(230);
-    this.setTooltip("");
-    this.setHelpUrl("");
+    init: function () {
+        this.appendDummyInput()
+            .appendField("Computation expression")
+            .appendField(new Blockly.FieldTextInput("name", ComputationExpressions.rename), "NAME");
+        this.appendValueInput("BIND")
+            .setCheck(null)
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .appendField("Bind(m, f)");
+        this.appendValueInput("RETURN")
+            .setCheck(null)
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .appendField("Return(x)");
+        this.setColour(20);
+        this.setTooltip("");
+        this.setHelpUrl("");
     },
-  getCompDef: function () {
-      return this.getFieldValue('NAME');
-  },
+    getCompDef: function () {
+        return this.getFieldValue('NAME');
+    },
 };
 
 Blockly.Blocks['comp_workflow'] = {
