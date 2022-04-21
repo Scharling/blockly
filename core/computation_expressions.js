@@ -78,10 +78,9 @@ const rename = function (name) {
     // Strip leading and trailing whitespace.  Beyond this, all names are legal.
     name = name.trim();
 
-    // const legalName = findLegalName(
-    //     name,
-    //      /** @type {!Block} */(this.getSourceBlock()));
-    const legalName = name;
+    const legalName = findLegalName(
+        name,
+         /** @type {!Block} */(this.getSourceBlock()));
     const oldName = this.getValue();
     if (oldName !== name && oldName !== legalName) {
         // Rename any references.
@@ -98,74 +97,74 @@ const rename = function (name) {
 };
 exports.rename = rename;
 
-// /**
-//  * Ensure two identically-named algebraic datatypes don't exist.
-//  * Take the proposed algebraic datatype name, and return a legal name i.e. one that
-//  * is not empty and doesn't collide with other algebraic datatypes.
-//  * @param {string} name Proposed algebraic datatype name.
-//  * @param {!Block} block Block to disambiguate.
-//  * @return {string} Non-colliding name.
-//  * @alias Blockly.AlgebraicDatatypes.findLegalName
-//  */
-// const findLegalName = function (name, block) {
-//     if (block.isInFlyout) {
-//         // Flyouts can have multiple procedures called 'do something'.
-//         return name;
-//     }
-//     name = name || Msg['UNNAMED_KEY'] || 'unnamed';
-//     while (!isLegalName(name, block.workspace, block)) {
-//         // Collision with another procedure.
-//         const r = name.match(/^(.*?)(\d+)$/);
-//         if (!r) {
-//             name += '2';
-//         } else {
-//             name = r[1] + (parseInt(r[2], 10) + 1);
-//         }
-//     }
-//     return name;
-// };
-// exports.findLegalName = findLegalName;
+/**
+ * Ensure two identically-named computations expressions don't exist.
+ * Take the proposed algebraic datatype name, and return a legal name i.e. one that
+ * is not empty and doesn't collide with other computations expressions.
+ * @param {string} name Proposed computations expressions name.
+ * @param {!Block} block Block to disambiguate.
+ * @return {string} Non-colliding name.
+ * @alias Blockly.ComputationExpressions.findLegalName
+ */
+const findLegalName = function (name, block) {
+    if (block.isInFlyout) {
+        // Flyouts can have multiple procedures called 'do something'.
+        return name;
+    }
+    name = name || Msg['UNNAMED_KEY'] || 'unnamed';
+    while (!isLegalName(name, block.workspace, block)) {
+        // Collision with another procedure.
+        const r = name.match(/^(.*?)(\d+)$/);
+        if (!r) {
+            name += '2';
+        } else {
+            name = r[1] + (parseInt(r[2], 10) + 1);
+        }
+    }
+    return name;
+};
+exports.findLegalName = findLegalName;
 
-// /**
-// * Does this algebraic datatype have a legal name?  Illegal names include names of
-// * algebraic datatypes already defined.
-// * @param {string} name The questionable name.
-// * @param {!Workspace} workspace The workspace to scan for collisions.
-// * @param {Block=} opt_exclude Optional block to exclude from
-// *     comparisons (one doesn't want to collide with oneself).
-// * @return {boolean} True if the name is legal.
-// */
-// const isLegalName = function (name, workspace, opt_exclude) {
-//     return !isNameUsed(name, workspace, opt_exclude);
-// };
+/**
+* Does this computations expression have a legal name?  Illegal names include names of
+* computations expressions already defined.
+* @param {string} name The questionable name.
+* @param {!Workspace} workspace The workspace to scan for collisions.
+* @param {Block=} opt_exclude Optional block to exclude from
+*     comparisons (one doesn't want to collide with oneself).
+* @return {boolean} True if the name is legal.
+*/
+const isLegalName = function (name, workspace, opt_exclude) {
+    return !isNameUsed(name, workspace, opt_exclude);
+};
 
-// /**
-//  * Return if the given name is already a algebraic datatype name.
-//  * @param {string} name The questionable name.
-//  * @param {!Workspace} workspace The workspace to scan for collisions.
-//  * @param {Block=} opt_exclude Optional block to exclude from
-//  *     comparisons (one doesn't want to collide with oneself).
-//  * @return {boolean} True if the name is used, otherwise return false.
-//  * @alias Blockly.AlgebraicDatatypes.isNameUsed
-//  */
-// const isNameUsed = function (name, workspace, opt_exclude) {
-//     const blocks = workspace.getAllBlocks(false);
-//     // Iterate through every block and check the name.
-//     for (let i = 0; i < blocks.length; i++) {
-//         if (blocks[i] === opt_exclude) {
-//             continue;
-//         }
-//         if (blocks[i].getDatatypeDef) {
-//             const datatypeBlock = /** @type {!DatatypeBlock} */ (blocks[i]);
-//             const datatypeName = datatypeBlock.getDatatypeDef();
-//             if (Names.equals(datatypeName[0], name)) {
-//                 return true;
-//             }
-//         }
-//     }
-//     return false;
-// };
-// exports.isNameUsed = isNameUsed;
+/**
+ * Return if the given name is already a computations expressions name.
+ * @param {string} name The questionable name.
+ * @param {!Workspace} workspace The workspace to scan for collisions.
+ * @param {Block=} opt_exclude Optional block to exclude from
+ *     comparisons (one doesn't want to collide with oneself).
+ * @return {boolean} True if the name is used, otherwise return false.
+ * @alias Blockly.ComputationExpressions.isNameUsed
+ */
+const isNameUsed = function (name, workspace, opt_exclude) {
+    const blocks = workspace.getAllBlocks(false);
+    // Iterate through every block and check the name.
+    for (let i = 0; i < blocks.length; i++) {
+        if (blocks[i] === opt_exclude) {
+            continue;
+        }
+        if (blocks[i].getCompDef) {
+            const compBlock = /** @type {!CompBlock} */ (blocks[i]);
+            const compName = compBlock.getCompDef();
+            if (Names.equals(compName, name)) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+exports.isNameUsed = isNameUsed;
 
 /**
  * Construct the blocks required by the flyout for the
@@ -251,7 +250,7 @@ const flyoutCategory = function (workspace) {
    */
     function populateWorkflows(compList) {
         for (let i = 0; i < compList.length; i++) {
-            // <block type="datatype" gap="16">
+            // <block type="comp_workflow" gap="16">
             //   <mutation name="name" items=0></mutation>
             // </block>
             const block = utilsXml.createElement('block');
