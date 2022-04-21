@@ -25,6 +25,8 @@ const Variables = goog.requireType('Blockly.Variables');
 const VariablesDynamic = goog.requireType('Blockly.VariablesDynamic');
 /* eslint-disable-next-line no-unused-vars */
 const AlgebraicDatatypes = goog.requireType('Blockly.AlgebraicDatatypes');
+/* eslint-disable-next-line no-unused-vars */
+const ComputationExpressions = goog.requireType('Blockly.ComputationExpressions');
 const WidgetDiv = goog.require('Blockly.WidgetDiv');
 const Xml = goog.require('Blockly.Xml');
 const arrayUtils = goog.require('Blockly.utils.array');
@@ -248,6 +250,13 @@ const WorkspaceSvg = function (
   if (AlgebraicDatatypes && AlgebraicDatatypes.flyoutCategory) {
     this.registerToolboxCategoryCallback(
       AlgebraicDatatypes.CATEGORY_NAME, AlgebraicDatatypes.flyoutCategory);
+    //this.addChangeListener(AlgebraicDatatypes.mutatorOpenListener);
+  }
+
+  const ComputationExpressions = goog.module.get('Blockly.ComputationExpressions');
+  if (ComputationExpressions && ComputationExpressions.flyoutCategory) {
+    this.registerToolboxCategoryCallback(
+      ComputationExpressions.CATEGORY_NAME, ComputationExpressions.flyoutCategory);
     //this.addChangeListener(AlgebraicDatatypes.mutatorOpenListener);
   }
 

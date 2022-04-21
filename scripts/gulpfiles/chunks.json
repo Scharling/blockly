@@ -1,7 +1,7 @@
 {
   "chunk": [
-    "blockly:259",
-    "all:11:blockly",
+    "blockly:260",
+    "all:12:blockly",
     "all1:11:blockly",
     "all2:11:blockly",
     "all3:11:blockly",
@@ -143,6 +143,7 @@
     "./core/algebraic_datatypes.js",
     "./core/procedures.js",
     "./core/variables_dynamic.js",
+    "./core/computation_expressions.js",
     "./core/renderers/common/debug.js",
     "./core/renderers/measurables/in_row_spacer.js",
     "./core/renderers/measurables/input_connection.js",
@@ -269,6 +270,7 @@
     "./core/common.js",
     "./closure/goog/base_minimal.js",
     "./core/blockly.js",
+    "./blocks/computation_expressions.js",
     "./blocks/algebraic_datatypes.js",
     "./blocks/variables_dynamic.js",
     "./blocks/variables.js",
