@@ -1709,12 +1709,15 @@ WorkspaceSvg.prototype.deleteVariableById = function (id) {
  *     their type. This will default to '' which is a specific type.
  * @param {?string=} opt_id The unique ID of the variable. This will default to
  *     a UUID.
+ * @param {?bool} ignoreRefresh If true, does not refresh toolbox
  * @return {!VariableModel} The newly created variable.
  */
-WorkspaceSvg.prototype.createVariable = function (name, opt_type, opt_id) {
+WorkspaceSvg.prototype.createVariable = function (name, opt_type, opt_id, ignoreRefresh) {
   const newVar = WorkspaceSvg.superClass_.createVariable.call(
     this, name, opt_type, opt_id);
-  this.refreshToolboxSelection();
+  if (!ignoreRefresh) {
+    this.refreshToolboxSelection();
+  }
   return newVar;
 };
 
