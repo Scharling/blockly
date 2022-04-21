@@ -126,7 +126,9 @@ Blockly.Blocks['comp_let'] = {
     init: function () {
         this.appendValueInput("VALUE")
             .setCheck(null)
-            .appendField("let!");
+            .appendField("let!")
+            .appendField(new Blockly.FieldVariable("x"), "VAR")
+            .appendField("=");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(20);
