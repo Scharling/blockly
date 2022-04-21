@@ -208,6 +208,71 @@ const flyoutCategory = function (workspace) {
         xmlList[xmlList.length - 1].setAttribute('gap', 24);
     }
 
+    const addOption = true;
+    if (addOption) {
+        const block = utilsXml.createElement('block');
+        block.setAttribute('type', 'typedefinition');
+        block.setAttribute('gap', 16);
+        
+        const field = utilsXml.createElement('field');
+        field.setAttribute('name', 'TYPENAME');
+        field.innerHTML = 'Option';
+        block.appendChild(field);
+
+        const mutation = utilsXml.createElement('mutation');
+        mutation.setAttribute('items', 1);
+        block.appendChild(mutation);
+
+        const statement = utilsXml.createElement('statement');
+        statement.setAttribute('name', 'CASES');
+        block.appendChild(statement);
+
+        const noneBlock = utilsXml.createElement('block');
+        noneBlock.setAttribute('type', 'case')
+        statement.appendChild(noneBlock);
+
+        const noneMutation = utilsXml.createElement('mutation');
+        noneMutation.setAttribute('items', 0);
+        noneBlock.appendChild(noneMutation);
+
+        const noneField = utilsXml.createElement('field');
+        noneField.setAttribute('name', 'NAME');
+        noneField.innerHTML = "None";
+        
+        noneBlock.appendChild(noneField);
+
+        const next = utilsXml.createElement('next');
+        noneBlock.appendChild(next);
+
+        const someBlock = utilsXml.createElement('block');
+        someBlock.setAttribute('type', 'case')
+        next.appendChild(someBlock);
+
+        const someMutation = utilsXml.createElement('mutation');
+        someMutation.setAttribute('items', 1);
+        someBlock.appendChild(someMutation);
+
+        const someField = utilsXml.createElement('field');
+        someField.setAttribute('name', 'NAME');
+        someField.innerHTML = "Some";
+        someBlock.appendChild(someField);
+
+        const value = utilsXml.createElement('value');
+        value.setAttribute('name', 'ADD0');
+        someBlock.appendChild(value);
+
+        const poly = utilsXml.createElement('block');
+        poly.setAttribute('type', 'type_poly');
+        value.appendChild(poly);
+
+        const polyField = utilsXml.createElement('field');
+        polyField.setAttribute('name', 'NAME');
+        polyField.innerHTML = 'a';
+        poly.appendChild(polyField);
+        console.log(block);
+        xmlList.push(block);
+    }
+
     /**
    * Add items to xmlList for each listed datatype.
    * @param {!Array<!Array>} datatypeList A list of datatypes, each of which
