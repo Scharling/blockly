@@ -53,10 +53,8 @@ Blockly.Blocks['comp_builder'] = {
 Blockly.Blocks['comp_workflow'] = {
     init: function () {
         this.appendDummyInput()
-            .appendField('lol', 'NAME');
+            .appendField('', 'NAME');
         this.appendStatementInput("WORKFLOW");
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
         this.setOutput(true, null);
         this.setColour(20);
         this.setTooltip("");
@@ -82,6 +80,45 @@ Blockly.Blocks['comp_workflow'] = {
         if (Names.equals(oldName, this.getWorkflowName())) {
             this.setFieldValue(newName, 'NAME');
         }
+    },
+    /**
+     * Create XML to represent the (non-editable) name and arguments.
+     * Backwards compatible serialization implementation.
+     * @return {!Element} XML storage element.
+     * @this {Block}
+     */
+    mutationToDom: function () {
+        const container = xmlUtils.createElement('mutation');
+        container.setAttribute('name', this.getWorkflowName());
+        return container;
+    },
+    /**
+     * Parse XML to restore the (non-editable) name and parameters.
+     * Backwards compatible serialization implementation.
+     * @param {!Element} xmlElement XML storage element.
+     * @this {Block}
+     */
+    domToMutation: function (xmlElement) {
+        const name = xmlElement.getAttribute('name');
+        this.renameComp(this.getWorkflowName(), name);
+    },
+    /**
+     * Returns the state of this block as a JSON serializable object.
+     * @return {{name: string, params:(!Array<string>|undefined)}} The state of
+     *     this block, ie the params and procedure name.
+     */
+    saveExtraState: function () {
+        const state = Object.create(null);
+        state['name'] = this.getWorkflowName();
+        return state;
+    },
+    /**
+     * Applies the given state to this block.
+     * @param {*} state The state to apply to this block, ie the params and
+     *     procedure name.
+     */
+    loadExtraState: function (state) {
+        this.renameComp(this.getWorkflowName(), state['name']);
     },
 };
 
