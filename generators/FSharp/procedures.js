@@ -199,7 +199,7 @@ FSharp['procedures_callreturn'] = function (block) {
 
   const argCount = block.getFieldValue('ARGCOUNT') === 'ALL' ? variables.length : Number(block.getFieldValue('ARGCOUNT'));
   for (let i = 0; i < argCount; i++) {
-    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE);
+    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_ATOMIC);
     if (argtext) {
       args[i] = argtext;
     }
@@ -217,7 +217,7 @@ FSharp['args_callreturn'] = function (block) {
 
   const argCount = block.getFieldValue('ARGCOUNT') === 'ALL' ? variables.length : Number(block.getFieldValue('ARGCOUNT'));
   for (let i = 0; i < argCount; i++) {
-    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE);
+    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_ATOMIC);
     if (argtext) {
       args[i] = argtext;
     }

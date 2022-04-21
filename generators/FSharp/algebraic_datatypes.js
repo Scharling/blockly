@@ -104,5 +104,5 @@ FSharp['type_builder'] = function (block) {
   const argsString = (args.length == 0) ? "" : "(" + args.join(", ") + ")";
 
   const code = builderName + argsString;
-  return [code, FSharp.ORDER_ATOMIC];
+  return [code, FSharp.ORDER_TYPE_CREATION];
 }
