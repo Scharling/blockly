@@ -7,7 +7,7 @@
     "all3:11:blockly",
     "all4:11:blockly",
     "all5:11:blockly",
-    "all6:11:blockly"
+    "all6:12:blockly"
   ],
   "js": [
     "./core/inject.js",
@@ -345,6 +345,7 @@
     "./generators/FSharp/pattern_matching.js",
     "./generators/FSharp/math.js",
     "./generators/FSharp/logic.js",
+    "./generators/FSharp/computation_expressions.js",
     "./generators/FSharp.js",
     "./generators/FSharp/algebraic_datatypes.js",
     "./generators/FSharp/all.js"
