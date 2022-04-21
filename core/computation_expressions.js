@@ -181,6 +181,48 @@ const flyoutCategory = function (workspace) {
         const block = utilsXml.createElement('block');
         block.setAttribute('type', 'comp_builder');
         block.setAttribute('gap', 16);
+
+        const value1 = utilsXml.createElement('value');
+        value1.setAttribute('name', 'BIND');
+
+        const bindBlock = utilsXml.createElement('block');
+        bindBlock.setAttribute('type', 'procedures_anonymous');
+
+        const bindMutation = utilsXml.createElement('mutation');
+        bindMutation.setAttribute('name', 'Bind');
+
+        const bindArgM = utilsXml.createElement('arg');
+        bindArgM.setAttribute('name', 'm');
+        const bindArgF = utilsXml.createElement('arg');
+        bindArgF.setAttribute('name', 'f');
+        //bindMutation.appendChild(bindArgM);
+        //bindMutation.appendChild(bindArgF);
+
+        bindBlock.appendChild(bindMutation);
+
+        value1.appendChild(bindBlock);
+
+        block.appendChild(value1);
+
+        const value2 = utilsXml.createElement('value');
+        value2.setAttribute('name', 'RETURN');
+
+        const returnBlock = utilsXml.createElement('block');
+        returnBlock.setAttribute('type', 'procedures_anonymous');
+
+        const returnMutation = utilsXml.createElement('mutation');
+        returnMutation.setAttribute('name', 'Return');
+
+        const returnArg = utilsXml.createElement('arg');
+        returnArg.setAttribute('name', 'x');
+        //returnMutation.appendChild(returnArg);
+
+        returnBlock.appendChild(returnMutation);
+
+        value2.appendChild(returnBlock);
+
+        block.appendChild(value2);
+        
         xmlList.push(block);
     }
     if (Blocks['comp_let']) {
