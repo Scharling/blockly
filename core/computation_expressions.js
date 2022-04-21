@@ -38,68 +38,65 @@ const { Workspace } = goog.require('Blockly.Workspace');
 const CATEGORY_NAME = 'COMPUTATIONEXPRESSION';
 exports.CATEGORY_NAME = CATEGORY_NAME;
 
+/**
+ * Find all user-created computation expression builders in a workspace.
+ * @param {!Workspace} root Root workspace.
+ * @return {!Array<!Array>} Array with builder definitions.
+ *      Each type is defined by a name (an extension would include which keywords are implemented).
+ * @alias Blockly.ComputationExpressions.allCompExpressions
+ */
+const allCompExpressions = function (root) {
+    const compExps =
+        root.getBlocksByType('comp_builder', false)
+            .map(function (block) {
+                return /** @type {!CompBlock} */ (block).getCompDef();
+            });
+    compExps.sort(procTupleComparator);
+    return compExps;
+};
+exports.allCompExpressions = allCompExpressions;
 
+/**
+ * Comparison function for case-insensitive sorting of the first element of
+ * a tuple.
+ * @param {!Array} ta First tuple.
+ * @param {!Array} tb Second tuple.
+ * @return {number} -1, 0, or 1 to signify greater than, equality, or less than.
+ */
+const procTupleComparator = function (ta, tb) {
+    return ta[0].localeCompare(tb[0], undefined, { sensitivity: 'base' });
+};
 
-// /**
-//  * Find all user-created algebraic datatype definitions in a workspace.
-//  * @param {!Workspace} root Root workspace.
-//  * @return {!Array<!Array>} Array wtih type definitions.
-//  *      Each type is defined by a three-element list of name,
-//  *      number of types inputs, and list of cases.
-//  * @alias Blockly.AlgebraicDatatypes.allDatatypes
-//  */
-//  const allDatatypes = function (root) {
-//     const datatypes =
-//         root.getBlocksByType('typedefinition', false)
-//             .map(function (block) {
-//                 return /** @type {!DatatypeBlock} */ (block).getDatatypeDef();
-//             });
-//     datatypes.sort(procTupleComparator);
-//     return datatypes;
-// };
-// exports.allDatatypes = allDatatypes;
+/**
+ * Rename a computation expression.  Called by the editable field.
+ * @param {string} name The proposed new name.
+ * @return {string} The accepted name.
+ * @this {Field}
+ * @alias Blockly.ComputationExpressions.rename
+ */
+const rename = function (name) {
+    // Strip leading and trailing whitespace.  Beyond this, all names are legal.
+    name = name.trim();
 
-// /**
-//  * Comparison function for case-insensitive sorting of the first element of
-//  * a tuple.
-//  * @param {!Array} ta First tuple.
-//  * @param {!Array} tb Second tuple.
-//  * @return {number} -1, 0, or 1 to signify greater than, equality, or less than.
-//  */
-// const procTupleComparator = function (ta, tb) {
-//     return ta[0].localeCompare(tb[0], undefined, { sensitivity: 'base' });
-// };
-
-// /**
-//  * Rename a datatype.  Called by the editable field.
-//  * @param {string} name The proposed new name.
-//  * @return {string} The accepted name.
-//  * @this {Field}
-//  * @alias Blockly.AlgebraicDatatypes.rename
-//  */
-// const rename = function (name) {
-//     // Strip leading and trailing whitespace.  Beyond this, all names are legal.
-//     name = name.trim();
-
-//     const legalName = findLegalName(
-//         name,
-//          /** @type {!Block} */(this.getSourceBlock()));
-//     //const legalName = name;
-//     const oldName = this.getValue();
-//     if (oldName !== name && oldName !== legalName) {
-//         // Rename any references.
-//         const blocks = this.getSourceBlock().workspace.getAllBlocks(false);
-//         for (let i = 0; i < blocks.length; i++) {
-//             if (blocks[i].rename) {
-//                 const datatypeBlock = /** @type {!DatatypeBlock} */ (blocks[i]);
-//                 datatypeBlock.rename(
-//               /** @type {string} */(oldName), legalName);
-//             }
-//         }
-//     }
-//     return legalName;
-// };
-// exports.rename = rename;
+    // const legalName = findLegalName(
+    //     name,
+    //      /** @type {!Block} */(this.getSourceBlock()));
+    const legalName = name;
+    const oldName = this.getValue();
+    if (oldName !== name && oldName !== legalName) {
+        // Rename any references.
+        const blocks = this.getSourceBlock().workspace.getAllBlocks(false);
+        for (let i = 0; i < blocks.length; i++) {
+            if (blocks[i].renameComp) {
+                const compBlock = /** @type {!CompBlock} */ (blocks[i]);
+                compBlock.renameComp(
+              /** @type {string} */(oldName), legalName);
+            }
+        }
+    }
+    return legalName;
+};
+exports.rename = rename;
 
 // /**
 //  * Ensure two identically-named algebraic datatypes don't exist.
@@ -179,6 +176,13 @@ exports.CATEGORY_NAME = CATEGORY_NAME;
  */
 const flyoutCategory = function (workspace) {
     let xmlList = [];
+    if (Blocks['comp_builder']) {
+        // <block type="comp_builder" gap="16"></block>
+        const block = utilsXml.createElement('block');
+        block.setAttribute('type', 'comp_builder');
+        block.setAttribute('gap', 16);
+        xmlList.push(block);
+    }
     if (Blocks['comp_let']) {
         // <block type="comp_let" gap="16"></block>
         const block = utilsXml.createElement('block');
@@ -198,43 +202,29 @@ const flyoutCategory = function (workspace) {
         xmlList[xmlList.length - 1].setAttribute('gap', 24);
     }
 
-    //     /**
-    //    * Add items to xmlList for each listed datatype.
-    //    * @param {!Array<!Array>} datatypeList A list of datatypes, each of which
-    //    *     is defined by a three-element list of name, parameter list, and return
-    //    *     value boolean.
-    //    * @param {string} templateName The type of the block to generate.
-    //    */
-    //     function populateDatatypes(datatypeList) {
-    //         for (let i = 0; i < datatypeList.length; i++) {
+    /**
+   * Add items to xmlList for each listed comp exp.
+   * @param {!Array<!Array>} datatypeList A list of computation expressions
+   * @param {string} templateName The type of the block to generate.
+   */
+    function populateWorkflows(compList) {
+        for (let i = 0; i < compList.length; i++) {
+            // <block type="datatype" gap="16">
+            //   <mutation name="name" items=0></mutation>
+            // </block>
+            const block = utilsXml.createElement('block');
+            block.setAttribute('type', 'comp_workflow');
+            block.setAttribute('gap', 16);
 
-    //             xmlList.push(createBlock('datatype', datatypeList[i][0], datatypes[i][1]));
+            const mutation = utilsXml.createElement('mutation');
+            mutation.setAttribute('name', compList[i]);
+            block.appendChild(mutation);
+            xmlList.push(block);
+        }
+    }
 
-    //             const cases = datatypes[i][2];
-    //             for (let j = 0; j < cases.length; j++) {
-    //                 xmlList.push(createBlock('type_builder', cases[j][0], cases[j][1].length));
-    //             }
-    //         }
-    //     }
-
-    //     function createBlock(templateName, name, typeNumber) {
-    //         // <block type="datatype" gap="16">
-    //         //   <mutation name="name" items=0></mutation>
-    //         // </block>
-
-    //         const block = utilsXml.createElement('block');
-    //         block.setAttribute('type', templateName);
-    //         block.setAttribute('gap', 16);
-
-    //         const mutation = utilsXml.createElement('mutation');
-    //         mutation.setAttribute('name', name);
-    //         mutation.setAttribute('items', typeNumber);
-    //         block.appendChild(mutation);
-    //         return block;
-    //     }
-
-    //     const datatypes = allDatatypes(workspace);
-    //     populateDatatypes(datatypes);
+    const compExps = allCompExpressions(workspace);
+    populateWorkflows(compExps);
     return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;

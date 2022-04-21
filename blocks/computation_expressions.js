@@ -35,6 +35,56 @@ goog.require('Blockly.Comment');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Warning');
 
+Blockly.Blocks['comp_builder'] = {
+    init: function () {
+        const nameField = new FieldTextInput('name', ComputationExpressions.rename);
+        this.appendDummyInput()
+            .appendField("???")
+            .appendField(nameField, "NAME");
+        this.setColour(20);
+        this.setTooltip("");
+        this.setHelpUrl("");
+    },
+    getCompDef: function () {
+        return this.getFieldValue('NAME');
+    },
+};
+
+Blockly.Blocks['comp_workflow'] = {
+    init: function () {
+        this.appendDummyInput()
+            .appendField('lol', 'NAME');
+        this.appendStatementInput("WORKFLOW");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setOutput(true, null);
+        this.setColour(20);
+        this.setTooltip("");
+        this.setHelpUrl("");
+    },
+    /**
+     * Returns the name of the computation expression this block refers.
+     * @return {string} Comp exp name.
+     * @this {Block}
+     */
+    getWorkflowName: function () {
+        // The NAME field is guaranteed to exist, null will never be returned.
+        return /** @type {string} */ (this.getFieldValue('NAME'));
+    },
+    /**
+     * Notification that a comp exp is renaming.
+     * If the name matches this block, rename it.
+     * @param {string} oldName Previous name of comp exp.
+     * @param {string} newName Renamed comp exp.
+     * @this {Block}
+     */
+    renameComp: function (oldName, newName) {
+        if (Names.equals(oldName, this.getWorkflowName())) {
+            this.setFieldValue(newName, 'NAME');
+        }
+    },
+};
+
 Blockly.Blocks['comp_let'] = {
     init: function () {
         this.appendValueInput("VALUE")
