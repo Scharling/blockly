@@ -17,6 +17,7 @@ const { NameType } = goog.require('Blockly.Names');
 
 
 FSharp['procedures_defreturn'] = function (block) {
+  console.log('procedures_defreturn');
   // Define a procedure with a return value.
   // First, add a 'global' statement for every variable that is not shadowed by
   // a local parameter.
@@ -170,20 +171,21 @@ function createArgsString(args, variableModels) {
 };
 
 function createRecString(block) {
-  for (var i = 0; i < block.inputList.length; i++) {
-    var input = block.inputList[i];
-    for (var j = 0; j < input.fieldRow.length; j++) {
-      var field = input.fieldRow[j];
-      if (field.name == "REC") {
-        if (field.value_) {
-          return "rec "
-        } else {
-          return "";
-        }
-      }
-    }
-  }
-  return "";
+  // for (var i = 0; i < block.inputList.length; i++) {
+  //   var input = block.inputList[i];
+  //   for (var j = 0; j < input.fieldRow.length; j++) {
+  //     var field = input.fieldRow[j];
+  //     if (field.name == "REC") {
+  //       if (field.value_) {
+  //         return "rec "
+  //       } else {
+  //         return "";
+  //       }
+  //     }
+  //   }
+  // }
+  if (block.isRec()) return "rec ";
+  else return "";
 }
 
 // Defining a procedure without a return value uses the same generator as

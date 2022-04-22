@@ -155,6 +155,9 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       container.setAttribute('statements', 'false');
     }
+
+    container.setAttribute('rec', this.isRec_);
+
     return container;
   },
   /**
@@ -189,10 +192,12 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
+    this.isRec_ = xmlElement.getAttribute('isRec') !== 'false';
     Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
     this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
+
   },
   /**
    * Returns the state of this block as a JSON serializable object.
@@ -223,6 +228,8 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       state['hasStatements'] = false;
     }
+
+    state['isRec'] = this.isRec_;
     return state;
   },
   /**
@@ -247,6 +254,7 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
+    this.isRec_ = state['isRec'] !== "false";
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
   },
@@ -314,10 +322,12 @@ const PROCEDURE_DEF_COMMON = {
       returnNode.appendChild(returnBlockNode);
     }
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
-    if (this.type === 'procedures_defreturn') {
+    if (this.type === 'procedures_defreturn' || this.type === 'procedures_anonymous') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
+      containerBlock.setFieldValue(this.isRec_, 'REC');
     } else {
-      containerBlock.removeInput('STATEMENT_INPUT');
+      //containerBlock.removeInput('STATEMENT_INPUT');
+      containerBlock.removeInput('REC_INPUT');
     }
 
     // Initialize procedure's callers with blank IDs.
@@ -366,6 +376,8 @@ const PROCEDURE_DEF_COMMON = {
 
     this.updateParams_();
     this.updateReturnType_();
+    let isRec = containerBlock.getFieldValue('REC');
+    this.isRec_ = isRec === 'TRUE';
     Procedures.mutateCallers(this);
 
     // Show/hide the statement input.
@@ -392,12 +404,17 @@ const PROCEDURE_DEF_COMMON = {
       }
     }
   },
+  isRec: function () {
+    console.log("isRec", this.isRec_);
+    return this.isRec_;
+  },
   /**
    * Return all variables referenced by this block.
    * @return {!Array<string>} List of variable names.
    * @this {Block}
    */
   getVars: function () {
+    console.log("getVars");
     return this.arguments_;
   },
   /**
@@ -569,6 +586,8 @@ Blocks['procedures_defreturn'] = {
     this.returnType_ = null;
     this.setStatements_(true);
     this.statementConnection_ = null;
+    this.isRec_ = false;
+
   },
   /**
    * Return the signature of this procedure definition.
@@ -664,6 +683,9 @@ Blocks['procedures_mutatorcontainer'] = {
     this.appendDummyInput('STATEMENT_INPUT')
       .appendField(Msg['PROCEDURES_ALLOW_STATEMENTS'])
       .appendField(new FieldCheckbox('TRUE'), 'STATEMENTS');
+    this.appendDummyInput('REC_INPUT')
+      .appendField('rec')
+      .appendField(new FieldCheckbox('FALSE'), 'REC');
     this.appendValueInput("RETURNTYPE")
       .setCheck("type")
       .setAlign(Blockly.ALIGN_RIGHT)
