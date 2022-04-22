@@ -17,6 +17,7 @@ goog.module('Blockly.blocks.procedures');
 const AbstractEvent = goog.requireType('Blockly.Events.Abstract');
 const ContextMenu = goog.require('Blockly.ContextMenu');
 const Events = goog.require('Blockly.Events');
+const eventUtils = goog.require('Blockly.Events.utils');
 const Procedures = goog.require('Blockly.Procedures');
 const Variables = goog.require('Blockly.Variables');
 const Xml = goog.require('Blockly.Xml');
@@ -102,6 +103,11 @@ const PROCEDURE_DEF_COMMON = {
     } finally {
       //Events.enable();
     }
+  },
+  updateIsRec_: function (isRec) {
+    this.isRec_ = isRec;
+    const recString = isRec ? "rec" : "";
+    this.setFieldValue(recString, "REC");
   },
   /**
    * Update the display of return type for this procedure definition block.
@@ -192,7 +198,7 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
-    this.isRec_ = xmlElement.getAttribute('isRec') !== 'false';
+    this.updateIsRec_(xmlElement.getAttribute('isRec') !== 'false');
     Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
@@ -254,7 +260,7 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
-    this.isRec_ = state['isRec'] !== "false";
+    this.updateIsRec_(state['isRec'] !== "false");
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
   },
@@ -377,7 +383,7 @@ const PROCEDURE_DEF_COMMON = {
     this.updateParams_();
     this.updateReturnType_();
     let isRec = containerBlock.getFieldValue('REC');
-    this.isRec_ = isRec === 'TRUE';
+    this.updateIsRec_(isRec === 'TRUE');
     Procedures.mutateCallers(this);
 
     // Show/hide the statement input.
@@ -405,7 +411,6 @@ const PROCEDURE_DEF_COMMON = {
     }
   },
   isRec: function () {
-    console.log("isRec", this.isRec_);
     return this.isRec_;
   },
   /**
@@ -414,7 +419,6 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   getVars: function () {
-    console.log("getVars");
     return this.arguments_;
   },
   /**
@@ -562,11 +566,9 @@ Blocks['procedures_defreturn'] = {
     this.appendDummyInput()
       .appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
       .appendField(nameField, 'NAME')
+      .appendField('', 'REC')
       .appendField('', 'PARAMS')
     this.appendValueInput('RETURN')
-      .appendField('rec')
-      .appendField(new FieldCheckbox('FALSE'), 'REC')
-      .appendField('| ')
       // .appendField('', 'RETURNTYPE')
       // .appendField(' | ')
       .setAlign(Align.RIGHT)
@@ -587,6 +589,7 @@ Blocks['procedures_defreturn'] = {
     this.setStatements_(true);
     this.statementConnection_ = null;
     this.isRec_ = false;
+    this.updateIsRec_(false);
 
   },
   /**
