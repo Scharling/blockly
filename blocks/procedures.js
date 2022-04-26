@@ -198,7 +198,7 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
-    this.updateIsRec_(xmlElement.getAttribute('isRec') !== 'false');
+    if (this.type === 'procedures_defreturn') this.updateIsRec_(xmlElement.getAttribute('isRec') !== 'false');
     Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
@@ -260,7 +260,7 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
-    this.updateIsRec_(state['isRec'] !== "false");
+    if (this.type === 'procedures_defreturn') this.updateIsRec_(state['isRec'] !== "false");
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
   },
@@ -330,6 +330,8 @@ const PROCEDURE_DEF_COMMON = {
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace);
     if (this.type === 'procedures_defreturn' || this.type === 'procedures_anonymous') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
+    }
+    if (this.type === 'procedures_defreturn' || this.type === 'procedures_anonymous') {
       containerBlock.setFieldValue(this.isRec_, 'REC');
     } else {
       //containerBlock.removeInput('STATEMENT_INPUT');
@@ -382,8 +384,10 @@ const PROCEDURE_DEF_COMMON = {
 
     this.updateParams_();
     this.updateReturnType_();
-    let isRec = containerBlock.getFieldValue('REC');
-    this.updateIsRec_(isRec === 'TRUE');
+    if (this.type === 'procedures_defreturn') {
+      let isRec = containerBlock.getFieldValue('REC');
+      this.updateIsRec_(isRec === 'TRUE');
+    }
     Procedures.mutateCallers(this);
 
     // Show/hide the statement input.
