@@ -170,20 +170,8 @@ function createArgsString(args, variableModels) {
 };
 
 function createRecString(block) {
-  for (var i = 0; i < block.inputList.length; i++) {
-    var input = block.inputList[i];
-    for (var j = 0; j < input.fieldRow.length; j++) {
-      var field = input.fieldRow[j];
-      if (field.name == "REC") {
-        if (field.value_) {
-          return "rec "
-        } else {
-          return "";
-        }
-      }
-    }
-  }
-  return "";
+  if (block.isRec()) return "rec ";
+  else return "";
 }
 
 // Defining a procedure without a return value uses the same generator as
@@ -199,7 +187,7 @@ FSharp['procedures_callreturn'] = function (block) {
 
   const argCount = block.getFieldValue('ARGCOUNT') === 'ALL' ? variables.length : Number(block.getFieldValue('ARGCOUNT'));
   for (let i = 0; i < argCount; i++) {
-    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE);
+    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_ATOMIC);
     if (argtext) {
       args[i] = argtext;
     }
@@ -217,7 +205,7 @@ FSharp['args_callreturn'] = function (block) {
 
   const argCount = block.getFieldValue('ARGCOUNT') === 'ALL' ? variables.length : Number(block.getFieldValue('ARGCOUNT'));
   for (let i = 0; i < argCount; i++) {
-    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_NONE);
+    const argtext = FSharp.valueToCode(block, 'ARG' + i, FSharp.ORDER_ATOMIC);
     if (argtext) {
       args[i] = argtext;
     }

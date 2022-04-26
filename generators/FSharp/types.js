@@ -30,7 +30,7 @@ function getTupleIndexName(index) {
         case 1:
             return "SND"
         default:
-            return "ADD" + (index-2)
+            return "ADD" + (index - 2)
     }
 }
 
@@ -51,6 +51,7 @@ FSharp['type_function'] = function (block) {
 FSharp['type_int'] = FSharp['type_unit'];
 FSharp['type_float'] = FSharp['type_unit'];
 FSharp['type_string'] = FSharp['type_unit'];
+FSharp['type_char'] = FSharp['type_unit'];
 FSharp['type_bool'] = FSharp['type_unit'];
 FSharp['type_unit'] = FSharp['type_unit'];
 FSharp['type_poly'] = FSharp['type_unit'];

@@ -17,6 +17,7 @@ goog.module('Blockly.blocks.procedures');
 const AbstractEvent = goog.requireType('Blockly.Events.Abstract');
 const ContextMenu = goog.require('Blockly.ContextMenu');
 const Events = goog.require('Blockly.Events');
+const eventUtils = goog.require('Blockly.Events.utils');
 const Procedures = goog.require('Blockly.Procedures');
 const Variables = goog.require('Blockly.Variables');
 const Xml = goog.require('Blockly.Xml');
@@ -44,7 +45,7 @@ goog.require('Blockly.Warning');
 
 const typeUtils = goog.require('Blockly.extra.utils.types');
 
-const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
+const types = ['type_int', 'type_float', 'type_string', 'type_char', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
 
 /**
  * Common properties for the procedure_defnoreturn and
@@ -111,6 +112,11 @@ const PROCEDURE_DEF_COMMON = {
       //Events.enable();
     }
   },
+  updateIsRec_: function (isRec) {
+    this.isRec_ = isRec;
+    const recString = isRec ? "rec" : "";
+    this.setFieldValue(recString, "REC");
+  },
   /**
    * Update the display of return type for this procedure definition block.
    * @private
@@ -164,6 +170,9 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       container.setAttribute('statements', 'false');
     }
+
+    container.setAttribute('rec', this.isRec_);
+
     return container;
   },
   /**
@@ -198,10 +207,12 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
+    this.updateIsRec_(xmlElement.getAttribute('isRec') !== 'false');
     Procedures.mutateCallers(this);
 
     // Show or hide the statement input.
     this.setStatements_(xmlElement.getAttribute('statements') !== 'false');
+
   },
   /**
    * Returns the state of this block as a JSON serializable object.
@@ -235,6 +246,8 @@ const PROCEDURE_DEF_COMMON = {
     if (this.procedureName) {
       state['procedureName'] = this.procedureName;
     }
+
+    state['isRec'] = this.isRec_;
     return state;
   },
   /**
@@ -262,6 +275,7 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
+    this.updateIsRec_(state['isRec'] !== "false");
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
   },
@@ -332,10 +346,12 @@ const PROCEDURE_DEF_COMMON = {
       returnNode.appendChild(returnBlockNode);
     }
     const containerBlock = Xml.domToBlock(containerBlockNode, workspace, this.procedureName);
-    if (this.type === 'procedures_defreturn') {
+    if (this.type === 'procedures_defreturn' || this.type === 'procedures_anonymous') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
+      containerBlock.setFieldValue(this.isRec_, 'REC');
     } else {
-      containerBlock.removeInput('STATEMENT_INPUT');
+      //containerBlock.removeInput('STATEMENT_INPUT');
+      containerBlock.removeInput('REC_INPUT');
     }
 
     // Initialize procedure's callers with blank IDs.
@@ -362,9 +378,8 @@ const PROCEDURE_DEF_COMMON = {
       }
       var varType = typeUtils.createNullType();
       for (var i = 0; i < paramBlock.childBlocks_.length; i++) {
-        if (paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && paramBlock.childBlocks_[i].type.startsWith("type_")) {
+        if (isTypedBlock(paramBlock, i)) {
           const typedBlock = paramBlock.childBlocks_[i];
-
           varType = typeUtils.createTypeFromBlock(typedBlock);
           break;
         }
@@ -388,6 +403,8 @@ const PROCEDURE_DEF_COMMON = {
 
     this.updateParams_();
     this.updateReturnType_();
+    let isRec = containerBlock.getFieldValue('REC');
+    this.updateIsRec_(isRec === 'TRUE');
     Procedures.mutateCallers(this);
 
     // Show/hide the statement input.
@@ -413,6 +430,9 @@ const PROCEDURE_DEF_COMMON = {
         }
       }
     }
+  },
+  isRec: function () {
+    return this.isRec_;
   },
   /**
    * Return all variables referenced by this block.
@@ -567,11 +587,9 @@ Blocks['procedures_defreturn'] = {
     this.appendDummyInput()
       .appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
       .appendField(nameField, 'NAME')
+      .appendField('', 'REC')
       .appendField('', 'PARAMS')
     this.appendValueInput('RETURN')
-      .appendField('rec')
-      .appendField(new FieldCheckbox('FALSE'), 'REC')
-      .appendField('| ')
       // .appendField('', 'RETURNTYPE')
       // .appendField(' | ')
       .setAlign(Align.RIGHT)
@@ -591,6 +609,9 @@ Blocks['procedures_defreturn'] = {
     this.returnType_ = null;
     this.setStatements_(true);
     this.statementConnection_ = null;
+    this.isRec_ = false;
+    this.updateIsRec_(false);
+
   },
   /**
    * Return the signature of this procedure definition.
@@ -688,6 +709,9 @@ Blocks['procedures_mutatorcontainer'] = {
     this.appendDummyInput('STATEMENT_INPUT')
       .appendField(Msg['PROCEDURES_ALLOW_STATEMENTS'])
       .appendField(new FieldCheckbox('TRUE'), 'STATEMENTS');
+    this.appendDummyInput('REC_INPUT')
+      .appendField('rec')
+      .appendField(new FieldCheckbox('FALSE'), 'REC');
     this.appendValueInput("RETURNTYPE")
       .setCheck("type")
       .setAlign(Blockly.ALIGN_RIGHT)
@@ -778,12 +802,15 @@ Blocks['procedures_mutatorarg'] = {
   },
 };
 
+function isTypedBlock(paramBlock, i) {
+  return paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && (paramBlock.childBlocks_[i].type.startsWith("type_") || paramBlock.childBlocks_[i].type.startsWith("datatype"))
+}
+
 function validatorExternal(sourceBlock, varName, thisBlock) {
   var varType = typeUtils.createNullType();
 
   for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
-    if (sourceBlock.childBlocks_[i] && sourceBlock.childBlocks_[i].type != null && sourceBlock.childBlocks_[i].type.startsWith("type_")) {
-
+    if (isTypedBlock(sourceBlock, i)) {
       varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[i]);
       break;
     }
