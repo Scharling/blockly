@@ -189,6 +189,7 @@ const rename = function (name) {
     name,
       /** @type {!Block} */(this.getSourceBlock()));
   const oldName = this.getValue();
+
   if (oldName !== name && oldName !== legalName) {
     // Rename any callers.
     const blocks = this.getSourceBlock().workspace.getAllBlocks(false);
@@ -203,6 +204,26 @@ const rename = function (name) {
   return legalName;
 };
 exports.rename = rename;
+
+const renameArgCall = function (fieldBlock, name) {
+  console.log(fieldBlock);
+  console.log(name);
+  const oldName = fieldBlock.getValue();
+  if (oldName !== name) {
+    const outerWs = Mutator.findParentWs(fieldBlock.getSourceBlock().workspace);
+    const blocks = outerWs.getAllBlocks(false);
+    console.log(blocks);
+    for (let i = 0; i < blocks.length; i++) {
+      if (blocks[i].renameProcedure) {
+        const procedureBlock = /** @type {!ProcedureBlock} */ (blocks[i]);
+        procedureBlock.renameProcedure(
+            /** @type {string} */(oldName), name);
+      }
+    }
+  }
+  return name;
+};
+exports.renameArgCall = renameArgCall;
 
 /**
  * Construct the blocks required by the flyout for the procedure category.

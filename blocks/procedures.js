@@ -356,7 +356,7 @@ const PROCEDURE_DEF_COMMON = {
     let paramBlock = containerBlock.getInputTargetBlock('STACK');
     while (paramBlock && !paramBlock.isInsertionMarker()) {
       try {
-        validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'), this);
+        validatorExternal(paramBlock, paramBlock.getFieldValue('NAME'), this, false);
       } catch (error) {
         console.log(error);
       }
@@ -753,7 +753,8 @@ Blocks['procedures_mutatorarg'] = {
    */
   validator_: function (varName) {
     const sourceBlock = this.getSourceBlock();
-    return validatorExternal(sourceBlock, varName, this);
+    // Procedures.renameArgCall(this, varName);
+    return validatorExternal(sourceBlock, varName, this, true);
   },
 
   /**
@@ -782,7 +783,8 @@ function isTypedBlock(paramBlock, i) {
   return paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && (paramBlock.childBlocks_[i].type.startsWith("type_") || paramBlock.childBlocks_[i].type.startsWith("datatype"))
 }
 
-function validatorExternal(sourceBlock, varName, thisBlock) {
+function validatorExternal(sourceBlock, varName, thisBlock, rename) {
+  console.log(thisBlock);
   var varType = typeUtils.createNullType();
 
   for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
@@ -790,6 +792,10 @@ function validatorExternal(sourceBlock, varName, thisBlock) {
       varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[i]);
       break;
     }
+  }
+
+  if (rename && varType.block_name === "type_function") {
+    Procedures.renameArgCall(thisBlock, varName);
   }
 
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);
