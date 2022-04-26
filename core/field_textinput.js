@@ -26,14 +26,14 @@ const object = goog.require('Blockly.utils.object');
 const parsing = goog.require('Blockly.utils.parsing');
 const userAgent = goog.require('Blockly.utils.userAgent');
 /* eslint-disable-next-line no-unused-vars */
-const {BlockSvg} = goog.requireType('Blockly.BlockSvg');
-const {Coordinate} = goog.require('Blockly.utils.Coordinate');
-const {DropDownDiv} = goog.require('Blockly.DropDownDiv');
-const {Field} = goog.require('Blockly.Field');
-const {KeyCodes} = goog.require('Blockly.utils.KeyCodes');
-const {Msg} = goog.require('Blockly.Msg');
+const { BlockSvg } = goog.requireType('Blockly.BlockSvg');
+const { Coordinate } = goog.require('Blockly.utils.Coordinate');
+const { DropDownDiv } = goog.require('Blockly.DropDownDiv');
+const { Field } = goog.require('Blockly.Field');
+const { KeyCodes } = goog.require('Blockly.utils.KeyCodes');
+const { Msg } = goog.require('Blockly.Msg');
 /* eslint-disable-next-line no-unused-vars */
-const {WorkspaceSvg} = goog.requireType('Blockly.WorkspaceSvg');
+const { WorkspaceSvg } = goog.requireType('Blockly.WorkspaceSvg');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.BlockChange');
 
@@ -53,7 +53,7 @@ goog.require('Blockly.Events.BlockChange');
  * @constructor
  * @alias Blockly.FieldTextInput
  */
-const FieldTextInput = function(opt_value, opt_validator, opt_config) {
+const FieldTextInput = function (opt_value, opt_validator, opt_config) {
   /**
    * Allow browser to spellcheck this field.
    * @type {boolean}
@@ -62,7 +62,7 @@ const FieldTextInput = function(opt_value, opt_validator, opt_config) {
   this.spellcheck_ = true;
 
   FieldTextInput.superClass_.constructor.call(
-      this, opt_value, opt_validator, opt_config);
+    this, opt_value, opt_validator, opt_config);
 
   /**
    * The HTML input element.
@@ -97,6 +97,8 @@ const FieldTextInput = function(opt_value, opt_validator, opt_config) {
    * @protected
    */
   this.workspace_ = null;
+
+  this.firstChar = '';
 };
 object.inherits(FieldTextInput, Field);
 
@@ -115,7 +117,7 @@ FieldTextInput.prototype.DEFAULT_VALUE = '';
  * @package
  * @nocollapse
  */
-FieldTextInput.fromJson = function(options) {
+FieldTextInput.fromJson = function (options) {
   const text = parsing.replaceMessageReferences(options['text']);
   // `this` might be a subclass of FieldTextInput if that class doesn't override
   // the static fromJson method.
@@ -143,7 +145,7 @@ FieldTextInput.prototype.CURSOR = 'text';
 /**
  * @override
  */
-FieldTextInput.prototype.configure_ = function(config) {
+FieldTextInput.prototype.configure_ = function (config) {
   FieldTextInput.superClass_.configure_.call(this, config);
   if (typeof config['spellcheck'] === 'boolean') {
     this.spellcheck_ = config['spellcheck'];
@@ -153,7 +155,7 @@ FieldTextInput.prototype.configure_ = function(config) {
 /**
  * @override
  */
-FieldTextInput.prototype.initView = function() {
+FieldTextInput.prototype.initView = function () {
   if (this.getConstants().FULL_BLOCK_FIELDS) {
     // Step one: figure out if this is the only field on this block.
     // Rendering is quite different in that case.
@@ -172,7 +174,7 @@ FieldTextInput.prototype.initView = function() {
     // The special case is when this is the only non-label field on the block
     // and it has an output but no inputs.
     this.fullBlockClickTarget_ =
-        nFields <= 1 && this.sourceBlock_.outputConnection && !nConnections;
+      nFields <= 1 && this.sourceBlock_.outputConnection && !nConnections;
   } else {
     this.fullBlockClickTarget_ = false;
   }
@@ -191,7 +193,7 @@ FieldTextInput.prototype.initView = function() {
  * @return {*} A valid string, or null if invalid.
  * @protected
  */
-FieldTextInput.prototype.doClassValidation_ = function(opt_newValue) {
+FieldTextInput.prototype.doClassValidation_ = function (opt_newValue) {
   if (opt_newValue === null || opt_newValue === undefined) {
     return null;
   }
@@ -207,7 +209,7 @@ FieldTextInput.prototype.doClassValidation_ = function(opt_newValue) {
  *    the htmlInput_.
  * @protected
  */
-FieldTextInput.prototype.doValueInvalid_ = function(_invalidValue) {
+FieldTextInput.prototype.doValueInvalid_ = function (_invalidValue) {
   if (this.isBeingEdited_) {
     this.isTextValid_ = false;
     const oldValue = this.value_;
@@ -215,8 +217,8 @@ FieldTextInput.prototype.doValueInvalid_ = function(_invalidValue) {
     this.value_ = this.htmlInput_.untypedDefaultValue_;
     if (this.sourceBlock_ && eventUtils.isEnabled()) {
       eventUtils.fire(new (eventUtils.get(eventUtils.BLOCK_CHANGE))(
-          this.sourceBlock_, 'field', this.name || null, oldValue,
-          this.value_));
+        this.sourceBlock_, 'field', this.name || null, oldValue,
+        this.value_));
     }
   }
 };
@@ -229,9 +231,10 @@ FieldTextInput.prototype.doValueInvalid_ = function(_invalidValue) {
  * that this is a string.
  * @protected
  */
-FieldTextInput.prototype.doValueUpdate_ = function(newValue) {
+FieldTextInput.prototype.doValueUpdate_ = function (newValue) {
   this.isTextValid_ = true;
   this.value_ = newValue;
+  this.firstChar = newValue.charAt(0);
   if (!this.isBeingEdited_) {
     // This should only occur if setValue is triggered programmatically.
     this.isDirty_ = true;
@@ -242,14 +245,14 @@ FieldTextInput.prototype.doValueUpdate_ = function(newValue) {
  * Updates text field to match the colour/style of the block.
  * @package
  */
-FieldTextInput.prototype.applyColour = function() {
+FieldTextInput.prototype.applyColour = function () {
   if (this.sourceBlock_ && this.getConstants().FULL_BLOCK_FIELDS) {
     if (this.borderRect_) {
       this.borderRect_.setAttribute(
-          'stroke', this.sourceBlock_.style.colourTertiary);
+        'stroke', this.sourceBlock_.style.colourTertiary);
     } else {
       this.sourceBlock_.pathObject.svgPath.setAttribute(
-          'fill', this.getConstants().FIELD_BORDER_RECT_COLOUR);
+        'fill', this.getConstants().FIELD_BORDER_RECT_COLOUR);
     }
   }
 };
@@ -259,7 +262,7 @@ FieldTextInput.prototype.applyColour = function() {
  * field's value.
  * @protected
  */
-FieldTextInput.prototype.render_ = function() {
+FieldTextInput.prototype.render_ = function () {
   FieldTextInput.superClass_.render_.call(this);
   // This logic is done in render_ rather than doValueInvalid_ or
   // doValueUpdate_ so that the code is more centralized.
@@ -280,7 +283,7 @@ FieldTextInput.prototype.render_ = function() {
  * Set whether this field is spellchecked by the browser.
  * @param {boolean} check True if checked.
  */
-FieldTextInput.prototype.setSpellcheck = function(check) {
+FieldTextInput.prototype.setSpellcheck = function (check) {
   if (check === this.spellcheck_) {
     return;
   }
@@ -298,11 +301,11 @@ FieldTextInput.prototype.setSpellcheck = function(check) {
  *     focus.  Defaults to false.
  * @protected
  */
-FieldTextInput.prototype.showEditor_ = function(_opt_e, opt_quietInput) {
+FieldTextInput.prototype.showEditor_ = function (_opt_e, opt_quietInput) {
   this.workspace_ = (/** @type {!BlockSvg} */ (this.sourceBlock_)).workspace;
   const quietInput = opt_quietInput || false;
   if (!quietInput &&
-      (userAgent.MOBILE || userAgent.ANDROID || userAgent.IPAD)) {
+    (userAgent.MOBILE || userAgent.ANDROID || userAgent.IPAD)) {
     this.showPromptEditor_();
   } else {
     this.showInlineEditor_(quietInput);
@@ -314,8 +317,8 @@ FieldTextInput.prototype.showEditor_ = function(_opt_e, opt_quietInput) {
  * Mobile browsers have issues with in-line textareas (focus and keyboards).
  * @private
  */
-FieldTextInput.prototype.showPromptEditor_ = function() {
-  dialog.prompt(Msg['CHANGE_VALUE_TITLE'], this.getText(), function(text) {
+FieldTextInput.prototype.showPromptEditor_ = function () {
+  dialog.prompt(Msg['CHANGE_VALUE_TITLE'], this.getText(), function (text) {
     // Text is null if user pressed cancel button.
     if (text !== null) {
       this.setValue(this.getValueFromEditorText_(text));
@@ -329,13 +332,13 @@ FieldTextInput.prototype.showPromptEditor_ = function() {
  *     focus.
  * @private
  */
-FieldTextInput.prototype.showInlineEditor_ = function(quietInput) {
+FieldTextInput.prototype.showInlineEditor_ = function (quietInput) {
   WidgetDiv.show(this, this.sourceBlock_.RTL, this.widgetDispose_.bind(this));
   this.htmlInput_ = this.widgetCreate_();
   this.isBeingEdited_ = true;
 
   if (!quietInput) {
-    this.htmlInput_.focus({preventScroll: true});
+    this.htmlInput_.focus({ preventScroll: true });
     this.htmlInput_.select();
   }
 };
@@ -345,7 +348,7 @@ FieldTextInput.prototype.showInlineEditor_ = function(quietInput) {
  * @return {!HTMLElement} The newly created text input editor.
  * @protected
  */
-FieldTextInput.prototype.widgetCreate_ = function() {
+FieldTextInput.prototype.widgetCreate_ = function () {
   eventUtils.setGroup(true);
   const div = WidgetDiv.getDiv();
 
@@ -368,14 +371,14 @@ FieldTextInput.prototype.widgetCreate_ = function() {
     borderRadius = (bBox.bottom - bBox.top) / 2 + 'px';
     // Pull stroke colour from the existing shadow block
     const strokeColour = this.sourceBlock_.getParent() ?
-        this.sourceBlock_.getParent().style.colourTertiary :
-        this.sourceBlock_.style.colourTertiary;
+      this.sourceBlock_.getParent().style.colourTertiary :
+      this.sourceBlock_.style.colourTertiary;
     htmlInput.style.border = (1 * scale) + 'px solid ' + strokeColour;
     div.style.borderRadius = borderRadius;
     div.style.transition = 'box-shadow 0.25s ease 0s';
     if (this.getConstants().FIELD_TEXTINPUT_BOX_SHADOW) {
       div.style.boxShadow =
-          'rgba(255, 255, 255, 0.3) 0 0 0 ' + (4 * scale) + 'px';
+        'rgba(255, 255, 255, 0.3) 0 0 0 ' + (4 * scale) + 'px';
     }
   }
   htmlInput.style.borderRadius = borderRadius;
@@ -398,7 +401,7 @@ FieldTextInput.prototype.widgetCreate_ = function() {
  * DOM-references belonging to the editor.
  * @protected
  */
-FieldTextInput.prototype.widgetDispose_ = function() {
+FieldTextInput.prototype.widgetDispose_ = function () {
   // Non-disposal related things that we do when the editor closes.
   this.isBeingEdited_ = false;
   this.isTextValid_ = true;
@@ -429,20 +432,20 @@ FieldTextInput.prototype.widgetDispose_ = function() {
  *    handlers will be bound.
  * @protected
  */
-FieldTextInput.prototype.bindInputEvents_ = function(htmlInput) {
+FieldTextInput.prototype.bindInputEvents_ = function (htmlInput) {
   // Trap Enter without IME and Esc to hide.
   this.onKeyDownWrapper_ = browserEvents.conditionalBind(
-      htmlInput, 'keydown', this, this.onHtmlInputKeyDown_);
+    htmlInput, 'keydown', this, this.onHtmlInputKeyDown_);
   // Resize after every input change.
   this.onKeyInputWrapper_ = browserEvents.conditionalBind(
-      htmlInput, 'input', this, this.onHtmlInputChange_);
+    htmlInput, 'input', this, this.onHtmlInputChange_);
 };
 
 /**
  * Unbind handlers for user input and workspace size changes.
  * @protected
  */
-FieldTextInput.prototype.unbindInputEvents_ = function() {
+FieldTextInput.prototype.unbindInputEvents_ = function () {
   if (this.onKeyDownWrapper_) {
     browserEvents.unbind(this.onKeyDownWrapper_);
     this.onKeyDownWrapper_ = null;
@@ -458,7 +461,7 @@ FieldTextInput.prototype.unbindInputEvents_ = function() {
  * @param {!Event} e Keyboard event.
  * @protected
  */
-FieldTextInput.prototype.onHtmlInputKeyDown_ = function(e) {
+FieldTextInput.prototype.onHtmlInputKeyDown_ = function (e) {
   if (e.keyCode === KeyCodes.ENTER) {
     WidgetDiv.hide();
     DropDownDiv.hideWithoutAnimation();
@@ -479,7 +482,7 @@ FieldTextInput.prototype.onHtmlInputKeyDown_ = function(e) {
  * @param {!Event} _e Keyboard event.
  * @private
  */
-FieldTextInput.prototype.onHtmlInputChange_ = function(_e) {
+FieldTextInput.prototype.onHtmlInputChange_ = function (_e) {
   const text = this.htmlInput_.value;
   if (text !== this.htmlInput_.oldValue_) {
     this.htmlInput_.oldValue_ = text;
@@ -498,7 +501,7 @@ FieldTextInput.prototype.onHtmlInputChange_ = function(_e) {
  * @param {*} newValue New value.
  * @protected
  */
-FieldTextInput.prototype.setEditorValue_ = function(newValue) {
+FieldTextInput.prototype.setEditorValue_ = function (newValue) {
   this.isDirty_ = true;
   if (this.isBeingEdited_) {
     // In the case this method is passed an invalid value, we still
@@ -514,7 +517,7 @@ FieldTextInput.prototype.setEditorValue_ = function(newValue) {
  * Resize the editor to fit the text.
  * @protected
  */
-FieldTextInput.prototype.resizeEditor_ = function() {
+FieldTextInput.prototype.resizeEditor_ = function () {
   const div = WidgetDiv.getDiv();
   const bBox = this.getScaledBBox();
   div.style.width = bBox.right - bBox.left + 'px';
@@ -534,7 +537,7 @@ FieldTextInput.prototype.resizeEditor_ = function() {
  * @return {boolean} True if the field is tab navigable.
  * @override
  */
-FieldTextInput.prototype.isTabNavigable = function() {
+FieldTextInput.prototype.isTabNavigable = function () {
   return true;
 };
 
@@ -547,7 +550,7 @@ FieldTextInput.prototype.isTabNavigable = function() {
  * @protected
  * @override
  */
-FieldTextInput.prototype.getText_ = function() {
+FieldTextInput.prototype.getText_ = function () {
   if (this.isBeingEdited_ && this.htmlInput_) {
     // We are currently editing, return the HTML input value instead.
     return this.htmlInput_.value;
@@ -564,7 +567,7 @@ FieldTextInput.prototype.getText_ = function() {
  * @return {string} The text to show on the HTML input.
  * @protected
  */
-FieldTextInput.prototype.getEditorText_ = function(value) {
+FieldTextInput.prototype.getEditorText_ = function (value) {
   return String(value);
 };
 
@@ -578,7 +581,7 @@ FieldTextInput.prototype.getEditorText_ = function(value) {
  * @return {*} The value to store.
  * @protected
  */
-FieldTextInput.prototype.getValueFromEditorText_ = function(text) {
+FieldTextInput.prototype.getValueFromEditorText_ = function (text) {
   return text;
 };
 

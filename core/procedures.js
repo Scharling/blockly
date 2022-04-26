@@ -205,19 +205,18 @@ const rename = function (name) {
 };
 exports.rename = rename;
 
-const renameArgCall = function (fieldBlock, name) {
-  console.log(fieldBlock);
-  console.log(name);
-  const oldName = fieldBlock.getValue();
+const renameArgCall = function (fieldBlock, name, procedureName) {
+  const oldName = procedureName + "." + fieldBlock.getValue();
+  const revertName = procedureName + "." + fieldBlock.firstChar;
+
   if (oldName !== name) {
     const outerWs = Mutator.findParentWs(fieldBlock.getSourceBlock().workspace);
     const blocks = outerWs.getAllBlocks(false);
-    console.log(blocks);
     for (let i = 0; i < blocks.length; i++) {
       if (blocks[i].renameProcedure) {
         const procedureBlock = /** @type {!ProcedureBlock} */ (blocks[i]);
         procedureBlock.renameProcedure(
-            /** @type {string} */(oldName), name);
+            /** @type {string} */(oldName), name, revertName);
       }
     }
   }

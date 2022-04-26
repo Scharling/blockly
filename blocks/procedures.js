@@ -701,6 +701,14 @@ Blocks['procedures_anonymous'] = {
   },
 };
 
+// function varNameWasReset(event) {
+//   if (event.type == Blockly.Events.BLOCK_CHANGE &&
+//     event.element == 'field' &&
+//     event.oldValue && event.newValue) {
+//     console.log("EVENT CATCHED!!!!!", event);
+//   }
+// }
+
 Blocks['procedures_mutatorcontainer'] = {
   /**
    * Mutator block for procedure container.
@@ -723,6 +731,7 @@ Blocks['procedures_mutatorcontainer'] = {
     this.setStyle('procedure_blocks');
     this.setTooltip(Msg['PROCEDURES_MUTATORCONTAINER_TOOLTIP']);
     this.contextMenu = false;
+    // this.workspace.addChangeListener(varNameWasReset);
   },
 };
 
@@ -812,7 +821,6 @@ function isTypedBlock(paramBlock, i) {
 }
 
 function validatorExternal(sourceBlock, varName, thisBlock, rename) {
-  console.log(thisBlock);
   var varType = typeUtils.createNullType();
 
   for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
@@ -820,10 +828,6 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
       varType = typeUtils.createTypeFromBlock(sourceBlock.childBlocks_[i]);
       break;
     }
-  }
-
-  if (rename && varType.block_name === "type_function") {
-    Procedures.renameArgCall(thisBlock, varName);
   }
 
   const outerWs = Mutator.findParentWs(sourceBlock.workspace);
@@ -859,6 +863,7 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
   var blockDBKeys = Object.keys(outerWs.blockDB_);
   var blockDBLength = blockDBKeys.length
   var varMapName = null;
+  var procedureName = "";
   for (var i = 0; i < blockDBLength; i++) {
     var element = outerWs.blockDB_[blockDBKeys[i]];
     if (element.mutator && element.mutator.workspace_) {
@@ -870,10 +875,18 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
         var mutatorBlock = element.mutator.workspace_.blockDB_[elementKeys[j]];
         if (mutatorBlock.type == "procedures_mutatorcontainer") {
           varMapName = mutatorBlock.procedureName + "." + varName;
+          procedureName = mutatorBlock.procedureName;
           console.log("found procedurename for varName (jackpot)", varMapName);
+
+
         }
       }
     }
+  }
+
+  if (rename && varType.block_name === "type_function") {
+    console.trace();
+    Procedures.renameArgCall(thisBlock, varMapName, procedureName);
   }
 
   let model = outerWs.getVariable(varMapName, varType);
@@ -911,10 +924,11 @@ const PROCEDURE_CALL_COMMON = {
    * If the name matches this block's procedure, rename it.
    * @param {string} oldName Previous name of procedure.
    * @param {string} newName Renamed procedure.
+   * @param {?string} revertName Revert name of input field.
    * @this {Block}
    */
-  renameProcedure: function (oldName, newName) {
-    if (Names.equals(oldName, this.getProcedureCall())) {
+  renameProcedure: function (oldName, newName, opt_revertName) {
+    if (Names.equals(oldName, this.getProcedureCall()) || Names.equals(opt_revertName, this.getProcedureCall())) {
       this.setFieldValue(newName, 'NAME');
       const baseMsg = this.outputConnection ?
         Msg['PROCEDURES_CALLRETURN_TOOLTIP'] :
@@ -1359,7 +1373,6 @@ Blocks['args_callreturn'] = {
     this.previousEnabledState_ = true;
     this.argCount_ = "ALL";
   },
-
   //defType_: 'args_defreturn',
 };
 
