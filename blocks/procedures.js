@@ -855,26 +855,18 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
   }
 
 
-
-  var blockDBKeys = Object.keys(outerWs.blockDB_);
-  var blockDBLength = blockDBKeys.length
   var varMapName = null;
-  for (var i = 0; i < blockDBLength; i++) {
-    var element = outerWs.blockDB_[blockDBKeys[i]];
-    if (element.mutator && element.mutator.workspace_) {
-
-      var elementKeys = Object.keys(element.mutator.workspace_.blockDB_);
-      var elementLength = elementKeys.length;
-
-      for (var j = 0; j < elementLength; j++) {
-        var mutatorBlock = element.mutator.workspace_.blockDB_[elementKeys[j]];
-        if (mutatorBlock.type == "procedures_mutatorcontainer") {
-          varMapName = mutatorBlock.procedureName + "." + varName;
-          console.log("found procedurename for varName (jackpot)", varMapName);
-        }
-      }
+  console.log("LOLOLOL", sourceBlock, thisBlock);
+  if (!thisBlock.procedureName) {
+    if (sourceBlock.parentBlock_) {
+      varMapName = sourceBlock.parentBlock_.procedureName+ "." + varName;
     }
+  } else {
+    varMapName = thisBlock.procedureName + "." + varName;
   }
+  console.log("eyy", varMapName);
+  console.log("882", varMapName, varType, varName)
+  if (varMapName === null) return varName;
 
   let model = outerWs.getVariable(varMapName, varType);
 
