@@ -18,7 +18,7 @@ const { NameType } = goog.require('Blockly.Names');
 
 FSharp['typedefinition'] = function (block) {
 
-  
+
   const typeName =
     FSharp.nameDB_.getName(block.getFieldValue('TYPENAME'), NameType.ALGEBRAIC_DATATYPE);
   var polyArgs = "";
@@ -26,24 +26,20 @@ FSharp['typedefinition'] = function (block) {
   if (block.itemCount_ > 0) {
     var args = [];
     for (var i = 0; i < block.itemCount_; i++) {
-        args.push(getPolyType(i));
+      args.push(getPolyType(i));
     }
     polyArgs = "<" + args.join(", ") + ">";
-  } 
+  }
 
-
-  console.log("typedef", block, polyArgs);
   let branch = FSharp.statementToCode(block, 'CASES');
   let code = "type " + typeName + polyArgs + " =\n" + branch;
-  
+
 
   FSharp.definitions_['%%' + typeName] = code;
   return null;
 }
 
 FSharp['case'] = function (block) {
-  console.log("case", block);
-
   var inputs = block.inputList.slice(1);
 
   var args = [];
@@ -54,7 +50,7 @@ FSharp['case'] = function (block) {
 
   const caseName =
     FSharp.nameDB_.getName(block.getFieldValue('NAME'), NameType.ALGEBRAIC_DATATYPE);
-    
+
   const ofString = (args.length == 0) ? "" : " of ";
 
   const code = '| ' + caseName + ofString + args.join(" * ") + '\n';
@@ -108,5 +104,5 @@ FSharp['type_builder'] = function (block) {
   const argsString = (args.length == 0) ? "" : "(" + args.join(", ") + ")";
 
   const code = builderName + argsString;
-  return [code, FSharp.ORDER_ATOMIC];
+  return [code, FSharp.ORDER_TYPE_CREATION];
 }

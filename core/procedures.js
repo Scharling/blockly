@@ -189,6 +189,7 @@ const rename = function (name) {
     name,
       /** @type {!Block} */(this.getSourceBlock()));
   const oldName = this.getValue();
+
   if (oldName !== name && oldName !== legalName) {
     // Rename any callers.
     const blocks = this.getSourceBlock().workspace.getAllBlocks(false);
@@ -203,6 +204,26 @@ const rename = function (name) {
   return legalName;
 };
 exports.rename = rename;
+
+const renameArgCall = function (fieldBlock, name) {
+  console.log(fieldBlock);
+  console.log(name);
+  const oldName = fieldBlock.getValue();
+  if (oldName !== name) {
+    const outerWs = Mutator.findParentWs(fieldBlock.getSourceBlock().workspace);
+    const blocks = outerWs.getAllBlocks(false);
+    console.log(blocks);
+    for (let i = 0; i < blocks.length; i++) {
+      if (blocks[i].renameProcedure) {
+        const procedureBlock = /** @type {!ProcedureBlock} */ (blocks[i]);
+        procedureBlock.renameProcedure(
+            /** @type {string} */(oldName), name);
+      }
+    }
+  }
+  return name;
+};
+exports.renameArgCall = renameArgCall;
 
 /**
  * Construct the blocks required by the flyout for the procedure category.
@@ -256,22 +277,31 @@ const flyoutCategory = function (workspace) {
     for (let i = 0; i < procedureList.length; i++) {
       const name = procedureList[i][0];
       const args = procedureList[i][1];
-      if (!procedureList[i][3]) {
-        continue;
+
+      if (procedureList[i][3]) {
+        // <block type="procedures_callnoreturn" gap="16">
+        //   <mutation name="do something">
+        //     <arg name="x"></arg>
+        //   </mutation>
+        // </block>
+        const block = createCallBlock(templateName);
+        const mutation = createCallMutation(name);
+        block.appendChild(mutation);
+        for (let j = 0; j < args.length; j++) {
+          const arg = createCallArg(args[j].name);
+          mutation.appendChild(arg);
+        }
+        xmlList.push(block);
       }
-      // <block type="procedures_callnoreturn" gap="16">
-      //   <mutation name="do something">
-      //     <arg name="x"></arg>
-      //   </mutation>
-      // </block>
-      const block = createCallBlock(templateName);
-      const mutation = createCallMutation(name);
-      block.appendChild(mutation);
+
       for (let j = 0; j < args.length; j++) {
-        const arg = createCallArg(args[j].displayName);
-        mutation.appendChild(arg);
         const type = args[j].type;
         if (type.block_name === "type_function") {
+          // <block type="args_callnoreturn" gap="16">
+          //   <mutation name="do something">
+          //     <arg name="x"></arg>
+          //   </mutation>
+          // </block>
           const argNum = type.inputs.length;
           const subBlock = createCallBlock("args_callreturn");
           const subMutation = createCallMutation(args[j].name);
@@ -283,7 +313,6 @@ const flyoutCategory = function (workspace) {
           xmlList.push(subBlock);
         }
       }
-      xmlList.push(block);
     }
   }
 
@@ -340,7 +369,7 @@ const updateMutatorFlyout = function (workspace) {
   xmlElement.appendChild(argBlock);
 
   // Our custom mutator blocks
-  const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
+  const types = ['type_int', 'type_float', 'type_string', 'type_char', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
   types.forEach(t => {
     xmlElement.appendChild(createTypeBlock(t));
   });
