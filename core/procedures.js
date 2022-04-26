@@ -256,22 +256,32 @@ const flyoutCategory = function (workspace) {
     for (let i = 0; i < procedureList.length; i++) {
       const name = procedureList[i][0];
       const args = procedureList[i][1];
-      if (!procedureList[i][3]) {
-        continue;
+
+      if (procedureList[i][3]) {
+        // <block type="procedures_callnoreturn" gap="16">
+        //   <mutation name="do something">
+        //     <arg name="x"></arg>
+        //   </mutation>
+        // </block>
+        const block = createCallBlock(templateName);
+        const mutation = createCallMutation(name);
+        block.appendChild(mutation);
+        for (let j = 0; j < args.length; j++) {
+          const arg = createCallArg(args[j].name);
+          mutation.appendChild(arg);
+          const type = args[j].type;
+        }
+        xmlList.push(block);
       }
-      // <block type="procedures_callnoreturn" gap="16">
-      //   <mutation name="do something">
-      //     <arg name="x"></arg>
-      //   </mutation>
-      // </block>
-      const block = createCallBlock(templateName);
-      const mutation = createCallMutation(name);
-      block.appendChild(mutation);
+
       for (let j = 0; j < args.length; j++) {
-        const arg = createCallArg(args[j].name);
-        mutation.appendChild(arg);
         const type = args[j].type;
         if (type.block_name === "type_function") {
+          // <block type="args_callnoreturn" gap="16">
+          //   <mutation name="do something">
+          //     <arg name="x"></arg>
+          //   </mutation>
+          // </block>
           const argNum = type.inputs.length;
           const subBlock = createCallBlock("args_callreturn");
           const subMutation = createCallMutation(args[j].name);
@@ -283,7 +293,6 @@ const flyoutCategory = function (workspace) {
           xmlList.push(subBlock);
         }
       }
-      xmlList.push(block);
     }
   }
 
