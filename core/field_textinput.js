@@ -234,7 +234,7 @@ FieldTextInput.prototype.doValueInvalid_ = function (_invalidValue) {
 FieldTextInput.prototype.doValueUpdate_ = function (newValue) {
   this.isTextValid_ = true;
   this.value_ = newValue;
-  this.firstChar = newValue.charAt(0);
+  this.firstChar = typeof newValue === "string" ? newValue.charAt(0) : '';
   if (!this.isBeingEdited_) {
     // This should only occur if setValue is triggered programmatically.
     this.isDirty_ = true;
