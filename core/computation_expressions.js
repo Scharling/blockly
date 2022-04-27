@@ -192,13 +192,15 @@ const flyoutCategory = function (workspace) {
 
         const bindArgM = utilsXml.createElement('arg');
         bindArgM.setAttribute('name', 'm');
+        bindArgM.setAttribute('displayName', 'm');
         const bindArgF = utilsXml.createElement('arg');
         bindArgF.setAttribute('name', 'f');
+        bindArgF.setAttribute('displayName', 'f');
         bindMutation.appendChild(bindArgM);
         bindMutation.appendChild(bindArgF);
 
-        workspace.createVariable('m', null, null, true);
-        workspace.createVariable('f',  null, null, true);
+        workspace.createVariable('anonymous.m', null, null, true, "m");
+        workspace.createVariable('anonymous.f',  null, null, true, "f");
 
 
         bindBlock.appendChild(bindMutation);
@@ -218,9 +220,10 @@ const flyoutCategory = function (workspace) {
 
         const returnArg = utilsXml.createElement('arg');
         returnArg.setAttribute('name', 'x');
+        returnArg.setAttribute('displayName', 'x');
         returnMutation.appendChild(returnArg);
 
-        workspace.createVariable('x',  null, null, true);
+        workspace.createVariable('anonymous.x',  null, null, true, "x");
 
         returnBlock.appendChild(returnMutation);
 

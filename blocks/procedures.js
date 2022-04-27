@@ -84,7 +84,12 @@ const PROCEDURE_DEF_COMMON = {
       paramString = Msg['PROCEDURES_BEFORE_PARAMS'] + ' ';
       for (var i = 0; i < this.arguments_.length; i++) {
         let arg = this.arguments_[i];
-        let varName = this.procedureName + "." + arg;
+        let varName = "";
+        if (this.procedureName) {
+          varName = this.procedureName + "." + arg;
+        } else {
+          varName = "anonymous." + arg;
+        }
 
         console.log("arg", arg, this.procedureName, varName)
         let variable = this.workspace.getVariableMap().getVariableByName(varName);
@@ -152,6 +157,8 @@ const PROCEDURE_DEF_COMMON = {
     for (let i = 0; i < this.argumentVarModels_.length; i++) {
       const parameter = xmlUtils.createElement('arg');
       const argModel = this.argumentVarModels_[i];
+      console.log("mut2Dom", argModel, this);
+      console.trace();
       parameter.setAttribute('name', argModel.name);
       parameter.setAttribute('varid', argModel.getId());
       parameter.setAttribute('displayName', argModel.displayName);
@@ -234,6 +241,7 @@ const PROCEDURE_DEF_COMMON = {
           'name': this.argumentVarModels_[i].name,
           'id': this.argumentVarModels_[i].getId(),
           'type': this.argumentVarModels_[i].type,
+          'displayName': this.argumentVarModels_[i].displayName
         });
       }
     }
@@ -261,6 +269,7 @@ const PROCEDURE_DEF_COMMON = {
     if (state['params']) {
       for (let i = 0; i < state['params'].length; i++) {
         const param = state['params'][i];
+        console.log("param", param);
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, param['id'], param['name'], param['type'], param['displayName']);
         this.arguments_.push(variable.displayName);
@@ -300,6 +309,7 @@ const PROCEDURE_DEF_COMMON = {
      *   </input>
      * </block>
      */
+    console.log("decomp", workspace, this);
     const containerBlockNode = xmlUtils.createElement('block');
     containerBlockNode.setAttribute('type', 'procedures_mutatorcontainer');
     const statementNode = xmlUtils.createElement('statement');
@@ -322,8 +332,14 @@ const PROCEDURE_DEF_COMMON = {
 
       const typeNode = xmlUtils.createElement('value');
       typeNode.setAttribute('name', 'TYPE');
-      var varName = this.procedureName + "." + this.arguments_[i];
+      let varName = "";
+      if (this.procedureName) {
+        varName = this.procedureName + "." + this.arguments_[i];
+      } else {
+        varName = "anonymous." + this.arguments_[i];
+      }
       var variable = outerWs.getVariableMap().getVariableByName(varName);
+      console.log("variable", variable, varName, this);
       const typeBlockNode = typeUtils.createBlockFromType(variable.type);
 
       if (typeBlockNode != null) {
@@ -336,6 +352,12 @@ const PROCEDURE_DEF_COMMON = {
 
 
     this.procedureName = this.getFieldValue('NAME');
+    var procedureName = "";
+    if (this.procedureName) {
+      procedureName = this.procedureName;
+    } else {
+      procedureName = "anonymous";
+    }
 
     // Set return type block
     const returnNode = xmlUtils.createElement('value');
@@ -345,7 +367,7 @@ const PROCEDURE_DEF_COMMON = {
       const returnBlockNode = typeUtils.createBlockFromType(this.returnType_);
       returnNode.appendChild(returnBlockNode);
     }
-    const containerBlock = Xml.domToBlock(containerBlockNode, workspace, this.procedureName);
+    const containerBlock = Xml.domToBlock(containerBlockNode, workspace, procedureName);
     if (this.type === 'procedures_defreturn' || this.type === 'procedures_anonymous') {
       containerBlock.setFieldValue(this.hasStatements_, 'STATEMENTS');
     }
@@ -389,7 +411,12 @@ const PROCEDURE_DEF_COMMON = {
       const varName = paramBlock.getFieldValue('NAME');
       this.arguments_.push(varName);
 
-      const varMapName = this.procedureName + "." + varName;
+      var varMapName = "";
+      if (this.procedureName) {
+        varMapName = this.procedureName + "." + varName;
+      } else {
+        varMapName = "anonymous." + varName;
+      }
 
       const variable = this.workspace.getVariable(varMapName, varType);
       this.argumentVarModels_.push(variable);
@@ -862,7 +889,11 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
   var procedureName = "";
   if (!thisBlock.procedureName) {
     if (sourceBlock.parentBlock_) {
-      varMapName = sourceBlock.parentBlock_.procedureName + "." + varName;
+      if (sourceBlock.parentBlock_.procedureName) {
+        varMapName = sourceBlock.parentBlock_.procedureName + "." + varName;
+      } else {
+        varMapName = "anonymous." + varName;
+      }
       procedureName = sourceBlock.parentBlock_.procedureName;
     }
   } else {
