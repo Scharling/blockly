@@ -474,6 +474,16 @@
      return this.arguments_;
    },
    /**
+   * Return all variables referenced by this block.
+   * @return {!Array<string>} List of variable names.
+   * @this {Block}
+   */
+  getPrefixedVars: function () {
+    var procedureName = this.getFieldValue("NAME");
+    return this.arguments_.map((element) => procedureName + "." + element);
+
+  },
+   /**
     * Return all variables referenced by this block.
     * @return {!Array<!VariableModel>} List of variable models.
     * @this {Block}
@@ -903,7 +913,6 @@
    if (varMapName === null) return varName;
  
    if (rename && varType.block_name === "type_function") {
-     console.trace();
      Procedures.renameArgCall(thisBlock, varMapName, procedureName);
    }
  
@@ -1226,7 +1235,7 @@
        let def = Procedures.getDefinition(name, this.workspace);
        if (def &&
          (def.type !== this.defType_ ||
-           JSON.stringify(def.getVars()) !== JSON.stringify(this.arguments_))) {
+           JSON.stringify(def.getPrefixedVars()) !== JSON.stringify(this.arguments_))) {
          // The signatures don't match.
          def = null;
        }
