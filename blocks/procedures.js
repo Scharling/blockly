@@ -1494,5 +1494,71 @@ Blocks['procedures_ifreturn'] = {
    * Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('custom_func');
    */
   // FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn'],
-  FUNCTION_TYPES: ['procedures_defreturn', 'procedures_anonymous'],
+  FUNCTION_TYPES: ['procedures_defreturn', 'procedures_anonymous', 'procedures_defnoreturn'],
+};
+
+Blocks['procedures_defnoreturn'] = {
+  ...PROCEDURE_DEF_COMMON,
+  /**
+   * Block for defining a procedure with no return value.
+   * @this {Block}
+   */
+  init: function () {
+    const initName = Procedures.findLegalName('', this);
+    const nameField = new FieldTextInput(initName, Procedures.rename);
+    nameField.setSpellcheck(false);
+    this.appendDummyInput()
+      .appendField(Msg['PROCEDURES_DEFNORETURN_TITLE'])
+      .appendField(nameField, 'NAME')
+      .appendField('', 'PARAMS');
+    this.setMutator(new Mutator(['procedures_mutatorarg']));
+    if ((this.workspace.options.comments ||
+      (this.workspace.options.parentWorkspace &&
+        this.workspace.options.parentWorkspace.options.comments)) &&
+      Msg['PROCEDURES_DEFNORETURN_COMMENT']) {
+      this.setCommentText(Msg['PROCEDURES_DEFNORETURN_COMMENT']);
+    }
+    this.setStyle('procedure_blocks');
+    this.setTooltip(Msg['PROCEDURES_DEFNORETURN_TOOLTIP']);
+    this.setHelpUrl(Msg['PROCEDURES_DEFNORETURN_HELPURL']);
+    this.arguments_ = [];
+    this.argumentVarModels_ = [];
+    this.setStatements_(true);
+    this.statementConnection_ = null;
+  },
+  /**
+   * Return the signature of this procedure definition.
+   * @return {!Array} Tuple containing three elements:
+   *     - the name of the defined procedure,
+   *     - a list of all its arguments,
+   *     - that it DOES NOT have a return value.
+   * @this {Block}
+   */
+  getProcedureDef: function () {
+    return [this.getFieldValue('NAME'), this.arguments_, false];
+  },
+  callType_: 'procedures_callnoreturn',
+};
+
+Blocks['procedures_callnoreturn'] = {
+  ...PROCEDURE_CALL_COMMON,
+  /**
+   * Block for calling a procedure with no return value.
+   * @this {Block}
+   */
+  init: function () {
+    this.appendDummyInput('TOPROW').appendField('', 'NAME');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setStyle('procedure_blocks');
+    // Tooltip is set in renameProcedure.
+    this.setHelpUrl(Msg['PROCEDURES_CALLNORETURN_HELPURL']);
+    this.arguments_ = [];
+    this.argumentVarModels_ = [];
+    this.quarkConnections_ = {};
+    this.quarkIds_ = null;
+    this.previousEnabledState_ = true;
+  },
+
+  defType_: 'procedures_defnoreturn',
 };

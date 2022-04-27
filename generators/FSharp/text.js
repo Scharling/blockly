@@ -244,7 +244,7 @@ FSharp['text_print'] = function (block) {
   // Print statement.
   FSharp.definitions_['open_system'] = 'open System';
   const msg = FSharp.valueToCode(block, 'TEXT', FSharp.ORDER_NONE) || '\'\'';
-  return 'printf ' + msg + '\n';
+  return 'printf "%A" ' + msg + '\n';
 };
 
 FSharp['text_replace'] = function (block) {

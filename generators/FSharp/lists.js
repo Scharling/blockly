@@ -16,43 +16,45 @@ const stringUtils = goog.require('Blockly.utils.string');
 const { NameType } = goog.require('Blockly.Names');
 
 
-// Python['lists_create_empty'] = function(block) {
-//   // Create an empty list.
-//   return ['[]', Python.ORDER_ATOMIC];
-// };
+FSharp['lists_create_with'] = function (block) {
+    // Create a list with any number of elements of any type.
+    const elements = new Array(block.itemCount_);
+    for (let i = 0; i < block.itemCount_; i++) {
+        elements[i] =
+            FSharp.valueToCode(block, 'ADD' + i, FSharp.ORDER_NONE) || null;
+    }
+    const filteredElements = elements.filter(e => e !== null);
+    const code = '[' + filteredElements.join('; ') + ']';
+    return [code, FSharp.ORDER_ATOMIC];
+};
 
-// Python['lists_create_with'] = function(block) {
-//   // Create a list with any number of elements of any type.
-//   const elements = new Array(block.itemCount_);
-//   for (let i = 0; i < block.itemCount_; i++) {
-//     elements[i] =
-//         Python.valueToCode(block, 'ADD' + i, Python.ORDER_NONE) || 'None';
-//   }
-//   const code = '[' + elements.join(', ') + ']';
-//   return [code, Python.ORDER_ATOMIC];
-// };
+FSharp['lists_length'] = function (block) {
+    // String or array length.
+    const list = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '[]';
+    const code = list + '.Length';
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
 
-// Python['lists_repeat'] = function(block) {
-//   // Create a list with one element repeated.
-//   const item = Python.valueToCode(block, 'ITEM', Python.ORDER_NONE) || 'None';
-//   const times =
-//       Python.valueToCode(block, 'NUM', Python.ORDER_MULTIPLICATIVE) || '0';
-//   const code = '[' + item + '] * ' + times;
-//   return [code, Python.ORDER_MULTIPLICATIVE];
-// };
+FSharp['lists_isEmpty'] = function (block) {
+    // Is the string null or array empty?
+    const list = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '[]';
+    const code = list + '.IsEmpty';
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
 
-// Python['lists_length'] = function(block) {
-//   // String or array length.
-//   const list = Python.valueToCode(block, 'VALUE', Python.ORDER_NONE) || '[]';
-//   return ['len(' + list + ')', Python.ORDER_FUNCTION_CALL];
-// };
+FSharp['lists_getHead'] = function (block) {
+    // Is the string null or array empty?
+    const list = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '[]';
+    const code = list + '.Head';
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
 
-// Python['lists_isEmpty'] = function(block) {
-//   // Is the string null or array empty?
-//   const list = Python.valueToCode(block, 'VALUE', Python.ORDER_NONE) || '[]';
-//   const code = 'not len(' + list + ')';
-//   return [code, Python.ORDER_LOGICAL_NOT];
-// };
+FSharp['lists_getTail'] = function (block) {
+    // Is the string null or array empty?
+    const list = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '[]';
+    const code = list + '.Tail';
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
 
 // Python['lists_indexOf'] = function(block) {
 //   // Find an item in the list.
@@ -87,87 +89,15 @@ const { NameType } = goog.require('Blockly.Names');
 //   return [code, Python.ORDER_FUNCTION_CALL];
 // };
 
-// Python['lists_getIndex'] = function(block) {
-//   // Get element at index.
-//   // Note: Until January 2013 this block did not have MODE or WHERE inputs.
-//   const mode = block.getFieldValue('MODE') || 'GET';
-//   const where = block.getFieldValue('WHERE') || 'FROM_START';
-//   const listOrder =
-//       (where === 'RANDOM') ? Python.ORDER_NONE : Python.ORDER_MEMBER;
-//   const list = Python.valueToCode(block, 'VALUE', listOrder) || '[]';
-
-//   switch (where) {
-//     case 'FIRST':
-//       if (mode === 'GET') {
-//         const code = list + '[0]';
-//         return [code, Python.ORDER_MEMBER];
-//       } else if (mode === 'GET_REMOVE') {
-//         const code = list + '.pop(0)';
-//         return [code, Python.ORDER_FUNCTION_CALL];
-//       } else if (mode === 'REMOVE') {
-//         return list + '.pop(0)\n';
-//       }
-//       break;
-//     case 'LAST':
-//       if (mode === 'GET') {
-//         const code = list + '[-1]';
-//         return [code, Python.ORDER_MEMBER];
-//       } else if (mode === 'GET_REMOVE') {
-//         const code = list + '.pop()';
-//         return [code, Python.ORDER_FUNCTION_CALL];
-//       } else if (mode === 'REMOVE') {
-//         return list + '.pop()\n';
-//       }
-//       break;
-//     case 'FROM_START': {
-//       const at = Python.getAdjustedInt(block, 'AT');
-//       if (mode === 'GET') {
-//         const code = list + '[' + at + ']';
-//         return [code, Python.ORDER_MEMBER];
-//       } else if (mode === 'GET_REMOVE') {
-//         const code = list + '.pop(' + at + ')';
-//         return [code, Python.ORDER_FUNCTION_CALL];
-//       } else if (mode === 'REMOVE') {
-//         return list + '.pop(' + at + ')\n';
-//       }
-//       break;
-//     }
-//     case 'FROM_END': {
-//       const at = Python.getAdjustedInt(block, 'AT', 1, true);
-//       if (mode === 'GET') {
-//         const code = list + '[' + at + ']';
-//         return [code, Python.ORDER_MEMBER];
-//       } else if (mode === 'GET_REMOVE') {
-//         const code = list + '.pop(' + at + ')';
-//         return [code, Python.ORDER_FUNCTION_CALL];
-//       } else if (mode === 'REMOVE') {
-//         return list + '.pop(' + at + ')\n';
-//       }
-//       break;
-//     }
-//     case 'RANDOM':
-//       Python.definitions_['import_random'] = 'import random';
-//       if (mode === 'GET') {
-//         const code = 'random.choice(' + list + ')';
-//         return [code, Python.ORDER_FUNCTION_CALL];
-//       } else {
-//         const functionName =
-//             Python.provideFunction_('lists_remove_random_item', [
-//               'def ' + Python.FUNCTION_NAME_PLACEHOLDER_ + '(myList):',
-//               '  x = int(random.random() * len(myList))',
-//               '  return myList.pop(x)'
-//             ]);
-//         const code = functionName + '(' + list + ')';
-//         if (mode === 'GET_REMOVE') {
-//           return [code, Python.ORDER_FUNCTION_CALL];
-//         } else if (mode === 'REMOVE') {
-//           return code + '\n';
-//         }
-//       }
-//       break;
-//   }
-//   throw Error('Unhandled combination (lists_getIndex).');
-// };
+FSharp['lists_getIndex'] = function (block) {
+    // Get element at index.
+    // Note: Until January 2013 this block did not have MODE or WHERE inputs.
+    const listOrder = FSharp.ORDER_MEMBER;
+    const list = FSharp.valueToCode(block, 'VALUE', listOrder) || '[]';
+    const at = FSharp.getAdjustedInt(block, 'AT');
+    const code = list + '[' + at + ']';
+    return [code, FSharp.ORDER_MEMBER];
+};
 
 // Python['lists_setIndex'] = function(block) {
 //   // Set element at index.
