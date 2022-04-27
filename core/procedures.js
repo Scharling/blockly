@@ -88,9 +88,15 @@ const allProcedures = function (root) {
     root.getBlocksByType('procedures_defreturn', false).map(function (block) {
       return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
     });
+  const proceduresNoReturn =
+    root.getBlocksByType('procedures_defnoreturn', false)
+      .map(function (block) {
+        return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
+      });
   proceduresAnonymous.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
-  return [proceduresAnonymous, proceduresReturn];
+  proceduresNoReturn.sort(procTupleComparator);
+  return [proceduresAnonymous, proceduresReturn, proceduresNoReturn];
 };
 exports.allProcedures = allProcedures;
 
@@ -232,6 +238,20 @@ exports.renameArgCall = renameArgCall;
  */
 const flyoutCategory = function (workspace) {
   const xmlList = [];
+  // if (Blocks['procedures_defnoreturn']) {
+  //   // <block type="procedures_defnoreturn" gap="16">
+  //   //     <field name="NAME">do something</field>
+  //   // </block>
+  //   const block = utilsXml.createElement('block');
+  //   block.setAttribute('type', 'procedures_defnoreturn');
+  //   block.setAttribute('gap', 16);
+  //   const nameField = utilsXml.createElement('field');
+  //   nameField.setAttribute('name', 'NAME');
+  //   nameField.appendChild(
+  //     utilsXml.createTextNode(Msg['PROCEDURES_DEFNORETURN_PROCEDURE']));
+  //   block.appendChild(nameField);
+  //   xmlList.push(block);
+  // }
   if (Blocks['procedures_defreturn']) {
     // <block type="procedures_defreturn" gap="16">
     //     <field name="NAME">do something</field>
@@ -337,6 +357,7 @@ const flyoutCategory = function (workspace) {
   const tuple = allProcedures(workspace);
   populateProcedures(tuple[0], 'args_callreturn');
   populateProcedures(tuple[1], 'procedures_callreturn');
+  populateProcedures(tuple[2], 'procedures_callnoreturn');
   return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
