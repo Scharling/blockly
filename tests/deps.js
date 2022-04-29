@@ -269,13 +269,9 @@ goog.addDependency('../../core/workspace_svg.js', ['Blockly.WorkspaceSvg'], ['Bl
 goog.addDependency('../../core/xml.js', ['Blockly.Xml'], ['Blockly.Events.utils', 'Blockly.extra.utils.types', 'Blockly.inputTypes', 'Blockly.utils.Size', 'Blockly.utils.dom', 'Blockly.utils.xml'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../core/zoom_controls.js', ['Blockly.ZoomControls'], ['Blockly.ComponentManager', 'Blockly.Css', 'Blockly.Events.Click', 'Blockly.Events.utils', 'Blockly.IPositionable', 'Blockly.Touch', 'Blockly.browserEvents', 'Blockly.internalConstants', 'Blockly.uiPosition', 'Blockly.utils.Rect', 'Blockly.utils.Size', 'Blockly.utils.Svg', 'Blockly.utils.dom'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/FSharp.js', ['Blockly.FSharp'], ['Blockly.Generator', 'Blockly.Names', 'Blockly.Variables', 'Blockly.inputTypes', 'Blockly.utils.string'], {'lang': 'es6', 'module': 'goog'});
-<<<<<<< HEAD
-goog.addDependency('../../generators/FSharp/all.js', ['Blockly.FSharp.all'], ['Blockly.FSharp.logic', 'Blockly.FSharp.math', 'Blockly.FSharp.procedures', 'Blockly.FSharp.texts', 'Blockly.FSharp.types', 'Blockly.FSharp.variables', 'Blockly.FSharp.variablesDynamic'], {'module': 'goog'});
-=======
 goog.addDependency('../../generators/FSharp/algebraic_datatypes.js', ['Blockly.FSharp.algebraicDatatypes'], ['Blockly.FSharp', 'Blockly.Names', 'Blockly.Variables'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/FSharp/all.js', ['Blockly.FSharp.all'], ['Blockly.FSharp.algebraicDatatypes', 'Blockly.FSharp.computationExpression', 'Blockly.FSharp.lists', 'Blockly.FSharp.logic', 'Blockly.FSharp.math', 'Blockly.FSharp.patternMatching', 'Blockly.FSharp.procedures', 'Blockly.FSharp.texts', 'Blockly.FSharp.types', 'Blockly.FSharp.variables', 'Blockly.FSharp.variablesDynamic'], {'module': 'goog'});
 goog.addDependency('../../generators/FSharp/computation_expressions.js', ['Blockly.FSharp.computationExpression'], ['Blockly.FSharp', 'Blockly.Names'], {'lang': 'es6', 'module': 'goog'});
->>>>>>> 4dda83918b97e14e5af32ea04f3830ee4d2d99b3
 goog.addDependency('../../generators/FSharp/lists.js', ['Blockly.FSharp.lists'], ['Blockly.FSharp', 'Blockly.Names', 'Blockly.utils.string'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/FSharp/logic.js', ['Blockly.FSharp.logic'], ['Blockly.FSharp'], {'lang': 'es6', 'module': 'goog'});
 goog.addDependency('../../generators/FSharp/math.js', ['Blockly.FSharp.math'], ['Blockly.FSharp', 'Blockly.Names'], {'lang': 'es6', 'module': 'goog'});

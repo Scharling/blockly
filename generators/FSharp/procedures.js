@@ -70,7 +70,7 @@ FSharp['procedures_defreturn'] = function (block) {
   for (let i = 0; i < variables.length; i++) {
     args[i] = FSharp.nameDB_.getName(variables[i], NameType.VARIABLE);
   }
-  let argsString = createArgsString(args, usedVariables);
+  let argsString = createArgsString(args, usedVariables, funcName);
   let recString = createRecString(block);
 
   let code = 'let ' + recString + funcName + ' ' + argsString + ' =\n' +
@@ -140,7 +140,7 @@ FSharp['procedures_anonymous'] = function (block) {
   for (let i = 0; i < variables.length; i++) {
     args[i] = FSharp.nameDB_.getName(variables[i], NameType.VARIABLE);
   }
-  let argsString = createArgsString(args, usedVariables);
+  let argsString = createArgsString(args, usedVariables, "anonymous");
   let code = 'fun' + argsString + ' ->\n' +
     xfix1 + loopTrap + branch + xfix2 + returnValue;
   code = FSharp.scrub_(block, code);
@@ -154,13 +154,14 @@ FSharp['procedures_anonymous'] = function (block) {
 
 
 
-function createArgsString(args, variableModels) {
+function createArgsString(args, variableModels, procedureName) {
   let str = "";
   for (var i = 0; i < args.length; i++) {
     let arg = args[i];
+    let procedureArg = procedureName.replace("_", " ") + "." + arg;
     for (var j = 0; j < variableModels.length; j++) {
       let varModel = variableModels[j];
-      if (varModel.name == arg) {
+      if (varModel.name == procedureArg) {
         str = str + " (" + arg + " : " + varModel.type.getFSharpType() + ")"
         break;
       }

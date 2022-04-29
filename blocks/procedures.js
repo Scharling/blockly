@@ -1338,7 +1338,6 @@
      options.push(option);
    },
  };
- 
  Blocks['procedures_callreturn'] = {
    ...PROCEDURE_CALL_COMMON,
    /**
@@ -1811,54 +1810,6 @@
     };
     options.push(option);
   },
-};
-
-Blocks['procedures_callreturn'] = {
-  ...PROCEDURE_CALL_COMMON,
-  /**
-   * Block for calling a procedure with a return value.
-   * @this {Block}
-   */
-  init: function () {
-    this.appendDummyInput('TOPROW').appendField('', 'NAME');
-    this.appendDummyInput('BOTTOMROW');
-    this.setOutput(true);
-    this.setStyle('procedure_blocks');
-    // Tooltip is set in domToMutation.
-    this.setHelpUrl(Msg['PROCEDURES_CALLRETURN_HELPURL']);
-    this.arguments_ = [];
-    this.argumentVarModels_ = [];
-    this.quarkConnections_ = {};
-    this.quarkIds_ = null;
-    this.previousEnabledState_ = true;
-    this.argCount_ = "ALL";
-  },
-
-  defType_: 'procedures_defreturn',
-};
-
-Blocks['args_callreturn'] = {
-  ...PROCEDURE_CALL_COMMON,
-  /**
-   * Block for calling a procedure with a return value.
-   * @this {Block}
-   */
-  init: function () {
-    this.appendDummyInput('TOPROW').appendField('', 'NAME');
-    this.appendDummyInput('BOTTOMROW');
-    this.setOutput(true);
-    this.setStyle('procedure_blocks');
-    // Tooltip is set in domToMutation.
-    this.setHelpUrl(Msg['PROCEDURES_CALLRETURN_HELPURL']);
-    this.arguments_ = [];
-    this.argumentVarModels_ = [];
-    this.quarkConnections_ = {};
-    this.quarkIds_ = null;
-    this.previousEnabledState_ = true;
-    this.argCount_ = "ALL";
-  },
-
-  //defType_: 'args_defreturn',
 };
 
 Blocks['procedures_ifreturn'] = {
