@@ -1,13 +1,13 @@
 {
   "chunk": [
-    "blockly:258",
-    "all:10:blockly",
+    "blockly:260",
+    "all:12:blockly",
     "all1:11:blockly",
     "all2:11:blockly",
     "all3:11:blockly",
     "all4:11:blockly",
     "all5:11:blockly",
-    "all6:8:blockly"
+    "all6:13:blockly"
   ],
   "js": [
     "./core/inject.js",
@@ -140,8 +140,10 @@
     "./core/events/events_var_rename.js",
     "./core/variable_map.js",
     "./core/names.js",
+    "./core/algebraic_datatypes.js",
     "./core/procedures.js",
     "./core/variables_dynamic.js",
+    "./core/computation_expressions.js",
     "./core/renderers/common/debug.js",
     "./core/renderers/measurables/in_row_spacer.js",
     "./core/renderers/measurables/input_connection.js",
@@ -268,6 +270,8 @@
     "./core/common.js",
     "./closure/goog/base_minimal.js",
     "./core/blockly.js",
+    "./blocks/computation_expressions.js",
+    "./blocks/algebraic_datatypes.js",
     "./blocks/variables_dynamic.js",
     "./blocks/variables.js",
     "./blocks/text.js",
@@ -333,13 +337,18 @@
     "./generators/dart.js",
     "./generators/dart/colour.js",
     "./generators/dart/all.js",
+    "./generators/FSharp/lists.js",
+    "./generators/FSharp/types.js",
     "./generators/FSharp/variables_dynamic.js",
     "./generators/FSharp/variables.js",
     "./generators/FSharp/text.js",
     "./generators/FSharp/procedures.js",
+    "./generators/FSharp/pattern_matching.js",
     "./generators/FSharp/math.js",
-    "./generators/FSharp.js",
     "./generators/FSharp/logic.js",
+    "./generators/FSharp/computation_expressions.js",
+    "./generators/FSharp.js",
+    "./generators/FSharp/algebraic_datatypes.js",
     "./generators/FSharp/all.js"
   ]
 }

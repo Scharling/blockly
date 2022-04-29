@@ -18,6 +18,9 @@ const createPrimitiveType = function (blockName) {
         case "type_string":
             textName = "string";
             break;
+        case "type_char":
+            textName = "char";
+            break;
         case "type_bool":
             textName = "bool";
             break;
@@ -102,17 +105,52 @@ const createTupleType = function (children) {
             return s
         },
         getFSharpType() {
-            var s = "(";
+            var args = []
             for (var i = 0; i < this.children.length; i++) {
-                s = s + this.children[i].getFSharpType() + " * "
+                args.push(this.children[i].getFSharpType());
             }
-            if (this.children.length > 0) s = s.slice(0, -3)
-            s = s + this.text_name_end
-            return s
+            return args.join(" * ")
         }
     }
 }
 exports.createTupleType = createTupleType;
+
+
+/**
+   * Create type object for a tuple type.
+   * @param children The items of the tuple.
+   * @return Type object.
+   */
+const createDatatypeType = function (children, blockName) {
+    return {
+        block_name: "type_datatype",
+        text_name_start: "<",
+        text_name_end: ">",
+        name: blockName,
+        children,
+        getType: function () {
+            var s = blockName + this.text_name_start;
+            var args = []
+            for (var i = 0; i < this.children.length; i++) {
+                args.push(this.children[i]?.getType())
+            }
+            s = s + args.join(", ")
+            s = s + this.text_name_end;
+            return s
+        },
+        getFSharpType() {
+            var s = blockName + this.text_name_start;
+            var args = []
+            for (var i = 0; i < this.children.length; i++) {
+                args.push(this.children[i]?.getFSharpType())
+            }
+            s = s + args.join(", ")
+            s = s + this.text_name_end;
+            return s
+        }
+    }
+}
+exports.createDatatypeType = createDatatypeType;
 
 /**
    * Create type object for a function type.
@@ -222,6 +260,7 @@ const createTypeFromBlock = function (block) {
         case "type_int":
         case "type_float":
         case "type_string":
+        case "type_char":
         case "type_bool":
         case "type_unit":
             return createPrimitiveType(block.type);
@@ -245,7 +284,17 @@ const createTypeFromBlock = function (block) {
             const inputs = inputBlocks.map(i => createTypeFromBlock(i));
             const output = outputBlock ? createTypeFromBlock(outputBlock) : null;
             return createFunctionType(inputs, output);
+        case "datatype":
+            const name = block.getFieldValue('NAME');
+            const dtChildren = [];
+            block.childBlocks_.forEach(b => {
+                if (b.type) {
+                    dtChildren.push(createTypeFromBlock(b));
+                }
+            });
+            return createDatatypeType(dtChildren, name);
     }
+    return null;
 }
 exports.createTypeFromBlock = createTypeFromBlock;
 
@@ -259,6 +308,7 @@ const createBlockFromType = function (type) {
         case "type_int":
         case "type_float":
         case "type_string":
+        case "type_char":
         case "type_bool":
         case "type_unit":
             const blockNode = xmlUtils.createElement('block');
@@ -309,6 +359,21 @@ const createBlockFromType = function (type) {
                 functionBlockNode.appendChild(outputValueBlock);
             }
             return functionBlockNode;
+        case "type_datatype":
+            const typeBlockNode = xmlUtils.createElement('block');
+            typeBlockNode.setAttribute('type', 'datatype');
+
+            const typeMutationBlock = xmlUtils.createElement('mutation');
+            typeMutationBlock.setAttribute('name', type.name);
+            typeMutationBlock.setAttribute('items', type.children.length);
+            typeBlockNode.appendChild(typeMutationBlock);
+            let j = 0;
+            type.children.forEach(element => {
+                const valueBlock = createValueBlock("ADD" + j, element);
+                typeBlockNode.appendChild(valueBlock);
+                i++;
+            });
+            return typeBlockNode;
         case "type_null":
             return null;
     }
@@ -376,6 +441,13 @@ const createXmlFromType = function (type, name) {
             const output = type.output ? createXmlFromType(type.output, 'output') : null;
             if (output) typeXml.appendChild(output);
             break;
+        case "type_datatype":
+            typeXml.setAttribute('name', type.name);
+            for (c in type.children) {
+                const childXml = createXmlFromType(type.children[c], 'child');
+                typeXml.appendChild(childXml);
+            }
+            break;
         default:
             break;
     }
@@ -394,6 +466,7 @@ const createTypeFromXml = function (xmlElement) {
         case "type_int":
         case "type_float":
         case "type_string":
+        case "type_char":
         case "type_bool":
         case "type_unit":
             return createPrimitiveType(type);
@@ -408,7 +481,6 @@ const createTypeFromXml = function (xmlElement) {
                 }
             }
             return createTupleType(children);
-
         case "type_function":
             let input = null;
             let output = null;
@@ -421,6 +493,15 @@ const createTypeFromXml = function (xmlElement) {
                 }
             }
             return createFunctionType(input, output);
+        case "type_datatype":
+            const typeChildren = [];
+            for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
+                if (childNode.nodeName.toLowerCase() === 'child') {
+                    const childType = createTypeFromXml(childNode);
+                    typeChildren.push(childType);
+                }
+            }
+            return createDatatypeType(typeChildren, xmlElement.getAttribute('name'));
     }
 }
 exports.createTypeFromXml = createTypeFromXml;

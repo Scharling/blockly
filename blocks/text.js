@@ -44,7 +44,7 @@ defineBlocksWithJsonArray([
       'name': 'TEXT',
       'text': '',
     }],
-    'output': 'String',
+    'output': 'StringValue',
     'style': 'text_blocks',
     'helpUrl': '%{BKY_TEXT_TEXT_HELPURL}',
     'tooltip': '%{BKY_TEXT_TEXT_TOOLTIP}',
@@ -150,7 +150,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': ['String', 'Array'],
+        'check': ['String', 'Array', 'StringValue'],
       },
     ],
     'output': 'Number',
@@ -165,7 +165,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': ['String', 'Array'],
+        'check': ['String', 'Array', 'StringValue'],
       },
     ],
     'output': 'Boolean',
@@ -180,7 +180,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': 'String',
+        'check': ['String', 'StringValue'],
       },
       {
         'type': 'field_dropdown',
@@ -199,7 +199,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'FIND',
-        'check': 'String',
+        'check': ['String', 'StringValue'],
       },
     ],
     'output': 'Number',
@@ -217,7 +217,7 @@ defineBlocksWithJsonArray([
       {
         'type': 'input_value',
         'name': 'VALUE',
-        'check': 'String',
+        'check': ['String', 'StringValue'],
       },
       {
         'type': 'field_dropdown',
@@ -257,7 +257,7 @@ Blocks['text_getSubstring'] = {
     ];
     this.setHelpUrl(Msg['TEXT_GET_SUBSTRING_HELPURL']);
     this.setStyle('text_blocks');
-    this.appendValueInput('STRING').setCheck('String').appendField(
+    this.appendValueInput('STRING').setCheck(['String', 'StringValue']).appendField(
       Msg['TEXT_GET_SUBSTRING_INPUT_IN_TEXT']);
     this.appendDummyInput('AT1');
     this.appendDummyInput('AT2');
@@ -317,7 +317,7 @@ Blocks['text_getSubstring'] = {
     this.removeInput('ORDINAL' + n, true);
     // Create either a value 'AT' input or a dummy input.
     if (isAt) {
-      this.appendValueInput('AT' + n).setCheck('Number');
+      this.appendValueInput('AT' + n).setCheck(['Number', 'NumberValue']);
       if (Msg['ORDINAL_NUMBER_SUFFIX']) {
         this.appendDummyInput('ORDINAL' + n)
           .appendField(Msg['ORDINAL_NUMBER_SUFFIX']);
@@ -376,7 +376,7 @@ Blocks['text_changeCase'] = {
     ];
     this.setHelpUrl(Msg['TEXT_CHANGECASE_HELPURL']);
     this.setStyle('text_blocks');
-    this.appendValueInput('TEXT').setCheck('String').appendField(
+    this.appendValueInput('TEXT').setCheck(['String', 'StringValue']).appendField(
       new FieldDropdown(OPERATORS), 'CASE');
     this.setOutput(true, 'String');
     this.setTooltip(Msg['TEXT_CHANGECASE_TOOLTIP']);
@@ -396,7 +396,7 @@ Blocks['text_trim'] = {
     ];
     this.setHelpUrl(Msg['TEXT_TRIM_HELPURL']);
     this.setStyle('text_blocks');
-    this.appendValueInput('TEXT').setCheck('String').appendField(
+    this.appendValueInput('TEXT').setCheck(['String', 'StringValue']).appendField(
       new FieldDropdown(OPERATORS), 'MODE');
     this.setOutput(true, 'String');
     this.setTooltip(Msg['TEXT_TRIM_TOOLTIP']);
@@ -439,7 +439,7 @@ const TEXT_PROMPT_COMMON = {
    * @this {Block}
    */
   updateType_: function (newOp) {
-    this.outputConnection.setCheck(newOp === 'NUMBER' ? 'Number' : 'String');
+    this.outputConnection.setCheck(newOp === 'NUMBER' ? ['Number', 'NumberValue'] : ['String', 'StringValue']);
   },
   /**
    * Create XML to represent the output type.
@@ -543,12 +543,12 @@ Blocks['text_count'] = {
         {
           'type': 'input_value',
           'name': 'SUB',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
         {
           'type': 'input_value',
           'name': 'TEXT',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
       ],
       'output': 'Number',
@@ -572,17 +572,17 @@ Blocks['text_replace'] = {
         {
           'type': 'input_value',
           'name': 'FROM',
-          'check': 'String',
+          'check': ['String', 'StringValue']
         },
         {
           'type': 'input_value',
           'name': 'TO',
-          'check': 'String',
+          'check': ['String', 'StringValue']
         },
         {
           'type': 'input_value',
           'name': 'TEXT',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
       ],
       'output': 'String',
@@ -606,7 +606,7 @@ Blocks['text_reverse'] = {
         {
           'type': 'input_value',
           'name': 'TEXT',
-          'check': 'String',
+          'check': ['String', 'StringValue'],
         },
       ],
       'output': 'String',
@@ -919,7 +919,7 @@ const TEXT_CHARAT_MUTATOR_MIXIN = {
     this.removeInput('ORDINAL', true);
     // Create either a value 'AT' input or a dummy input.
     if (isAt) {
-      this.appendValueInput('AT').setCheck('Number');
+      this.appendValueInput('AT').setCheck(['Number', 'NumberValue']);
       if (Msg['ORDINAL_NUMBER_SUFFIX']) {
         this.appendDummyInput('ORDINAL').appendField(
           Msg['ORDINAL_NUMBER_SUFFIX']);

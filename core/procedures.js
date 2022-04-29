@@ -17,6 +17,7 @@ goog.module('Blockly.Procedures');
 
 /* eslint-disable-next-line no-unused-vars */
 const Abstract = goog.requireType('Blockly.Events.Abstract');
+const AlgebraicDatatypes = goog.require('Blockly.AlgebraicDatatypes');
 const Variables = goog.require('Blockly.Variables');
 const Xml = goog.require('Blockly.Xml');
 const eventUtils = goog.require('Blockly.Events.utils');
@@ -27,6 +28,7 @@ const { Block } = goog.requireType('Blockly.Block');
 /* eslint-disable-next-line no-unused-vars */
 const { Field } = goog.requireType('Blockly.Field');
 const { Msg } = goog.require('Blockly.Msg');
+const { Mutator } = goog.require('Blockly.Mutator');
 const { Names } = goog.require('Blockly.Names');
 /* eslint-disable-next-line no-unused-vars */
 const { WorkspaceSvg } = goog.requireType('Blockly.WorkspaceSvg');
@@ -86,9 +88,15 @@ const allProcedures = function (root) {
     root.getBlocksByType('procedures_defreturn', false).map(function (block) {
       return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
     });
+  const proceduresNoReturn =
+    root.getBlocksByType('procedures_defnoreturn', false)
+      .map(function (block) {
+        return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
+      });
   proceduresAnonymous.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
-  return [proceduresAnonymous, proceduresReturn];
+  proceduresNoReturn.sort(procTupleComparator);
+  return [proceduresAnonymous, proceduresReturn, proceduresNoReturn];
 };
 exports.allProcedures = allProcedures;
 
@@ -187,6 +195,7 @@ const rename = function (name) {
     name,
       /** @type {!Block} */(this.getSourceBlock()));
   const oldName = this.getValue();
+
   if (oldName !== name && oldName !== legalName) {
     // Rename any callers.
     const blocks = this.getSourceBlock().workspace.getAllBlocks(false);
@@ -202,6 +211,25 @@ const rename = function (name) {
 };
 exports.rename = rename;
 
+const renameArgCall = function (fieldBlock, name, procedureName) {
+  const oldName = procedureName + "." + fieldBlock.getValue();
+  const revertName = procedureName + "." + fieldBlock.firstChar;
+
+  if (oldName !== name) {
+    const outerWs = Mutator.findParentWs(fieldBlock.getSourceBlock().workspace);
+    const blocks = outerWs.getAllBlocks(false);
+    for (let i = 0; i < blocks.length; i++) {
+      if (blocks[i].renameProcedure) {
+        const procedureBlock = /** @type {!ProcedureBlock} */ (blocks[i]);
+        procedureBlock.renameProcedure(
+            /** @type {string} */(oldName), name, revertName);
+      }
+    }
+  }
+  return name;
+};
+exports.renameArgCall = renameArgCall;
+
 /**
  * Construct the blocks required by the flyout for the procedure category.
  * @param {!Workspace} workspace The workspace containing procedures.
@@ -210,6 +238,20 @@ exports.rename = rename;
  */
 const flyoutCategory = function (workspace) {
   const xmlList = [];
+  // if (Blocks['procedures_defnoreturn']) {
+  //   // <block type="procedures_defnoreturn" gap="16">
+  //   //     <field name="NAME">do something</field>
+  //   // </block>
+  //   const block = utilsXml.createElement('block');
+  //   block.setAttribute('type', 'procedures_defnoreturn');
+  //   block.setAttribute('gap', 16);
+  //   const nameField = utilsXml.createElement('field');
+  //   nameField.setAttribute('name', 'NAME');
+  //   nameField.appendChild(
+  //     utilsXml.createTextNode(Msg['PROCEDURES_DEFNORETURN_PROCEDURE']));
+  //   block.appendChild(nameField);
+  //   xmlList.push(block);
+  // }
   if (Blocks['procedures_defreturn']) {
     // <block type="procedures_defreturn" gap="16">
     //     <field name="NAME">do something</field>
@@ -254,22 +296,31 @@ const flyoutCategory = function (workspace) {
     for (let i = 0; i < procedureList.length; i++) {
       const name = procedureList[i][0];
       const args = procedureList[i][1];
-      if (!procedureList[i][3]) {
-        continue;
+
+      if (procedureList[i][3]) {
+        // <block type="procedures_callnoreturn" gap="16">
+        //   <mutation name="do something">
+        //     <arg name="x"></arg>
+        //   </mutation>
+        // </block>
+        const block = createCallBlock(templateName);
+        const mutation = createCallMutation(name);
+        block.appendChild(mutation);
+        for (let j = 0; j < args.length; j++) {
+          const arg = createCallArg(args[j].name);
+          mutation.appendChild(arg);
+        }
+        xmlList.push(block);
       }
-      // <block type="procedures_callnoreturn" gap="16">
-      //   <mutation name="do something">
-      //     <arg name="x"></arg>
-      //   </mutation>
-      // </block>
-      const block = createCallBlock(templateName);
-      const mutation = createCallMutation(name);
-      block.appendChild(mutation);
+
       for (let j = 0; j < args.length; j++) {
-        const arg = createCallArg(args[j].displayName);
-        mutation.appendChild(arg);
         const type = args[j].type;
         if (type.block_name === "type_function") {
+          // <block type="args_callnoreturn" gap="16">
+          //   <mutation name="do something">
+          //     <arg name="x"></arg>
+          //   </mutation>
+          // </block>
           const argNum = type.inputs.length;
           const subBlock = createCallBlock("args_callreturn");
           const subMutation = createCallMutation(args[j].name);
@@ -281,7 +332,6 @@ const flyoutCategory = function (workspace) {
           xmlList.push(subBlock);
         }
       }
-      xmlList.push(block);
     }
   }
 
@@ -307,6 +357,7 @@ const flyoutCategory = function (workspace) {
   const tuple = allProcedures(workspace);
   populateProcedures(tuple[0], 'args_callreturn');
   populateProcedures(tuple[1], 'procedures_callreturn');
+  populateProcedures(tuple[2], 'procedures_callnoreturn');
   return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
@@ -338,10 +389,25 @@ const updateMutatorFlyout = function (workspace) {
   xmlElement.appendChild(argBlock);
 
   // Our custom mutator blocks
-  const types = ['type_int', 'type_float', 'type_string', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
+  const types = ['type_int', 'type_float', 'type_string', 'type_char', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
   types.forEach(t => {
     xmlElement.appendChild(createTypeBlock(t));
   });
+
+  const outerWs = Mutator.findParentWs(workspace);
+  const algebraicDatatypes = AlgebraicDatatypes.allDatatypes(outerWs);
+  for (let i = 0; i < algebraicDatatypes.length; i++) {
+    const def = algebraicDatatypes[i];
+    const typeBlock = utilsXml.createElement('block');
+    typeBlock.setAttribute('type', 'datatype');
+    typeBlock.setAttribute('gap', 10);
+
+    const typeMutation = utilsXml.createElement('mutation');
+    typeMutation.setAttribute('name', def[0]);
+    typeMutation.setAttribute('items', def[1]);
+    typeBlock.appendChild(typeMutation);
+    xmlElement.appendChild(typeBlock);
+  }
 
   workspace.updateToolbox(xmlElement);
 };
@@ -349,6 +415,7 @@ const updateMutatorFlyout = function (workspace) {
 function createTypeBlock(type) {
   const typeBlock = utilsXml.createElement('block');
   typeBlock.setAttribute('type', type);
+  typeBlock.setAttribute('gap', 10);
   return typeBlock;
 }
 

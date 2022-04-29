@@ -136,8 +136,16 @@ const flyoutCategory = function (workspace) {
 
   xmlList.push(button);
 
+  if (Blocks['value_tuple']) {
+    const tupleBlock = utilsXml.createElement('block');
+    tupleBlock.setAttribute('type', 'value_tuple');
+    tupleBlock.setAttribute('gap', 16);
+    xmlList.push(tupleBlock);
+  }
+
   const blockList = flyoutCategoryBlocks(workspace);
   xmlList = xmlList.concat(blockList);
+
   return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
@@ -499,7 +507,7 @@ exports.generateVariableFieldDom = generateVariableFieldDom;
  *     or name + type combination.
  * @alias Blockly.Variables.getOrCreateVariablePackage
  */
-const getOrCreateVariablePackage = function(workspace, id, opt_name, opt_type, displayName) {
+const getOrCreateVariablePackage = function (workspace, id, opt_name, opt_type, displayName) {
   let variable = getVariable(workspace, id, opt_name, opt_type);
   if (!variable) {
     variable = createVariable(workspace, id, opt_name, opt_type, displayName);
@@ -560,10 +568,11 @@ exports.getVariable = getVariable;
  * @param {?string} id The ID to use to create the variable, or null.
  * @param {string=} opt_name The string to use to create the variable.
  * @param {type=} opt_type The type to use to create the variable.
+ * @param {?string} displayName 
  * @return {!VariableModel} The variable corresponding to the given ID
  *     or name + type combination.
  */
-const createVariable = function (workspace, id, opt_name, opt_type) {
+const createVariable = function (workspace, id, opt_name, opt_type, displayName) {
   const potentialVariableMap = workspace.getPotentialVariableMap();
   // Variables without names get uniquely named for this workspace.
   if (!opt_name) {
@@ -574,9 +583,9 @@ const createVariable = function (workspace, id, opt_name, opt_type) {
   // Create a potential variable if in the flyout.
   let variable = null;
   if (potentialVariableMap) {
-    variable = potentialVariableMap.createVariable(opt_name, opt_type, id);
+    variable = potentialVariableMap.createVariable(opt_name, opt_type, id, displayName);
   } else {  // In the main workspace, create a real variable.
-    variable = workspace.createVariable(opt_name, opt_type, id);
+    variable = workspace.createVariable(opt_name, opt_type, id, false, displayName);
   }
   return variable;
 };

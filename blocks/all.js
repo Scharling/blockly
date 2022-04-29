@@ -21,3 +21,5 @@ goog.require('Blockly.blocks.procedures');
 goog.require('Blockly.blocks.texts');
 goog.require('Blockly.blocks.variables');
 goog.require('Blockly.blocks.variablesDynamic');
+goog.require('Blockly.blocks.algebraicDatatypes');
+goog.require('Blockly.blocks.computationExpressions');
