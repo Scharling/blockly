@@ -87,9 +87,13 @@ const variablesToDom = function(variableList) {
       element.appendChild(typeBlock);
       element.setAttribute('type', variable.type.getType());
     }
+    if (variable.displayName) {
+      element.setAttribute('displayName', variable.displayName);
+    }
     element.id = variable.getId();
     variables.appendChild(element);
   }
+  console.log("variables being dommed", variables, variableList);
   return variables;
 };
 exports.variablesToDom = variablesToDom;
@@ -672,7 +676,12 @@ const domToVariables = function(xmlVariables, workspace) {
     const id = xmlChild.getAttribute('id');
     const name = xmlChild.textContent;
 
-    workspace.createVariable(name, type, id);
+    var displayName = "";
+    if (xmlChild.getAttribute('displayName')) {
+      displayName = xmlChild.getAttribute('displayName');
+    }
+    console.log("dedommed", xmlChild, displayName, type, id, xmlVariables);
+    console.log(workspace.createVariable2(name, type, id, displayName));
   }
 };
 exports.domToVariables = domToVariables;

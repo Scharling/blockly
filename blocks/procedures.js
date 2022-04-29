@@ -51,7 +51,7 @@
   * Common properties for the procedure_defnoreturn and
   * procedure_defreturn blocks.
   */
- const PROCEDURE_DEF_COMMON = {
+const PROCEDURE_DEF_COMMON = {
    /**
     * Add or remove the statement block from this function definition.
     * @param {boolean} hasStatements True if a statement block is needed.
@@ -287,6 +287,7 @@
      if (this.type === 'procedures_defreturn') this.updateIsRec_(state['isRec'] !== "false");
      Procedures.mutateCallers(this);
      this.setStatements_(state['hasStatements'] === false ? false : true);
+     console.log("loadExtraState", this.procedureName, this, state);
    },
    /**
     * Populate the mutator's dialog with this block's components.
@@ -316,6 +317,7 @@
      statementNode.setAttribute('name', 'STACK');
      containerBlockNode.appendChild(statementNode);
  
+     this.procedureName = this.getFieldValue('NAME');
      const outerWs = Mutator.findParentWs(workspace);
      let node = statementNode;
      for (let i = 0; i < this.arguments_.length; i++) {
@@ -332,11 +334,14 @@
  
        const typeNode = xmlUtils.createElement('value');
        typeNode.setAttribute('name', 'TYPE');
-       let varName = "";
-       if (this.procedureName) {
-         varName = this.procedureName + "." + this.arguments_[i];
-       } else {
-         varName = "anonymous." + this.arguments_[i];
+       let varName = this.arguments_[i];
+       if (!(this.arguments_[i].startsWith(this.procedureName + ".") || this.arguments_[i].startsWith("anonymous."))) {
+         console.log("oops", this.arguments_[i]);
+        if (this.procedureName) {
+          varName = this.procedureName + "." + this.arguments_[i];
+        } else {
+          varName = "anonymous." + this.arguments_[i];
+        }
        }
        var variable = outerWs.getVariableMap().getVariableByName(varName);
        console.log("variable", variable, varName, this);
@@ -613,9 +618,9 @@
      }
    },
    callType_: 'procedures_callnoreturn',
- };
+};
  
- Blocks['procedures_defreturn'] = {
+Blocks['procedures_defreturn'] = {
    ...PROCEDURE_DEF_COMMON,
    /**
     * Block for defining a procedure with a return value.
@@ -674,9 +679,9 @@
      });
      return [this.getFieldValue('NAME'), args, true, true, this.returnType_];
    },
- };
+};
  
- Blocks['procedures_anonymous'] = {
+Blocks['procedures_anonymous'] = {
    ...PROCEDURE_DEF_COMMON,
    /**
     * Block for defining an anonymous procedure with a return value.
@@ -736,7 +741,7 @@
      }
      return [name, args, true, createCallBlock, this.returnType_];
    },
- };
+};
  
  // function varNameWasReset(event) {
  //   if (event.type == Blockly.Events.BLOCK_CHANGE &&
@@ -745,8 +750,7 @@
  //     console.log("EVENT CATCHED!!!!!", event);
  //   }
  // }
- 
- Blocks['procedures_mutatorcontainer'] = {
+Blocks['procedures_mutatorcontainer'] = {
    /**
     * Mutator block for procedure container.
     * @this {Block}
@@ -770,9 +774,9 @@
      this.contextMenu = false;
      // this.workspace.addChangeListener(varNameWasReset);
    },
- };
+};
  
- Blocks['procedures_mutatorarg'] = {
+Blocks['procedures_mutatorarg'] = {
    /**
     * Mutator block for procedure argument.
     * @this {Block}
@@ -851,13 +855,13 @@
        }
      }
    },
- };
+};
  
- function isTypedBlock(paramBlock, i) {
-   return paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && (paramBlock.childBlocks_[i].type.startsWith("type_") || paramBlock.childBlocks_[i].type.startsWith("datatype"))
- }
+function isTypedBlock(paramBlock, i) {
+  return paramBlock.childBlocks_[i] && paramBlock.childBlocks_[i].type != null && (paramBlock.childBlocks_[i].type.startsWith("type_") || paramBlock.childBlocks_[i].type.startsWith("datatype"))
+}
  
- function validatorExternal(sourceBlock, varName, thisBlock, rename) {
+function validatorExternal(sourceBlock, varName, thisBlock, rename) {
    var varType = typeUtils.createNullType();
  
    for (var i = 0; i < sourceBlock.childBlocks_.length; i++) {
@@ -930,13 +934,13 @@
      }
    }
    return varName;
- }
+};
  
  /**
   * Common properties for the procedure_callnoreturn and
   * procedure_callreturn blocks.
   */
- const PROCEDURE_CALL_COMMON = {
+const PROCEDURE_CALL_COMMON = {
    /**
     * Returns the name of the procedure this block calls.
     * @return {string} Procedure name.
@@ -1337,8 +1341,8 @@
      };
      options.push(option);
    },
- };
- Blocks['procedures_callreturn'] = {
+};
+Blocks['procedures_callreturn'] = {
    ...PROCEDURE_CALL_COMMON,
    /**
     * Block for calling a procedure with a return value.
@@ -1377,9 +1381,9 @@
    },
  
    defType_: 'procedures_defreturn',
- };
+};
  
- Blocks['args_callreturn'] = {
+Blocks['args_callreturn'] = {
    ...PROCEDURE_CALL_COMMON,
    /**
     * Block for calling a procedure with a return value.
@@ -1956,7 +1960,7 @@ Blocks['procedures_defnoreturn'] = {
      return [this.getFieldValue('NAME'), this.arguments_, false];
    },
    callType_: 'procedures_callnoreturn',
- };
+};
  
 Blocks['procedures_callnoreturn'] = {
   ...PROCEDURE_CALL_COMMON,
