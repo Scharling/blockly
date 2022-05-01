@@ -93,10 +93,23 @@ const allProcedures = function (root) {
       .map(function (block) {
         return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
       });
+  const partialApp1 =
+    root.getBlocksByType('procedures_callreturn', false)
+      .map(function (block) {
+        return /** @type {!ProcedureBlock} */ (block).getCallResults();
+      });
+  const partialApp2 =
+    root.getBlocksByType('args_callreturn', false)
+      .map(function (block) {
+        return /** @type {!ProcedureBlock} */ (block).getCallResults();
+      });
+  const partialApplications = [...partialApp1, ...partialApp2].filter(pa => pa[0]).map(pa => pa[1]);
+  console.log(partialApplications);
   proceduresAnonymous.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
   proceduresNoReturn.sort(procTupleComparator);
-  return [proceduresAnonymous, proceduresReturn, proceduresNoReturn];
+  partialApplications.sort(procTupleComparator);
+  return [proceduresAnonymous, proceduresReturn, partialApplications, proceduresNoReturn];
 };
 exports.allProcedures = allProcedures;
 
@@ -292,7 +305,7 @@ const flyoutCategory = function (workspace) {
    *     value boolean.
    * @param {string} templateName The type of the block to generate.
    */
-  function populateProcedures(procedureList, templateName) {
+  function populateProcedures(procedureList, templateName, createForArgs) {
     for (let i = 0; i < procedureList.length; i++) {
       const name = procedureList[i][0];
       const args = procedureList[i][1];
@@ -312,6 +325,8 @@ const flyoutCategory = function (workspace) {
         }
         xmlList.push(block);
       }
+
+      if (!createForArgs) continue;
 
       for (let j = 0; j < args.length; j++) {
         const type = args[j].type;
@@ -355,9 +370,10 @@ const flyoutCategory = function (workspace) {
   }
 
   const tuple = allProcedures(workspace);
-  populateProcedures(tuple[0], 'args_callreturn');
-  populateProcedures(tuple[1], 'procedures_callreturn');
-  populateProcedures(tuple[2], 'procedures_callnoreturn');
+  populateProcedures(tuple[0], 'args_callreturn', true);
+  populateProcedures(tuple[1], 'procedures_callreturn', true);
+  populateProcedures(tuple[2], 'args_callreturn', false);
+  populateProcedures(tuple[3], 'procedures_callnoreturn', true);
   return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
@@ -515,6 +531,34 @@ const mutateCallers = function (defBlock) {
   }
 };
 exports.mutateCallers = mutateCallers;
+
+/**
+ * When a procedure definition changes its parameters, find and edit all its
+ * callers.
+ * @param {!Block} defBlock Procedure definition block.
+ * @alias Blockly.Procedures.mutateCallers
+ */
+const mutatePartialCallers = function (defBlock) {
+  const procedureBlock = /** @type {!ProcedureBlock} */ (defBlock);
+  let name;
+  if (procedureBlock.getCallResults) {
+    if (procedureBlock.getCallResults()[0]) {
+      name = procedureBlock.getCallResults()[1][0];
+    } else {
+      return;
+    }
+  } else {
+    return;
+  }
+  const xmlElement = defBlock.mutationToDom(true);
+  const callers = getCallers(name, defBlock.workspace);
+  for (let i = 0, caller; (caller = callers[i]); i++) {
+    const oldMutationDom = caller.mutationToDom();
+    const oldMutation = oldMutationDom && Xml.domToText(oldMutationDom);
+    caller.mutatePartialApplicationCall(xmlElement);
+  }
+};
+exports.mutatePartialCallers = mutatePartialCallers;
 
 /**
  * Find the definition block for the named procedure.
