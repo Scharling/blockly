@@ -591,6 +591,23 @@ exports.appendDomToWorkspace = appendDomToWorkspace;
  * @alias Blockly.Xml.domToBlock
  */
 const domToBlock = function(xmlBlock, workspace, procedureName) {
+  console.log("domToBlock", xmlBlock, workspace, procedureName);
+
+  if (!procedureName) {
+    var type = xmlBlock.getAttribute('type');
+    if (type == "procedures_defreturn") {
+      for (var i = 0; i < xmlBlock.childNodes; i++) {
+        var child = xmlBlock.childNodes[i];
+        console.log("child", child);
+        if (child.nodeType == "field" && child.nodeName == "NAME") {
+          console.log("boingsoad");
+        }
+      }
+    }
+  }
+  
+  console.log("domToBlock post update", xmlBlock, workspace, procedureName);
+
   const {Workspace} = goog.module.get('Blockly.Workspace');
   if (xmlBlock instanceof Workspace) {
     const swap = xmlBlock;
@@ -681,7 +698,8 @@ const domToVariables = function(xmlVariables, workspace) {
       displayName = xmlChild.getAttribute('displayName');
     }
     console.log("dedommed", xmlChild, displayName, type, id, xmlVariables);
-    console.log(workspace.createVariable2(name, type, id, displayName));
+    var cVar = workspace.createVariable2(name, type, id, displayName);
+    console.log("dedom2", cVar);
   }
 };
 exports.domToVariables = domToVariables;
@@ -939,6 +957,7 @@ const domToBlockHeadless = function(
   const id = xmlBlock.getAttribute('id');
   block = workspace.newBlock(prototypeName, id);
   block.procedureName = procedureName;
+  console.log("domToBlockHeadless", block, procedureName);
   // Preprocess childNodes so tags can be processed in a consistent order.
   const xmlChildNameMap = mapSupportedXmlTags(xmlBlock);
 

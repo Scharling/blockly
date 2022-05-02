@@ -161,6 +161,7 @@ const flyoutCategoryBlocks = function (workspace) {
   if (procedures.length > 0) {
     if (Blocks['variables_get']) {
       procedures.forEach(element => {
+        console.log("flyoutCategoryBlocks", element, workspace, procedures);
         const varType = typeUtils.createFunctionType(element[1].map(a => a.type), element[4]);
         getOrCreateVariablePackage(workspace, '', element[0], varType);
       });
@@ -219,11 +220,14 @@ const allProcedures = function (root) {
         return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
       });
   const proceduresReturn =
-    root.getBlocksByType('procedures_defreturn', false).map(function (block) {
+    root.getBlocksByType('procedures_defreturn', false)
+      .map(function (block) {
       return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
     });
   proceduresAnonymous.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
+  console.log("boop", root.getBlocksByType('procedures_defreturn', false));
+  console.log("allProcedures", root, proceduresAnonymous, proceduresReturn);
   return [proceduresAnonymous, proceduresReturn];
 };
 

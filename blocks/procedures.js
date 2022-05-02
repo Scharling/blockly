@@ -675,8 +675,10 @@ Blocks['procedures_defreturn'] = {
        const varName = this.procedureName + "." + argName;
  
        const variable = this.workspace.getVariableMap().getVariableByName(varName);
+       console.log("variable?", variable, this.argumentVarModels_);
        args.push(variable);
      });
+     console.log("getProcedureDef", this, args);
      return [this.getFieldValue('NAME'), args, true, true, this.returnType_];
    },
 };
@@ -1957,7 +1959,9 @@ Blocks['procedures_defnoreturn'] = {
     * @this {Block}
     */
    getProcedureDef: function () {
-     return [this.getFieldValue('NAME'), this.arguments_, false];
+      console.log("getProcedureDef", this);
+      console.trace();
+     return [this.getFieldValue('NAME'), this.argumentVarModels_, false];
    },
    callType_: 'procedures_callnoreturn',
 };
