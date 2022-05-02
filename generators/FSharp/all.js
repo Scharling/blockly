@@ -19,4 +19,5 @@ goog.require('Blockly.FSharp.variables');
 goog.require('Blockly.FSharp.variablesDynamic');
 goog.require('Blockly.FSharp.types');
 goog.require('Blockly.FSharp.lists');
+goog.require('Blockly.FSharp.option');
 

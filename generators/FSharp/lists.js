@@ -1,11 +1,5 @@
 /**
- * @license
- * Copyright 2012 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
- * @fileoverview Generating Python for list blocks.
+ * @fileoverview Generating FSharp for list blocks.
  */
 'use strict';
 
