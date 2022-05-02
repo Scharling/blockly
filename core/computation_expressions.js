@@ -26,6 +26,8 @@ const { Names } = goog.require('Blockly.Names');
 const { WorkspaceSvg } = goog.requireType('Blockly.WorkspaceSvg');
 const { Workspace } = goog.require('Blockly.Workspace');
 
+const typeUtils = goog.require('Blockly.extra.utils.types');
+
 /**
  * String for use in the "custom" attribute of a category in toolbox XML.
  * This string indicates that the category should be dynamically populated with
@@ -193,16 +195,16 @@ const flyoutCategory = function (workspace) {
         const bindArgM = utilsXml.createElement('arg');
         bindArgM.setAttribute('name', 'm');
         bindArgM.setAttribute('displayName', 'm');
+
         const bindArgF = utilsXml.createElement('arg');
         bindArgF.setAttribute('name', 'f');
         bindArgF.setAttribute('displayName', 'f');
+
         bindMutation.appendChild(bindArgM);
         bindMutation.appendChild(bindArgF);
 
         workspace.createVariable('anonymous.m', null, null, true, "m");
-        workspace.createVariable('anonymous.f',  null, null, true, "f");
-
-
+        workspace.createVariable('anonymous.f', typeUtils.createFunctionType([], null), null, true, "f");
         bindBlock.appendChild(bindMutation);
 
         value1.appendChild(bindBlock);
@@ -223,14 +225,36 @@ const flyoutCategory = function (workspace) {
         returnArg.setAttribute('displayName', 'x');
         returnMutation.appendChild(returnArg);
 
-        workspace.createVariable('anonymous.x',  null, null, true, "x");
+        workspace.createVariable('anonymous.x', null, null, true, "x");
 
         returnBlock.appendChild(returnMutation);
 
         value2.appendChild(returnBlock);
 
         block.appendChild(value2);
-        
+
+        const value3 = utilsXml.createElement('value');
+        value3.setAttribute('name', 'RETURNFROM');
+
+        const returnFromBlock = utilsXml.createElement('block');
+        returnFromBlock.setAttribute('type', 'procedures_anonymous');
+
+        const returnFromMutation = utilsXml.createElement('mutation');
+        returnFromMutation.setAttribute('name', 'ReturnFrom');
+
+        const returnFromArg = utilsXml.createElement('arg');
+        returnFromArg.setAttribute('name', 'x');
+        returnFromArg.setAttribute('displayName', 'x');
+        returnFromMutation.appendChild(returnFromArg);
+
+        //workspace.createVariable('anonymous.x', null, null, true, "x");
+
+        returnFromBlock.appendChild(returnFromMutation);
+
+        value3.appendChild(returnFromBlock);
+
+        block.appendChild(value3);
+
         xmlList.push(block);
     }
     if (Blocks['comp_let']) {
@@ -244,6 +268,20 @@ const flyoutCategory = function (workspace) {
         // <block type="comp_return" gap="16"></block>
         const block = utilsXml.createElement('block');
         block.setAttribute('type', 'comp_return');
+        block.setAttribute('gap', 16);
+        xmlList.push(block);
+    }
+    if (Blocks['comp_returnFrom']) {
+        // <block type="comp_returnFrom" gap="16"></block>
+        const block = utilsXml.createElement('block');
+        block.setAttribute('type', 'comp_returnFrom');
+        block.setAttribute('gap', 16);
+        xmlList.push(block);
+    }
+    if (Blocks['comp_do']) {
+        // <block type="comp_do" gap="16"></block>
+        const block = utilsXml.createElement('block');
+        block.setAttribute('type', 'comp_do');
         block.setAttribute('gap', 16);
         xmlList.push(block);
     }

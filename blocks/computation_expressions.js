@@ -60,6 +60,10 @@ Blockly.Blocks['comp_builder'] = {
             .setCheck(null)
             .setAlign(Blockly.ALIGN_RIGHT)
             .appendField("Return(x)");
+        this.appendValueInput("RETURNFROM")
+            .setCheck(null)
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .appendField("ReturnFrom(x)");
         this.setColour(20);
         this.setTooltip("");
         this.setHelpUrl("");
@@ -141,7 +145,43 @@ Blockly.Blocks['comp_workflow'] = {
     },
 };
 
+const COMP_METHODS_COMMON = {
+    /**
+     * Called whenever anything on the workspace changes.
+     * Add warning if this case block is not nested inside a type workflow block.
+     * @param {!AbstractEvent} _e Change event.
+     * @this {Block}
+     */
+    onchange: function (_e) {
+        if (this.workspace.isDragging && this.workspace.isDragging()) {
+            return;  // Don't change state at the start of a drag.
+        }
+        let legal = false;
+        // Is the block nested in a procedure?
+        let block = this;
+        do {
+            if (block.type === 'comp_workflow') {
+                legal = true;
+                break;
+            }
+            block = block.getSurroundParent();
+        } while (block);
+        if (legal) {
+            this.setWarningText(null);
+            if (!this.isInFlyout) {
+                this.setEnabled(true);
+            }
+        } else {
+            this.setWarningText('Warning: This block may be used only within a computation expression workflow block.');
+            if (!this.isInFlyout && !this.getInheritedDisabled()) {
+                this.setEnabled(false);
+            }
+        }
+    },
+}
+
 Blockly.Blocks['comp_let'] = {
+    ...COMP_METHODS_COMMON,
     init: function () {
         this.appendValueInput("VALUE")
             .setCheck(null)
@@ -154,41 +194,10 @@ Blockly.Blocks['comp_let'] = {
         this.setTooltip("");
         this.setHelpUrl("");
     },
-    /**
-     * Called whenever anything on the workspace changes.
-     * Add warning if this case block is not nested inside a type workflow block.
-     * @param {!AbstractEvent} _e Change event.
-     * @this {Block}
-     */
-    onchange: function (_e) {
-        if (this.workspace.isDragging && this.workspace.isDragging()) {
-            return;  // Don't change state at the start of a drag.
-        }
-        let legal = false;
-        // Is the block nested in a procedure?
-        let block = this;
-        do {
-            if (block.type === 'comp_workflow') {
-                legal = true;
-                break;
-            }
-            block = block.getSurroundParent();
-        } while (block);
-        if (legal) {
-            this.setWarningText(null);
-            if (!this.isInFlyout) {
-                this.setEnabled(true);
-            }
-        } else {
-            this.setWarningText('Warning: This block may be used only within a computation expression workflow block.');
-            if (!this.isInFlyout && !this.getInheritedDisabled()) {
-                this.setEnabled(false);
-            }
-        }
-    },
 };
 
 Blockly.Blocks['comp_return'] = {
+    ...COMP_METHODS_COMMON,
     init: function () {
         this.appendValueInput("VALUE")
             .setCheck(null)
@@ -199,36 +208,34 @@ Blockly.Blocks['comp_return'] = {
         this.setTooltip("");
         this.setHelpUrl("");
     },
-    /**
-     * Called whenever anything on the workspace changes.
-     * Add warning if this case block is not nested inside a type workflow block.
-     * @param {!AbstractEvent} _e Change event.
-     * @this {Block}
-     */
-    onchange: function (_e) {
-        if (this.workspace.isDragging && this.workspace.isDragging()) {
-            return;  // Don't change state at the start of a drag.
-        }
-        let legal = false;
-        // Is the block nested in a procedure?
-        let block = this;
-        do {
-            if (block.type === 'comp_workflow') {
-                legal = true;
-                break;
-            }
-            block = block.getSurroundParent();
-        } while (block);
-        if (legal) {
-            this.setWarningText(null);
-            if (!this.isInFlyout) {
-                this.setEnabled(true);
-            }
-        } else {
-            this.setWarningText('Warning: This block may be used only within a computation expression workflow block.');
-            if (!this.isInFlyout && !this.getInheritedDisabled()) {
-                this.setEnabled(false);
-            }
-        }
+};
+
+
+Blockly.Blocks['comp_returnFrom'] = {
+    ...COMP_METHODS_COMMON,
+    init: function () {
+        this.appendValueInput("VALUE")
+            .setCheck(null)
+            .appendField("return!");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(20);
+        this.setTooltip("");
+        this.setHelpUrl("");
+    },
+};
+
+
+Blockly.Blocks['comp_do'] = {
+    ...COMP_METHODS_COMMON,
+    init: function () {
+        this.appendValueInput("VALUE")
+            .setCheck(null)
+            .appendField("do!");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(20);
+        this.setTooltip("");
+        this.setHelpUrl("");
     },
 };

@@ -104,7 +104,6 @@ const allProcedures = function (root) {
         return /** @type {!ProcedureBlock} */ (block).getCallResults();
       });
   const partialApplications = [...partialApp1, ...partialApp2].filter(pa => pa[0]).map(pa => pa[1]);
-  console.log(partialApplications);
   proceduresAnonymous.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
   proceduresNoReturn.sort(procTupleComparator);
@@ -310,7 +309,7 @@ const flyoutCategory = function (workspace) {
       const name = procedureList[i][0];
       const args = procedureList[i][1];
 
-      if (procedureList[i][3]) {
+      if (procedureList[i][3] && args.length > 0) {
         // <block type="procedures_callnoreturn" gap="16">
         //   <mutation name="do something">
         //     <arg name="x"></arg>
@@ -330,7 +329,7 @@ const flyoutCategory = function (workspace) {
 
       for (let j = 0; j < args.length; j++) {
         const type = args[j].type;
-        if (type.block_name === "type_function") {
+        if (type.block_name === "type_function" && type.inputs.length > 0) {
           // <block type="args_callnoreturn" gap="16">
           //   <mutation name="do something">
           //     <arg name="x"></arg>
