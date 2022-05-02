@@ -71,3 +71,15 @@ FSharp['comp_return'] = function (block) {
         FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '0';
     return 'return ' + argument0 + '\n';
 }
+
+FSharp['comp_returnFrom'] = function (block) {
+    const argument0 =
+        FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '0';
+    return 'return! ' + argument0 + '\n';
+}
+
+FSharp['comp_do'] = function (block) {
+    const argument0 =
+        FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '0';
+    return 'do! ' + argument0 + '\n';
+}

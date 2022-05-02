@@ -745,7 +745,7 @@ Blocks['procedures_anonymous'] = {
   getProcedureDef: function () {
     const args = [];
     this.arguments_.forEach(argName => {
-      const variable = this.workspace.getVariableMap().getVariableByName(argName);
+      const variable = this.workspace.getVariableMap().getVariableByName('anonymous.' + argName);
       args.push(variable);
     });
     let name = this.id;
