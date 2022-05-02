@@ -87,9 +87,13 @@ const variablesToDom = function(variableList) {
       element.appendChild(typeBlock);
       element.setAttribute('type', variable.type.getType());
     }
+    if (variable.displayName) {
+      element.setAttribute('displayName', variable.displayName);
+    }
     element.id = variable.getId();
     variables.appendChild(element);
   }
+  console.log("variables being dommed", variables, variableList);
   return variables;
 };
 exports.variablesToDom = variablesToDom;
@@ -587,6 +591,23 @@ exports.appendDomToWorkspace = appendDomToWorkspace;
  * @alias Blockly.Xml.domToBlock
  */
 const domToBlock = function(xmlBlock, workspace, procedureName) {
+  console.log("domToBlock", xmlBlock, workspace, procedureName);
+
+  if (!procedureName) {
+    var type = xmlBlock.getAttribute('type');
+    if (type == "procedures_defreturn") {
+      for (var i = 0; i < xmlBlock.childNodes; i++) {
+        var child = xmlBlock.childNodes[i];
+        console.log("child", child);
+        if (child.nodeType == "field" && child.nodeName == "NAME") {
+          console.log("boingsoad");
+        }
+      }
+    }
+  }
+  
+  console.log("domToBlock post update", xmlBlock, workspace, procedureName);
+
   const {Workspace} = goog.module.get('Blockly.Workspace');
   if (xmlBlock instanceof Workspace) {
     const swap = xmlBlock;
@@ -672,7 +693,13 @@ const domToVariables = function(xmlVariables, workspace) {
     const id = xmlChild.getAttribute('id');
     const name = xmlChild.textContent;
 
-    workspace.createVariable(name, type, id);
+    var displayName = "";
+    if (xmlChild.getAttribute('displayName')) {
+      displayName = xmlChild.getAttribute('displayName');
+    }
+    console.log("dedommed", xmlChild, displayName, type, id, xmlVariables);
+    var cVar = workspace.createVariable2(name, type, id, displayName);
+    console.log("dedom2", cVar);
   }
 };
 exports.domToVariables = domToVariables;
@@ -930,6 +957,7 @@ const domToBlockHeadless = function(
   const id = xmlBlock.getAttribute('id');
   block = workspace.newBlock(prototypeName, id);
   block.procedureName = procedureName;
+  console.log("domToBlockHeadless", block, procedureName);
   // Preprocess childNodes so tags can be processed in a consistent order.
   const xmlChildNameMap = mapSupportedXmlTags(xmlBlock);
 

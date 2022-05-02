@@ -287,6 +287,7 @@ const PROCEDURE_DEF_COMMON = {
     if (this.type === 'procedures_defreturn') this.updateIsRec_(state['isRec'] !== "false");
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
+    console.log("loadExtraState", this.procedureName, this, state);
   },
   /**
    * Populate the mutator's dialog with this block's components.
@@ -316,6 +317,7 @@ const PROCEDURE_DEF_COMMON = {
     statementNode.setAttribute('name', 'STACK');
     containerBlockNode.appendChild(statementNode);
 
+    this.procedureName = this.getFieldValue('NAME');
     const outerWs = Mutator.findParentWs(workspace);
     let node = statementNode;
     for (let i = 0; i < this.arguments_.length; i++) {
@@ -332,11 +334,14 @@ const PROCEDURE_DEF_COMMON = {
 
       const typeNode = xmlUtils.createElement('value');
       typeNode.setAttribute('name', 'TYPE');
-      let varName = "";
-      if (this.procedureName) {
-        varName = this.procedureName + "." + this.arguments_[i];
-      } else {
-        varName = "anonymous." + this.arguments_[i];
+      let varName = this.arguments_[i];
+      if (!(this.arguments_[i].startsWith(this.procedureName + ".") || this.arguments_[i].startsWith("anonymous."))) {
+        console.log("oops", this.arguments_[i]);
+        if (this.procedureName) {
+          varName = this.procedureName + "." + this.arguments_[i];
+        } else {
+          varName = "anonymous." + this.arguments_[i];
+        }
       }
       var variable = outerWs.getVariableMap().getVariableByName(varName);
       console.log("variable", variable, varName, this);
@@ -670,8 +675,10 @@ Blocks['procedures_defreturn'] = {
       const varName = this.procedureName + "." + argName;
 
       const variable = this.workspace.getVariableMap().getVariableByName(varName);
+      console.log("variable?", variable, this.argumentVarModels_);
       args.push(variable);
     });
+    console.log("getProcedureDef", this, args);
     return [this.getFieldValue('NAME'), args, true, true, this.returnType_];
   },
 };
@@ -745,7 +752,6 @@ Blocks['procedures_anonymous'] = {
 //     console.log("EVENT CATCHED!!!!!", event);
 //   }
 // }
-
 Blocks['procedures_mutatorcontainer'] = {
   /**
    * Mutator block for procedure container.
@@ -930,7 +936,17 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
     }
   }
   return varName;
-}
+};
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Common properties for the procedure_callnoreturn and

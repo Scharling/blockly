@@ -173,7 +173,7 @@ VariableMap.prototype.renameVariableWithConflict_ = function (
  *     a UUID.
  * @return {!VariableModel} The newly created variable.
  */
-VariableMap.prototype.createVariable = function (name, opt_type, opt_id, displayName) {
+VariableMap.prototype.createVariable = function(name, opt_type, opt_id, displayName) {
   console.log("createVariable called", name, opt_type, opt_id, displayName);
   console.trace();
   let variable = this.getVariable(name, opt_type);
