@@ -36,15 +36,33 @@ FSharp['lists_isEmpty'] = function (block) {
     return [code, FSharp.ORDER_FUNCTION_APPLICATION];
 };
 
+FSharp['lists_sort'] = function (block) {
+    const list = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '[]';
+    const code = 'List.sort ' + list;
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
+
+FSharp['lists_cons'] = function (block) {
+    const value = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || null;
+    const list = FSharp.valueToCode(block, 'LIST', FSharp.ORDER_NONE) || '[]';
+    const code = value === null ? list : value + '::' + list;
+    return [code, FSharp.ORDER_ADDITIVE];
+};
+
+FSharp['lists_append'] = function (block) {
+    const list1 = FSharp.valueToCode(block, 'LIST1', FSharp.ORDER_NONE) || '[]';
+    const list2 = FSharp.valueToCode(block, 'LIST2', FSharp.ORDER_NONE) || '[]';
+    const code = list1 + '@' + list2;
+    return [code, FSharp.ORDER_ADDITIVE];
+};
+
 FSharp['lists_getHead'] = function (block) {
-    // Is the string null or array empty?
     const list = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '[]';
     const code = list + '.Head';
     return [code, FSharp.ORDER_FUNCTION_APPLICATION];
 };
 
 FSharp['lists_getTail'] = function (block) {
-    // Is the string null or array empty?
     const list = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || '[]';
     const code = list + '.Tail';
     return [code, FSharp.ORDER_FUNCTION_APPLICATION];
@@ -84,13 +102,44 @@ FSharp['lists_getTail'] = function (block) {
 // };
 
 FSharp['lists_getIndex'] = function (block) {
-    // Get element at index.
-    // Note: Until January 2013 this block did not have MODE or WHERE inputs.
     const listOrder = FSharp.ORDER_MEMBER;
     const list = FSharp.valueToCode(block, 'VALUE', listOrder) || '[]';
     const at = FSharp.getAdjustedInt(block, 'AT');
     const code = list + '[' + at + ']';
     return [code, FSharp.ORDER_MEMBER];
+};
+
+FSharp['lists_exists'] = function (block) {
+    const listOrder = FSharp.ORDER_MEMBER;
+    const list = FSharp.valueToCode(block, 'LIST', listOrder) || '[]';
+    const func = FSharp.valueToCode(block, 'FUNCTION', listOrder) || "fun elem -> true";
+    const code = 'List.exists' + ' (' + func + ') ' + list;
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
+
+FSharp['lists_map'] = function (block) {
+    const listOrder = FSharp.ORDER_MEMBER;
+    const list = FSharp.valueToCode(block, 'LIST', listOrder) || '[]';
+    const func = FSharp.valueToCode(block, 'FUNCTION', listOrder) || "fun elem -> elem";
+    const code = 'List.map' + ' (' + func + ') ' + list;
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
+
+FSharp['lists_filter'] = function (block) {
+    const listOrder = FSharp.ORDER_MEMBER;
+    const list = FSharp.valueToCode(block, 'LIST', listOrder) || '[]';
+    const func = FSharp.valueToCode(block, 'FUNCTION', listOrder) || "fun elem -> true";
+    const code = 'List.filter' + ' (' + func + ') ' + list;
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
+};
+
+FSharp['lists_fold'] = function (block) {
+    const listOrder = FSharp.ORDER_MEMBER;
+    const list = FSharp.valueToCode(block, 'LIST', listOrder) || '[]';
+    const func = FSharp.valueToCode(block, 'FUNCTION', listOrder) || "fun acc elem -> acc";
+    const acc = FSharp.valueToCode(block, 'VALUE', listOrder) || "0";
+    const code = 'List.fold' + ' (' + func + ') ' + acc + ' ' + list;
+    return [code, FSharp.ORDER_FUNCTION_APPLICATION];
 };
 
 // Python['lists_setIndex'] = function(block) {
