@@ -161,7 +161,6 @@ const flyoutCategoryBlocks = function (workspace) {
   if (procedures.length > 0) {
     if (Blocks['variables_get']) {
       procedures.forEach(element => {
-        console.log("flyoutCategoryBlocks", element, workspace, procedures);
         const varType = typeUtils.createFunctionType(element[1].map(a => a.type), element[4]);
         getOrCreateVariablePackage(workspace, '', element[0], varType);
       });
@@ -198,17 +197,19 @@ const flyoutCategoryBlocks = function (workspace) {
 
     if (Blocks['variables_get']) {
       variableModelList.sort(VariableModel.compareByName);
+      var varSet = new Set();
       for (let i = 0, variable; (variable = variableModelList[i]); i++) {
-        const block = utilsXml.createElement('block');
-        block.setAttribute('type', 'variables_get');
-        block.setAttribute('gap', 8);
-        console.log(variable);
-        block.appendChild(generateVariableFieldDom(variable));
-        xmlList.push(block);
+        if (!varSet.has(variable.name)){
+          const block = utilsXml.createElement('block');
+          block.setAttribute('type', 'variables_get');
+          block.setAttribute('gap', 8);
+          block.appendChild(generateVariableFieldDom(variable, true));
+          xmlList.push(block);
+          varSet.add(variable.displayName);
+        }
       }
     }
   }
-
   return xmlList;
 };
 exports.flyoutCategoryBlocks = flyoutCategoryBlocks;
@@ -483,7 +484,7 @@ exports.nameUsedWithAnyType = nameUsedWithAnyType;
  * @return {?Element} The generated DOM.
  * @alias Blockly.Variables.generateVariableFieldDom
  */
-const generateVariableFieldDom = function (variableModel) {
+const generateVariableFieldDom = function (variableModel, useDisplayName) {
   /* Generates the following XML:
    * <field name="VAR" id="goKTKmYJ8DhVHpruv" variabletype="int">foo</field>
    */
@@ -492,7 +493,12 @@ const generateVariableFieldDom = function (variableModel) {
   field.setAttribute('name', 'VAR');
   field.setAttribute('id', variableModel.getId());
   field.setAttribute('variabletype', variableModel.type.getType());
-  const name = utilsXml.createTextNode(variableModel.name);
+  var name = "";
+  if (useDisplayName) {
+    name = utilsXml.createTextNode(variableModel.displayName);
+  } else {
+    name = utilsXml.createTextNode(variableModel.name);
+  }
   field.appendChild(name);
   return field;
 };

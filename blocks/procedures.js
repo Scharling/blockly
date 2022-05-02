@@ -85,13 +85,12 @@ const PROCEDURE_DEF_COMMON = {
       for (var i = 0; i < this.arguments_.length; i++) {
         let arg = this.arguments_[i];
         let varName = "";
-        if (this.procedureName) {
+        if (this.getProcedureName()) {
           varName = this.procedureName + "." + arg;
         } else {
           varName = "anonymous." + arg;
         }
 
-        console.log("arg", arg, this.procedureName, varName)
         let variable = this.workspace.getVariableMap().getVariableByName(varName);
 
         console.log("var", variable, this.workspace.getVariableMap())
@@ -195,11 +194,13 @@ const PROCEDURE_DEF_COMMON = {
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
         const varName = childNode.getAttribute('name');
+        const displayName = childNode.getAttribute('displayName');
+        const type = childNode.getAttribute('type');
         const varId =
           childNode.getAttribute('varid') || childNode.getAttribute('varId');
-        this.arguments_.push(varName);
+        this.arguments_.push(displayName);
         const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, varId, varName, '', childNode.getAttribute('displayName'));
+          this.workspace, varId, varName, childNode.getAttribute('type'), childNode.getAttribute('displayName'));
         if (variable !== null) {
           this.argumentVarModels_.push(variable);
         } else {
@@ -251,7 +252,7 @@ const PROCEDURE_DEF_COMMON = {
     if (!this.hasStatements_) {
       state['hasStatements'] = false;
     }
-    if (this.procedureName) {
+    if (this.getProcedureName()) {
       state['procedureName'] = this.procedureName;
     }
 
@@ -336,7 +337,6 @@ const PROCEDURE_DEF_COMMON = {
       typeNode.setAttribute('name', 'TYPE');
       let varName = this.arguments_[i];
       if (!(this.arguments_[i].startsWith(this.procedureName + ".") || this.arguments_[i].startsWith("anonymous."))) {
-        console.log("oops", this.arguments_[i]);
         if (this.procedureName) {
           varName = this.procedureName + "." + this.arguments_[i];
         } else {
@@ -344,7 +344,6 @@ const PROCEDURE_DEF_COMMON = {
         }
       }
       var variable = outerWs.getVariableMap().getVariableByName(varName);
-      console.log("variable", variable, varName, this);
       const typeBlockNode = typeUtils.createBlockFromType(variable.type);
 
       if (typeBlockNode != null) {
@@ -355,10 +354,8 @@ const PROCEDURE_DEF_COMMON = {
       node = nextNode;
     }
 
-
-    this.procedureName = this.getFieldValue('NAME');
     var procedureName = "";
-    if (this.procedureName) {
+    if (this.getProcedureName()) {
       procedureName = this.procedureName;
     } else {
       procedureName = "anonymous";
@@ -417,7 +414,7 @@ const PROCEDURE_DEF_COMMON = {
       this.arguments_.push(varName);
 
       var varMapName = "";
-      if (this.procedureName) {
+      if (this.getProcedureName()) {
         varMapName = this.procedureName + "." + varName;
       } else {
         varMapName = "anonymous." + varName;
@@ -495,6 +492,20 @@ const PROCEDURE_DEF_COMMON = {
    */
   getVarModels: function () {
     return this.argumentVarModels_;
+  },
+  /**
+   * Return procedureName.
+   * @return {!String} procedureName
+   * @this {Block}
+   */
+  getProcedureName: function () {
+    if (this.procedureName) {
+      return this.procedureName;
+    } else {
+      var procedureName = this.getFieldValue("NAME");
+      this.procedureName = procedureName;
+      return this.procedureName;
+    }
   },
   /**
    * Notification that a variable is renaming.
@@ -670,6 +681,7 @@ Blocks['procedures_defreturn'] = {
    * @this {Block}
    */
   getProcedureDef: function () {
+    /*
     const args = [];
     this.arguments_.forEach(argName => {
       const varName = this.procedureName + "." + argName;
@@ -678,8 +690,9 @@ Blocks['procedures_defreturn'] = {
       console.log("variable?", variable, this.argumentVarModels_);
       args.push(variable);
     });
-    console.log("getProcedureDef", this, args);
-    return [this.getFieldValue('NAME'), args, true, true, this.returnType_];
+    console.log("getProcedureDef", this, args, this.argumentVarModels_);
+    */
+    return [this.getFieldValue('NAME'), this.argumentVarModels_, true, true, this.returnType_];
   },
 };
 
@@ -938,16 +951,6 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
   return varName;
 };
 
-
-
-
-
-
-
-
-
-
-
 /**
  * Common properties for the procedure_callnoreturn and
  * procedure_callreturn blocks.
@@ -971,7 +974,7 @@ const PROCEDURE_CALL_COMMON = {
    * @private
    * @this {Block}
    */
-  setProcedureParameters_: function (paramNames, paramIds) {
+  setProcedureParameters_: function (paramNames, paramIds, displayNames, types) {
     // Data structures:
     // this.arguments = ['x', 'y']
     //     Existing param names.
@@ -1036,7 +1039,7 @@ const PROCEDURE_CALL_COMMON = {
       this.argumentVarModels_ = [];
       for (let i = 0; i < this.arguments_.length; i++) {
         const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, null, this.arguments_[i], '', 'if you see this, inform oliver :)');
+          this.workspace, null, this.arguments_[i], (types && types[i]) ? types[i] : "", (displayNames && displayNames[i]) ? displayNames[i] : "");
         this.argumentVarModels_.push(variable);
       }
     }
@@ -1117,7 +1120,8 @@ const PROCEDURE_CALL_COMMON = {
       const argField = this.getField('ARGNAME' + i);
       const variable = this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
       const extraType = (variable) ? " (" + variable?.type.getType() + ")" : "";
-      const text = this.arguments_[i] + extraType;
+      const argName = (this.argumentVarModels_[i]) ? this.argumentVarModels_[i].displayName : this.arguments_[i];
+      const text = argName + extraType;
       if (argField) {
         // Ensure argument name is up to date.
         // The argument name field is deterministic based on the mutation,
@@ -1194,13 +1198,19 @@ const PROCEDURE_CALL_COMMON = {
     this.argCount_ = argCount ?? 'ALL';
     const args = [];
     const paramIds = [];
+    const displayNames = [];
+    const types = [];
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
         args.push(childNode.getAttribute('name'));
         paramIds.push(childNode.getAttribute('paramId'));
+        displayNames.push(childNode.getAttribute('displayName'));
+        if (childNode.childNodes[0] && childNode.childNodes[0].getAttribute('type')) {
+          types.push(typeUtils.createTypeFromXml(childNode.childNodes[0]));
+        }
       }
     }
-    this.setProcedureParameters_(args, paramIds);
+    this.setProcedureParameters_(args, paramIds, displayNames, types);
   },
   /**
    * Returns the state of this block as a JSON serializable object.
@@ -1214,6 +1224,15 @@ const PROCEDURE_CALL_COMMON = {
     if (this.arguments_.length) {
       state['params'] = this.arguments_;
     }
+    const displayNames = [];
+    const types = [];
+    for (var i = 0; i < this.argumentVarModels_.length; i++) {
+      var element = this.argumentVarModels_[i];
+      displayNames.push(element.displayName);
+      types.push(element.type);
+    }
+    state['displayNames'] = displayNames;
+    state['types'] = types;
     return state;
   },
   /**
@@ -1229,7 +1248,7 @@ const PROCEDURE_CALL_COMMON = {
       const ids = [];
       ids.length = params.length;
       ids.fill(null);
-      this.setProcedureParameters_(params, ids);
+      this.setProcedureParameters_(params, ids, state['displayNames'], state['types']);
     }
   },
   /**
@@ -1622,7 +1641,7 @@ Blocks['procedures_defnoreturn'] = {
    * @this {Block}
    */
   getProcedureDef: function () {
-    return [this.getFieldValue('NAME'), this.arguments_, false];
+    return [this.getFieldValue('NAME'), this.argumentsVarModels_, false];
   },
   callType_: 'procedures_callnoreturn',
 };

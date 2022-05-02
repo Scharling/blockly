@@ -36,6 +36,7 @@ const { Workspace } = goog.require('Blockly.Workspace');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.BlockChange');
 
+const typeUtils = goog.require('Blockly.extra.utils.types');
 
 /**
  * String for use in the "custom" attribute of a category in toolbox XML.
@@ -320,7 +321,7 @@ const flyoutCategory = function (workspace) {
         const mutation = createCallMutation(name);
         block.appendChild(mutation);
         for (let j = 0; j < args.length; j++) {
-          const arg = createCallArg(args[j].name);
+          const arg = createCallArg(args[j].name, args[j].displayName, args[j].type);
           mutation.appendChild(arg);
         }
         xmlList.push(block);
@@ -363,9 +364,19 @@ const flyoutCategory = function (workspace) {
     return mutation;
   }
 
-  function createCallArg(name) {
+  function createCallArg(name, displayName, type = "") {
+    if (!displayName) displayName = name;
     const arg = utilsXml.createElement('arg');
     arg.setAttribute('name', name);
+    arg.setAttribute('displayName', displayName);
+
+    if (type) {
+      const typeXml = typeUtils.createXmlFromType(type, "type");
+      arg.appendChild(typeXml);
+      arg.setAttribute('type', type.getType());
+    } else {
+      arg.setAttribute('type', type);
+    }
     return arg;
   }
 
