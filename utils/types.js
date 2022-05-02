@@ -66,6 +66,48 @@ const createPolyType = function (typeName) {
 exports.createPolyType = createPolyType;
 
 /**
+   * Create type object for an optiontype.
+   * @param subtype The type inside option.
+   * @return Type object.
+   */
+const createOptionType = function (subtype) {
+    return {
+        block_name: "type_option",
+        subtype,
+        text_name_start: "option<",
+        text_name_end: ">",
+        getType: function () {
+            return this.text_name_start + (this.subtype?.getType() || "") + this.text_name_end;
+        },
+        getFSharpType() {
+            return this.getType();
+        }
+    }
+}
+exports.createOptionType = createOptionType;
+
+/**
+   * Create type object for an optiontype.
+   * @param subtype The type inside option.
+   * @return Type object.
+   */
+const createListType = function (subtype) {
+    return {
+        block_name: "type_list",
+        subtype,
+        text_name_start: "list<",
+        text_name_end: ">",
+        getType: function () {
+            return this.text_name_start + (this.subtype?.getType() || "") + this.text_name_end;
+        },
+        getFSharpType() {
+            return this.getType();
+        }
+    }
+}
+exports.createListType = createListType;
+
+/**
    * Create type object for a null type.
    * @return Type object.
    */
@@ -267,6 +309,14 @@ const createTypeFromBlock = function (block) {
         case "type_poly":
             const typeName = block.getFieldValue('NAME');
             return createPolyType(typeName);
+        case "type_option":
+            const optionSub = block.childBlocks_.map(b => createTypeFromBlock(b));
+            const optionSubvalue = optionSub.length > 0 ? optionSub[0] : null;
+            return createOptionType(optionSubvalue);
+        case "type_list":
+            const listSub = block.childBlocks_.map(b => createTypeFromBlock(b));
+            const listSubvalue = listSub.length > 0 ? listSub[0] : null;
+            return createListType(listSubvalue);
         case "type_tuple":
             const children = block.childBlocks_.map(b => createTypeFromBlock(b));
             return createTupleType(children);
@@ -323,6 +373,13 @@ const createBlockFromType = function (type) {
             fieldNode.appendChild(typeName);
             polyBlockNode.appendChild(fieldNode);
             return polyBlockNode;
+        case "type_option":
+        case "type_list":
+            const olBlockNode = xmlUtils.createElement('block');
+            olBlockNode.setAttribute('type', type.block_name);
+            const olValueBlock = createValueBlock("TYPE", type.subtype);
+            olBlockNode.appendChild(olValueBlock);
+            return olBlockNode;
         case "type_tuple":
             const tupleBlockNode = xmlUtils.createElement('block');
             tupleBlockNode.setAttribute('type', type.block_name);
@@ -427,6 +484,12 @@ const createXmlFromType = function (type, name) {
     switch (type.block_name) {
         case "type_poly":
             typeXml.setAttribute('name', type.text_name);
+        case "type_option":
+        case "type_list":
+            if (!!type.subtype) {
+                const childXml = createXmlFromType(type.subtype, 'subtype')
+                typeXml.appendChild(childXml);
+            }
         case "type_tuple":
             for (c in type.children) {
                 const childXml = createXmlFromType(type.children[c], 'child');
@@ -472,6 +535,22 @@ const createTypeFromXml = function (xmlElement) {
             return createPrimitiveType(type);
         case "type_poly":
             return createPolyType(xmlElement.getAttribute('name'));
+        case "type_option":
+            let optionSubtype = null;
+            for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
+                if (childNode.nodeName.toLowerCase() === 'subtype') {
+                    optionSubtype = createTypeFromXml(childNode);
+                }
+            }
+            return createOptionType(optionSubtype);
+        case "type_list":
+            let listSubtype = null;
+            for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
+                if (childNode.nodeName.toLowerCase() === 'subtype') {
+                    listSubtype = createTypeFromXml(childNode);
+                }
+            }
+            return createListType(listSubtype);
         case "type_tuple":
             const children = [];
             for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {

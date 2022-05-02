@@ -405,7 +405,7 @@ const updateMutatorFlyout = function (workspace) {
   xmlElement.appendChild(argBlock);
 
   // Our custom mutator blocks
-  const types = ['type_int', 'type_float', 'type_string', 'type_char', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly'];
+  const types = ['type_int', 'type_float', 'type_string', 'type_char', 'type_bool', 'type_unit', 'type_tuple', 'type_function', 'type_poly', 'type_option', 'type_list'];
   types.forEach(t => {
     xmlElement.appendChild(createTypeBlock(t));
   });

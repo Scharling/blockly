@@ -47,6 +47,17 @@ FSharp['type_function'] = function (block) {
     return [code, FSharp.ORDER_FUNCTION_ARROW];
 };
 
+// FSharp['type_option'] = function (block) {
+//     const type = FSharp.valueToCode(block, 'TYPE', FSharp.ORDER_ATOMIC);
+//     const code = 'option<' + type + '>';
+//     return [code, FSharp.ORDER_ATOMIC];
+// };
+
+// FSharp['type_list'] = function (block) {
+//     const type = FSharp.valueToCode(block, 'TYPE', FSharp.ORDER_ATOMIC);
+//     const code = 'list<' + type + '>';
+//     return [code, FSharp.ORDER_ATOMIC];
+// };
 
 FSharp['type_int'] = FSharp['type_unit'];
 FSharp['type_float'] = FSharp['type_unit'];
@@ -55,3 +66,5 @@ FSharp['type_char'] = FSharp['type_unit'];
 FSharp['type_bool'] = FSharp['type_unit'];
 FSharp['type_unit'] = FSharp['type_unit'];
 FSharp['type_poly'] = FSharp['type_unit'];
+FSharp['type_option'] = FSharp['type_unit'];
+FSharp['type_list'] = FSharp['type_unit'];
