@@ -1714,7 +1714,6 @@ WorkspaceSvg.prototype.deleteVariableById = function (id) {
  * @return {!VariableModel} The newly created variable.
  */
 WorkspaceSvg.prototype.createVariable = function (name, opt_type, opt_id, ignoreRefresh, displayName) {
-  console.log("ws creatVariable", name, opt_type, opt_id, ignoreRefresh, displayName);
   console.trace();
   const newVar = WorkspaceSvg.superClass_.createVariable2.call(
     this, name, opt_type, opt_id, displayName);

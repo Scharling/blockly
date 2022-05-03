@@ -93,7 +93,6 @@ const PROCEDURE_DEF_COMMON = {
 
         let variable = this.workspace.getVariableMap().getVariableByName(varName);
 
-        console.log("var", variable, this.workspace.getVariableMap())
         if (variable) {
           if (i > 0) {
             paramString += ", ";
@@ -109,7 +108,6 @@ const PROCEDURE_DEF_COMMON = {
     // The params field is deterministic based on the mutation,
     // no need to fire a change event.
     //Events.disable();
-    console.log("paramstring", paramString)
     try {
       this.setFieldValue(paramString, 'PARAMS');
     } finally {
@@ -156,8 +154,6 @@ const PROCEDURE_DEF_COMMON = {
     for (let i = 0; i < this.argumentVarModels_.length; i++) {
       const parameter = xmlUtils.createElement('arg');
       const argModel = this.argumentVarModels_[i];
-      console.log("mut2Dom", argModel, this);
-      console.trace();
       parameter.setAttribute('name', argModel.name);
       parameter.setAttribute('varid', argModel.getId());
       parameter.setAttribute('displayName', argModel.displayName);
@@ -229,6 +225,7 @@ const PROCEDURE_DEF_COMMON = {
    *     parameters and statements.
    */
   saveExtraState: function () {
+    console.log("Save extra");
     if (!this.argumentVarModels_.length && this.hasStatements_ && !this.returnType_) {
       return null;
     }
@@ -265,12 +262,12 @@ const PROCEDURE_DEF_COMMON = {
    *     statements.
    */
   loadExtraState: function (state) {
+    console.log("loadextra");
     this.arguments_ = [];
     this.argumentVarModels_ = [];
     if (state['params']) {
       for (let i = 0; i < state['params'].length; i++) {
         const param = state['params'][i];
-        console.log("param", param);
         const variable = Variables.getOrCreateVariablePackage(
           this.workspace, param['id'], param['name'], param['type'], param['displayName']);
         this.arguments_.push(variable.displayName);
@@ -288,7 +285,6 @@ const PROCEDURE_DEF_COMMON = {
     if (this.type === 'procedures_defreturn') this.updateIsRec_(state['isRec'] !== "false");
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
-    console.log("loadExtraState", this.procedureName, this, state);
   },
   /**
    * Populate the mutator's dialog with this block's components.
@@ -344,6 +340,7 @@ const PROCEDURE_DEF_COMMON = {
         }
       }
       var variable = outerWs.getVariableMap().getVariableByName(varName);
+      console.log("fuck", variable, varName, outerWs.getVariableMap());
       const typeBlockNode = typeUtils.createBlockFromType(variable.type);
 
       if (typeBlockNode != null) {
@@ -390,6 +387,7 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   compose: function (containerBlock) {
+    console.log("compose");
     // Parameter list.
     this.arguments_ = [];
     this.returnType_ = null;
@@ -1031,7 +1029,6 @@ const PROCEDURE_CALL_COMMON = {
       }
     }
 
-    console.log("about to create variables", paramNames, this)
     // Rebuild the block's arguments.
     this.arguments_ = [].concat(paramNames);
     // And rebuild the argument model list.
@@ -1445,7 +1442,6 @@ Blocks['procedures_callreturn'] = {
    * @this {Block}
    */
   renameProcedure: function (oldName, newName) {
-    console.log("1361")
     if (Names.equals(oldName, this.getProcedureCall())) {
       this.setFieldValue(newName, 'NAME');
       const baseMsg = this.outputConnection ?
@@ -1487,8 +1483,6 @@ Blocks['args_callreturn'] = {
   * @this {Block}
   */
   renameProcedure: function (oldName, newName, opt_revertName) {
-    console.log("rename", oldName, newName, opt_revertName, this);
-    console.trace();
     if (Names.equals(oldName, this.getProcedureCall()) || Names.equals(opt_revertName, this.getProcedureCall())) {
       this.setFieldValue(newName, 'NAME');
       const baseMsg = this.outputConnection ?

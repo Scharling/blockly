@@ -199,7 +199,7 @@ const flyoutCategoryBlocks = function (workspace) {
       variableModelList.sort(VariableModel.compareByName);
       var varSet = new Set();
       for (let i = 0, variable; (variable = variableModelList[i]); i++) {
-        if (!varSet.has(variable.name)){
+        if (!varSet.has(variable.name)) {
           const block = utilsXml.createElement('block');
           block.setAttribute('type', 'variables_get');
           block.setAttribute('gap', 8);
@@ -223,12 +223,10 @@ const allProcedures = function (root) {
   const proceduresReturn =
     root.getBlocksByType('procedures_defreturn', false)
       .map(function (block) {
-      return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
-    });
+        return /** @type {!ProcedureBlock} */ (block).getProcedureDef();
+      });
   proceduresAnonymous.sort(procTupleComparator);
   proceduresReturn.sort(procTupleComparator);
-  console.log("boop", root.getBlocksByType('procedures_defreturn', false));
-  console.log("allProcedures", root, proceduresAnonymous, proceduresReturn);
   return [proceduresAnonymous, proceduresReturn];
 };
 
@@ -488,7 +486,6 @@ const generateVariableFieldDom = function (variableModel, useDisplayName) {
   /* Generates the following XML:
    * <field name="VAR" id="goKTKmYJ8DhVHpruv" variabletype="int">foo</field>
    */
-  console.log(variableModel)
   const field = utilsXml.createElement('field');
   field.setAttribute('name', 'VAR');
   field.setAttribute('id', variableModel.getId());

@@ -196,7 +196,6 @@ VariableMap.prototype.createVariable = function (name, opt_type, opt_id, display
   const id = opt_id || idGenerator.genUid();
   const type = opt_type || typeUtils.createNullType();
   variable = new VariableModel(this.workspace, name, type, id, displayName);
-  console.log(type);
   const variables = this.variableMap_[type.getType()] || [];
   variables.push(variable);
   // Delete the list of variables of this type, and re-add it so that
