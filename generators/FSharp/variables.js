@@ -16,9 +16,14 @@ const { NameType } = goog.require('Blockly.Names');
 
 
 FSharp['variables_get'] = function (block) {
+  var blockName = block.inputList[0].fieldRow[0].textContent_.data;
+  var blockNameSanitized = blockName.replace(/\s/g /* all kinds of spaces*/,
+                                        " " /* ordinary space */)
+  var variable = block.workspace.getVariableMap().getVariableByName(blockNameSanitized)
+
   // Variable getter.
   const code =
-    FSharp.nameDB_.getName(block.getFieldValue('VAR'), NameType.VARIABLE);
+    FSharp.nameDB_.getName(variable.displayName, NameType.VARIABLE);
   return [code, FSharp.ORDER_ATOMIC];
 };
 
