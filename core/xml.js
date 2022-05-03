@@ -596,11 +596,10 @@ const domToBlock = function(xmlBlock, workspace, procedureName) {
   if (!procedureName) {
     var type = xmlBlock.getAttribute('type');
     if (type == "procedures_defreturn") {
-      for (var i = 0; i < xmlBlock.childNodes; i++) {
+      for (var i = 0; i < xmlBlock.childNodes.length; i++) {
         var child = xmlBlock.childNodes[i];
-        console.log("child", child);
-        if (child.nodeType == "field" && child.nodeName == "NAME") {
-          console.log("boingsoad");
+        if (child.nodeName == "field" && child.textContent) {
+          procedureName = child.textContent;
         }
       }
     }
