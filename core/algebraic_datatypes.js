@@ -213,7 +213,7 @@ const flyoutCategory = function (workspace) {
         const block = utilsXml.createElement('block');
         block.setAttribute('type', 'typedefinition');
         block.setAttribute('gap', 16);
-        
+
         const field = utilsXml.createElement('field');
         field.setAttribute('name', 'TYPENAME');
         field.innerHTML = 'Option';
@@ -238,7 +238,7 @@ const flyoutCategory = function (workspace) {
         const noneField = utilsXml.createElement('field');
         noneField.setAttribute('name', 'NAME');
         noneField.innerHTML = "None";
-        
+
         noneBlock.appendChild(noneField);
 
         const next = utilsXml.createElement('next');
@@ -269,7 +269,6 @@ const flyoutCategory = function (workspace) {
         polyField.setAttribute('name', 'NAME');
         polyField.innerHTML = 'a';
         poly.appendChild(polyField);
-        console.log(block);
         xmlList.push(block);
     }
 

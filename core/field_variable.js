@@ -170,7 +170,6 @@ FieldVariable.prototype.fromXml = function (fieldElement) {
   const variable = Variables.getOrCreateVariablePackage(
     this.sourceBlock_.workspace, id, variableName, variableType);
   const variableTypeType = (variableType.getType != null) ? variableType.getType() : variableType;
-  console.log("variableTypeType", variableTypeType)
   // This should never happen :)
   if (variableType !== null && variableTypeType !== variable.type.getType()) {
     throw Error(
