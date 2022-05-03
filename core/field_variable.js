@@ -267,7 +267,11 @@ FieldVariable.prototype.getValue = function () {
  *     variable is selected.
  */
 FieldVariable.prototype.getText = function () {
-  return this.variable_ ? this.variable_.name : '';
+  if (this.variable_) {
+    return this.variable_.displayName ? this.variable_.displayName : this.variable_.name;
+  } else {
+    return '';
+  }
 };
 
 /**

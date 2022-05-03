@@ -956,7 +956,6 @@ const domToBlockHeadless = function(
   const id = xmlBlock.getAttribute('id');
   block = workspace.newBlock(prototypeName, id);
   block.procedureName = procedureName;
-  console.log("domToBlockHeadless", block, procedureName);
   // Preprocess childNodes so tags can be processed in a consistent order.
   const xmlChildNameMap = mapSupportedXmlTags(xmlBlock);
 
@@ -988,7 +987,6 @@ const domToBlockHeadless = function(
   applyFieldTagNodes(xmlChildNameMap.field, block);
   applyInputTagNodes(xmlChildNameMap.input, workspace, block, prototypeName);
   applyNextTagNodes(xmlChildNameMap.next, workspace, block);
-
   if (shouldCallInitSvg) {
     // InitSvg needs to be called after variable fields are loaded.
     block.initSvg();

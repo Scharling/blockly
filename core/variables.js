@@ -145,7 +145,6 @@ const flyoutCategory = function (workspace) {
 
   const blockList = flyoutCategoryBlocks(workspace);
   xmlList = xmlList.concat(blockList);
-
   return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;
@@ -488,7 +487,6 @@ const generateVariableFieldDom = function (variableModel, useDisplayName) {
   /* Generates the following XML:
    * <field name="VAR" id="goKTKmYJ8DhVHpruv" variabletype="int">foo</field>
    */
-  console.log(variableModel)
   const field = utilsXml.createElement('field');
   field.setAttribute('name', 'VAR');
   field.setAttribute('id', variableModel.getId());

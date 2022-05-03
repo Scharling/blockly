@@ -619,7 +619,7 @@ const PROCEDURE_DEF_COMMON = {
         argOption.text =
           Msg['VARIABLES_SET_CREATE_GET'].replace('%1', argVar.name);
 
-        const argXmlField = Variables.generateVariableFieldDom(argVar);
+        const argXmlField = Variables.generateVariableFieldDom(argVar, true);
         const argXmlBlock = xmlUtils.createElement('block');
         argXmlBlock.setAttribute('type', 'variables_get');
         argXmlBlock.appendChild(argXmlField);

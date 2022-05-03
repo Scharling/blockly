@@ -213,13 +213,13 @@ Names.prototype.getUserNames = function(type) {
 Names.prototype.getDistinctName = function(name, type) {
   let safeName = this.safeName_(name);
   let i = '';
-  while (this.dbReverse_[safeName + i] ||
+  while ((this.dbReverse_[safeName + i] && this.dbReverse_[safeName + i] === type) ||
          (safeName + i) in this.reservedDict_) {
     // Collision with existing name.  Create a unique name.
     i = i ? i + 1 : 2;
   }
   safeName += i;
-  this.dbReverse_[safeName] = true;
+  this.dbReverse_[safeName] = type;
   const isVar =
       type === NameType.VARIABLE || type === NameType.DEVELOPER_VARIABLE;
   const prefix = isVar ? this.variablePrefix_ : '';
