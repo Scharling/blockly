@@ -706,7 +706,7 @@ Blocks['procedures_anonymous'] = {
     //const initName = Procedures.findLegalName('', this);
     //const nameField = new FieldTextInput(initName, Procedures.rename);
     //nameField.setSpellcheck(false);
-    this.setOutput(true, 'Value');
+    this.setOutput(true);
     this.appendDummyInput()
       .appendField('do')
       //.appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
@@ -1426,7 +1426,7 @@ Blocks['procedures_callreturn'] = {
   init: function () {
     this.appendDummyInput('TOPROW').appendField('', 'NAME');
     this.appendDummyInput('BOTTOMROW');
-    this.setOutput(true, 'Value');
+    this.setOutput(true);
     this.setStyle('procedure_blocks');
     // Tooltip is set in domToMutation.
     this.setHelpUrl(Msg['PROCEDURES_CALLRETURN_HELPURL']);
@@ -1467,7 +1467,7 @@ Blocks['args_callreturn'] = {
   init: function () {
     this.appendDummyInput('TOPROW').appendField('', 'NAME');
     this.appendDummyInput('BOTTOMROW');
-    this.setOutput(true, 'Value');
+    this.setOutput(true);
     this.setStyle('procedure_blocks');
     // Tooltip is set in domToMutation.
     this.setHelpUrl(Msg['PROCEDURES_CALLRETURN_HELPURL']);
