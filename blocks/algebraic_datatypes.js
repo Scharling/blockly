@@ -85,9 +85,10 @@ Blockly.Blocks['typedefinition'] = {
     init: function () {
         const nameField = new FieldTextInput('typeName', AlgebraicDatatypes.rename);
         this.appendDummyInput()
-            .appendField("Define Type")
+            .appendField("define")
             .appendField(nameField, "TYPENAME")
-            .appendField('', 'PARAMS');
+            .appendField('', 'PARAMS')
+            .appendField('as');
         this.appendStatementInput("CASES")
             .setCheck("String");
         this.setInputsInline(true);
@@ -327,7 +328,7 @@ Blockly.Blocks['case'] = {
             if (!this.getInput('ADD' + i)) {
                 const input = this.appendValueInput('ADD' + i);
                 if (i > 0 && i < this.itemCount_) {
-                    input.appendField("*");
+                    input.appendField("and");
                 }
             }
         }
@@ -381,7 +382,7 @@ Blockly.Blocks['case_create_with_container'] = {
     init: function () {
         //this.setStyle('list_blocks');
         this.setColour(180);
-        this.appendDummyInput().appendField("Types for case");
+        this.appendDummyInput().appendField("types for case");
         this.appendStatementInput('STACK');
         this.setTooltip("Add or remove types to the case.");
         this.contextMenu = false;
@@ -502,7 +503,7 @@ Blockly.Blocks['datatype'] = {
             if (!this.getInput('ADD' + i)) {
                 const input = this.appendValueInput('ADD' + i);
                 if (i > 0 && i < this.itemCount_) {
-                    input.appendField(",");
+                    input.appendField("and");
                 }
             }
         }
