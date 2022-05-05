@@ -209,6 +209,8 @@ const rename = function (name) {
       /** @type {!Block} */(this.getSourceBlock()));
   const oldName = this.getValue();
 
+  this.getSourceBlock().renameVarsWhenProcedurenameChanges(legalName);
+
   if (oldName !== name && oldName !== legalName) {
     // Rename any callers.
     const blocks = this.getSourceBlock().workspace.getAllBlocks(false);
