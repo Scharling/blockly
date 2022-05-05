@@ -171,23 +171,29 @@ const createDatatypeType = function (children, blockName) {
         name: blockName,
         children,
         getType: function () {
-            var s = blockName + this.text_name_start;
+            var s = blockName;
             var args = []
             for (var i = 0; i < this.children.length; i++) {
                 args.push(this.children[i]?.getType())
             }
-            s = s + args.join(", ")
-            s = s + this.text_name_end;
+            if (args.length > 0) {
+                s = s + this.text_name_start;
+                s = s + args.join(", ")
+                s = s + this.text_name_end;
+            }
             return s
         },
         getFSharpType() {
-            var s = blockName + this.text_name_start;
+            var s = blockName;
             var args = []
             for (var i = 0; i < this.children.length; i++) {
                 args.push(this.children[i]?.getFSharpType())
             }
-            s = s + args.join(", ")
-            s = s + this.text_name_end;
+            if (args.length > 0) {
+                s = s + this.text_name_start;
+                s = s + args.join(", ")
+                s = s + this.text_name_end;
+            }
             return s
         }
     }

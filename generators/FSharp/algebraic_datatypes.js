@@ -74,7 +74,7 @@ FSharp['datatype'] = function (block) {
     args.push(arg);
   }
 
-  const code = datatypeName + "<" + args.join(", ") + ">";
+  const code = datatypeName + (args.length > 0 ? "<" + args.join(", ") + ">" : "");
   return [code, FSharp.ORDER_ATOMIC];
 }
 
