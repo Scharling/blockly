@@ -171,7 +171,7 @@ FieldVariable.prototype.fromXml = function (fieldElement) {
     this.sourceBlock_.workspace, id, variableName, variableType);
   const variableTypeType = (variableType.getType != null) ? variableType.getType() : variableType;
   // This should never happen :)
-  if (variableType !== null && variableTypeType !== variable.type.getType()) {
+  if (variableType !== null && variableTypeType !== "nullType" && variableTypeType !== variable.type.getType()) {
     throw Error(
       'Serialized variable type with id \'' + variable.getId() +
       '\' had type ' + variable.type.getType() + ', and ' +
@@ -194,9 +194,6 @@ FieldVariable.prototype.toXml = function (fieldElement) {
 
   fieldElement.id = this.variable_.getId();
   fieldElement.textContent = this.variable_.name;
-  if (this.variable_.type) {
-    fieldElement.setAttribute('variabletype', this.variable_.type.getType());
-  }
   return fieldElement;
 };
 
