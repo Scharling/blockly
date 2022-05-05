@@ -921,7 +921,7 @@ Field.prototype.forceRerender = function() {
  * than this method.
  * @param {*} newValue New value.
  */
-Field.prototype.setValue = function(newValue) {
+Field.prototype.setValue = function(newValue, isDragging) {
   const doLogging = false;
   if (newValue === null) {
     doLogging && console.log('null, return');
@@ -939,7 +939,7 @@ Field.prototype.setValue = function(newValue) {
 
   const localValidator = this.getValidator();
   if (localValidator) {
-    validatedValue = localValidator.call(this, newValue);
+    validatedValue = localValidator.call(this, newValue, isDragging);
     // Local validators might accidentally forget to return, we'll ignore that.
     newValue = this.processValidation_(newValue, validatedValue);
     if (newValue instanceof Error) {

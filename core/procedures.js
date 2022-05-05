@@ -200,7 +200,7 @@ exports.isNameUsed = isNameUsed;
  * @this {Field}
  * @alias Blockly.Procedures.rename
  */
-const rename = function (name) {
+const rename = function (name, isDragging) {
   // Strip leading and trailing whitespace.  Beyond this, all names are legal.
   name = name.trim();
 
@@ -209,7 +209,9 @@ const rename = function (name) {
       /** @type {!Block} */(this.getSourceBlock()));
   const oldName = this.getValue();
 
-  this.getSourceBlock().renameVarsWhenProcedurenameChanges(legalName);
+  if (!isDragging) {
+    this.getSourceBlock().renameVarsWhenProcedurenameChanges(legalName);
+  }
 
   if (oldName !== name && oldName !== legalName) {
     // Rename any callers.

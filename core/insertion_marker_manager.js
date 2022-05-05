@@ -44,7 +44,7 @@ const {WorkspaceSvg} = goog.requireType('Blockly.WorkspaceSvg');
  * @constructor
  * @alias Blockly.InsertionMarkerManager
  */
-const InsertionMarkerManager = function(block) {
+const InsertionMarkerManager = function(block, isDragging) {
   common.setSelected(block);
 
   /**
@@ -87,7 +87,7 @@ const InsertionMarkerManager = function(block) {
    * @type {BlockSvg}
    * @private
    */
-  this.firstMarker_ = this.createMarkerBlock_(this.topBlock_);
+  this.firstMarker_ = this.createMarkerBlock_(this.topBlock_, isDragging);
 
   /**
    * The connection that this block would connect to if released immediately.
@@ -282,7 +282,7 @@ InsertionMarkerManager.prototype.update = function(dxy, dragTarget) {
  *     block.
  * @private
  */
-InsertionMarkerManager.prototype.createMarkerBlock_ = function(sourceBlock) {
+InsertionMarkerManager.prototype.createMarkerBlock_ = function(sourceBlock, isDragging) {
   const imType = sourceBlock.type;
 
   eventUtils.disable();
@@ -321,7 +321,7 @@ InsertionMarkerManager.prototype.createMarkerBlock_ = function(sourceBlock) {
           throw new Error(InsertionMarkerManager.DUPLICATE_BLOCK_ERROR.replace(
               '%1', 'a field'));
         }
-        resultField.setValue(sourceField.getValue());
+        resultField.setValue(sourceField.getValue(), isDragging);
       }
     }
 

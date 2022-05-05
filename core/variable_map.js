@@ -304,7 +304,7 @@ VariableMap.prototype.deleteVariableInternal = function (variable, uses) {
  */
 VariableMap.prototype.getVariable = function (name, opt_type) {
   const type = opt_type || typeUtils.createNullType();
-  const list = this.variableMap_[type];
+  const list = this.variableMap_[type.getType()];
   if (list) {
     for (let j = 0, variable; (variable = list[j]); j++) {
       if (Names.equals(variable.name, name)) {
