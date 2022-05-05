@@ -228,7 +228,7 @@ const rename = function (name, isDragging) {
 };
 exports.rename = rename;
 
-const renameArgCall = function (fieldBlock, name, procedureName) {
+const renameArgCall = function (fieldBlock, name, procedureName, displayName) {
   const oldName = procedureName + "." + fieldBlock.getValue();
   const revertName = procedureName + "." + fieldBlock.firstChar;
 
@@ -239,7 +239,7 @@ const renameArgCall = function (fieldBlock, name, procedureName) {
       if (blocks[i].renameProcedure) {
         const procedureBlock = /** @type {!ProcedureBlock} */ (blocks[i]);
         procedureBlock.renameProcedure(
-            /** @type {string} */(oldName), name, revertName);
+            /** @type {string} */(oldName), name, revertName, displayName);
       }
     }
   }
@@ -321,7 +321,7 @@ const flyoutCategory = function (workspace) {
         //   </mutation>
         // </block>
         const block = createCallBlock(templateName);
-        const mutation = createCallMutation(name);
+        const mutation = createCallMutation(name, null);
         block.appendChild(mutation);
         for (let j = 0; j < args.length; j++) {
           const arg = createCallArg(args[j].name, args[j].displayName, args[j].type);
@@ -342,7 +342,7 @@ const flyoutCategory = function (workspace) {
           // </block>
           const argNum = type.inputs.length;
           const subBlock = createCallBlock("args_callreturn");
-          const subMutation = createCallMutation(args[j].name);
+          const subMutation = createCallMutation(args[j].name, args[j].displayName);
           subBlock.appendChild(subMutation);
           for (let k = 0; k < argNum; k++) {
             const subArg = createCallArg(("a" + k + " (" + type.inputs[k].getType() + ")"));
@@ -361,9 +361,10 @@ const flyoutCategory = function (workspace) {
     return block;
   }
 
-  function createCallMutation(name) {
+  function createCallMutation(name, displayName) {
     const mutation = utilsXml.createElement('mutation');
     mutation.setAttribute('name', name);
+    if (!!displayName) mutation.setAttribute('displayName', displayName);
     return mutation;
   }
 

@@ -200,7 +200,7 @@ FSharp['procedures_callreturn'] = function (block) {
 
 FSharp['args_callreturn'] = function (block) {
   // Call a procedure with a return value.
-  const funcName = block.getFieldValue('NAME');
+  const funcName = block.displayName ? block.displayName : block.getFieldValue('NAME');
   const args = [];
   const variables = block.getVars();
 

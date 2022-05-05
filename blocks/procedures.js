@@ -948,7 +948,7 @@ function validatorExternal(sourceBlock, varName, thisBlock, rename) {
   if (varMapName === null) return varName;
 
   if (rename && varType.block_name === "type_function") {
-    Procedures.renameArgCall(thisBlock, varMapName, procedureName);
+    Procedures.renameArgCall(thisBlock, varMapName, procedureName, varName);
   }
 
   let model = outerWs.getVariable(varMapName, varType);
@@ -1192,16 +1192,17 @@ const PROCEDURE_CALL_COMMON = {
   mutationToDom: function () {
     const container = xmlUtils.createElement('mutation');
     container.setAttribute('name', this.getProcedureCall());
+    if (this.type === 'args_callreturn') container.setAttribute('displayName', this.displayName);
     container.setAttribute('argCount', this.argCount_);
     for (let i = 0; i < this.arguments_.length; i++) {
       const parameter = xmlUtils.createElement('arg');
       parameter.setAttribute('name', this.arguments_[i]);
-      
+
       const argVarModel = this.argumentVarModels_[i];
       if (argVarModel) {
         parameter.setAttribute('paramId', argVarModel.id_);
         parameter.setAttribute('displayName', argVarModel.displayName);
-        
+
         const typeBlock = typeUtils.createXmlFromType(argVarModel.type, 'type');
         parameter.appendChild(typeBlock);
       }
@@ -1218,6 +1219,7 @@ const PROCEDURE_CALL_COMMON = {
   domToMutation: function (xmlElement) {
     const name = xmlElement.getAttribute('name');
     this.renameProcedure(this.getProcedureCall(), name);
+    if (this.type === 'args_callreturn') this.displayName = xmlElement.getAttribute('displayName');
     const argCount = xmlElement.getAttribute('argCount');
     this.argCount_ = argCount ?? 'ALL';
     const args = [];
@@ -1245,6 +1247,7 @@ const PROCEDURE_CALL_COMMON = {
   saveExtraState: function () {
     const state = Object.create(null);
     state['name'] = this.getProcedureCall();
+    if (this.type === 'args_callreturn') state['displayName'] = this.displayName;
     state['argCount'] = this.argCount_
     if (this.arguments_.length) {
       state['params'] = this.arguments_;
@@ -1267,6 +1270,7 @@ const PROCEDURE_CALL_COMMON = {
    */
   loadExtraState: function (state) {
     this.renameProcedure(this.getProcedureCall(), state['name']);
+    if (this.type === 'args_callreturn') this.displayName = state['displayName'];
     this.argCount_ = state['argCount'];
     const params = state['params'];
     if (params) {
@@ -1501,6 +1505,7 @@ Blocks['args_callreturn'] = {
     this.quarkIds_ = null;
     this.previousEnabledState_ = true;
     this.argCount_ = "ALL";
+    this.displayName = null;
   },
   /**
   * Notification that a procedure is renaming.
@@ -1510,13 +1515,14 @@ Blocks['args_callreturn'] = {
   * @param {?string} revertName Revert name of input field.
   * @this {Block}
   */
-  renameProcedure: function (oldName, newName, opt_revertName) {
-    if (Names.equals(oldName, this.getProcedureCall()) ||(opt_revertName && Names.equals(opt_revertName, this.getProcedureCall()))) {
+  renameProcedure: function (oldName, newName, opt_revertName, displayName) {
+    if (Names.equals(oldName, this.getProcedureCall()) || (opt_revertName && Names.equals(opt_revertName, this.getProcedureCall()))) {
       this.setFieldValue(newName, 'NAME');
       const baseMsg = this.outputConnection ?
         Msg['PROCEDURES_CALLRETURN_TOOLTIP'] :
         Msg['PROCEDURES_CALLNORETURN_TOOLTIP'];
       this.setTooltip(baseMsg.replace('%1', newName));
+      if (displayName) this.displayName = displayName;
     }
   },
   //defType_: 'args_defreturn',
