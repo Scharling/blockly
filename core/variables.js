@@ -145,7 +145,6 @@ const flyoutCategory = function (workspace) {
 
   const blockList = flyoutCategoryBlocks(workspace);
   xmlList = xmlList.concat(blockList);
-
   return xmlList;
 };
 exports.flyoutCategory = flyoutCategory;

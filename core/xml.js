@@ -978,7 +978,6 @@ const domToBlockHeadless = function (
   applyFieldTagNodes(xmlChildNameMap.field, block);
   applyInputTagNodes(xmlChildNameMap.input, workspace, block, prototypeName);
   applyNextTagNodes(xmlChildNameMap.next, workspace, block);
-
   if (shouldCallInitSvg) {
     // InitSvg needs to be called after variable fields are loaded.
     block.initSvg();
