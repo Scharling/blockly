@@ -584,6 +584,20 @@ const PROCEDURE_DEF_COMMON = {
       }
     }
   },
+  renameVarsWhenProcedurenameChanges: function (newProcedurename) {
+    this.procedureName = newProcedurename;
+    const oldArgs = [...this.arguments_];
+    const newVarModels = [];
+    for (let i = 0; i < this.argumentVarModels_.length; i++) {
+      const varModel = this.argumentVarModels_[i];
+      this.workspace.renameVariableById(varModel.getId(), newProcedurename + "." + varModel.displayName);
+      const newVar = this.workspace.getVariableById(varModel.getId());
+      newVarModels.push(newVar);
+    }
+    this.argumentVarModels_ = newVarModels;
+    this.arguments_ = oldArgs;
+    this.updateParams_();
+  },
   /**
    * Add custom menu options to this block's context menu.
    * @param {!Array} options List of menu options to add to.

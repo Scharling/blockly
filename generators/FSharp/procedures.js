@@ -24,7 +24,7 @@ FSharp['procedures_defreturn'] = function (block) {
   const workspace = block.workspace;
   const usedVariables = Variables.allUsedVarModels(workspace) || [];
   for (let i = 0, variable; (variable = usedVariables[i]); i++) {
-    const varName = variable.name;
+    const varName = variable.displayName;
     if (block.getVars().indexOf(varName) === -1) {
       globals.push(FSharp.nameDB_.getName(varName, NameType.VARIABLE));
     }
