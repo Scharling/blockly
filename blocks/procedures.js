@@ -147,6 +147,7 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   mutationToDom: function (opt_paramIds) {
+    console.log("mutationToDom");
     const container = xmlUtils.createElement('mutation');
     if (opt_paramIds) {
       container.setAttribute('name', this.getFieldValue('NAME'));
@@ -173,7 +174,7 @@ const PROCEDURE_DEF_COMMON = {
       container.setAttribute('statements', 'false');
     }
 
-    container.setAttribute('rec', this.isRec_);
+    container.setAttribute('isRec', this.isRec_);
 
     return container;
   },
@@ -184,6 +185,7 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   domToMutation: function (xmlElement) {
+    console.log("domToMutation", xmlElement);
     this.arguments_ = [];
     this.returnType_ = null;
     this.argumentVarModels_ = [];
@@ -262,7 +264,7 @@ const PROCEDURE_DEF_COMMON = {
    *     statements.
    */
   loadExtraState: function (state) {
-    console.log("loadextra");
+    console.log("loadextra", state);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
     if (state['params']) {
@@ -282,7 +284,7 @@ const PROCEDURE_DEF_COMMON = {
     }
     this.updateParams_();
     this.updateReturnType_();
-    if (this.type === 'procedures_defreturn') this.updateIsRec_(state['isRec'] !== "false");
+    if (this.type === 'procedures_defreturn') this.updateIsRec_(state['isRec']);
     Procedures.mutateCallers(this);
     this.setStatements_(state['hasStatements'] === false ? false : true);
   },
@@ -307,7 +309,7 @@ const PROCEDURE_DEF_COMMON = {
      *   </input>
      * </block>
      */
-    console.log("decomp", workspace, this);
+    console.log("decomp");
     const containerBlockNode = xmlUtils.createElement('block');
     containerBlockNode.setAttribute('type', 'procedures_mutatorcontainer');
     const statementNode = xmlUtils.createElement('statement');
@@ -339,7 +341,8 @@ const PROCEDURE_DEF_COMMON = {
           varName = "anonymous." + this.arguments_[i];
         }
       }
-      var variable = outerWs.getVariableMap().getVariableByName(varName);
+      const varModel = this.argumentVarModels_[i];
+      const variable = Variables.getOrCreateVariablePackage(outerWs, varModel.getId(), varName, varModel.type, varModel.displayName);
       console.log("fuck", variable, varName, outerWs.getVariableMap());
       const typeBlockNode = typeUtils.createBlockFromType(variable.type);
 
