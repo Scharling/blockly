@@ -20,7 +20,7 @@ FSharp['match'] = function (block) {
   let matchingBlock = FSharp.valueToCode(block, "VARIABLE", FSharp.ORDER_ATOMIC);
 
   let branch = FSharp.statementToCode(block, 'CASES');
-  let code = "\nmatch " + matchingBlock + " with" + branch;
+  let code = "match " + matchingBlock + " with" + branch;
 
   return [code, FSharp.ORDER_ATOMIC];
 }
