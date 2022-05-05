@@ -146,7 +146,7 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   mutationToDom: function (opt_paramIds) {
-    console.log("mutationToDom");
+    console.log("mutationToDom", this);
     const container = xmlUtils.createElement('mutation');
     if (opt_paramIds) {
       container.setAttribute('name', this.getFieldValue('NAME'));
@@ -421,7 +421,9 @@ const PROCEDURE_DEF_COMMON = {
       }
 
       const variable = this.workspace.getVariable(varMapName, varType);
-      this.argumentVarModels_.push(variable);
+      if (variable) {
+        this.argumentVarModels_.push(variable);
+      }
       this.paramIds_.push(paramBlock.id);
       paramBlock =
         paramBlock.nextConnection && paramBlock.nextConnection.targetBlock();
