@@ -1511,7 +1511,7 @@ Blocks['args_callreturn'] = {
   * @this {Block}
   */
   renameProcedure: function (oldName, newName, opt_revertName) {
-    if (Names.equals(oldName, this.getProcedureCall()) || Names.equals(opt_revertName, this.getProcedureCall())) {
+    if (Names.equals(oldName, this.getProcedureCall()) ||(opt_revertName && Names.equals(opt_revertName, this.getProcedureCall()))) {
       this.setFieldValue(newName, 'NAME');
       const baseMsg = this.outputConnection ?
         Msg['PROCEDURES_CALLRETURN_TOOLTIP'] :
