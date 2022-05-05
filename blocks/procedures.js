@@ -92,7 +92,6 @@ const PROCEDURE_DEF_COMMON = {
         }
 
         let variable = this.workspace.getVariableMap().getVariableByName(varName);
-
         if (variable) {
           if (i > 0) {
             paramString += ", ";
@@ -1181,6 +1180,15 @@ const PROCEDURE_CALL_COMMON = {
     for (let i = 0; i < this.arguments_.length; i++) {
       const parameter = xmlUtils.createElement('arg');
       parameter.setAttribute('name', this.arguments_[i]);
+      
+      const argVarModel = this.argumentVarModels_[i];
+      if (argVarModel) {
+        parameter.setAttribute('paramId', argVarModel.id_);
+        parameter.setAttribute('displayName', argVarModel.displayName);
+        
+        const typeBlock = typeUtils.createXmlFromType(argVarModel.type, 'type');
+        parameter.appendChild(typeBlock);
+      }
       container.appendChild(parameter);
     }
     return container;
@@ -1200,6 +1208,7 @@ const PROCEDURE_CALL_COMMON = {
     const paramIds = [];
     const displayNames = [];
     const types = [];
+    console.log("domtomut", name, argCount, xmlElement);
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
         args.push(childNode.getAttribute('name'));
