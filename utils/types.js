@@ -567,17 +567,17 @@ const createTypeFromXml = function (xmlElement) {
             }
             return createTupleType(children);
         case "type_function":
-            let input = null;
+            let inputs = [];
             let output = null;
             for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
                 if (childNode.nodeName.toLowerCase() === 'input') {
-                    input = createTypeFromXml(childNode);
+                    inputs.push(createTypeFromXml(childNode));
                 }
                 if (childNode.nodeName.toLowerCase() === 'output') {
                     output = createTypeFromXml(childNode);
                 }
             }
-            return createFunctionType(input, output);
+            return createFunctionType(inputs, output);
         case "type_datatype":
             const typeChildren = [];
             for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
