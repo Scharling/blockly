@@ -131,7 +131,7 @@ FSharp['procedures_anonymous'] = function (block) {
     xfix2 = xfix1;
   }
   if (returnValue) {
-    returnValue = FSharp.INDENT + returnValue + '\n';
+    returnValue = returnValue + '\n';
   } else if (!branch) {
     branch = FSharp.INDENT + 'failwith "function not implemented"';
   }
@@ -140,9 +140,16 @@ FSharp['procedures_anonymous'] = function (block) {
   for (let i = 0; i < variables.length; i++) {
     args[i] = FSharp.nameDB_.getName(variables[i], NameType.VARIABLE);
   }
+  console.log("fuck", branch);
+  console.log("fuck2", returnValue);
   let argsString = createArgsString(args, usedVariables, "anonymous");
-  let code = 'fun' + argsString + ' ->\n' +
-    xfix1 + loopTrap + branch + xfix2 + returnValue;
+  let code = '';
+  if (branch) {
+    code = 'fun' + argsString + ' ->\n' +
+      xfix1 + loopTrap + branch + xfix2 + FSharp.INDENT + returnValue;
+  } else {
+    code = 'fun' + argsString + ' -> ' + returnValue;
+  }
   code = FSharp.scrub_(block, code);
   // Add % so as not to collide with helper functions in definitions list.
   //FSharp.definitions_['%' + funcName] = code;
