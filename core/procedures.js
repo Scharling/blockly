@@ -290,10 +290,10 @@ const flyoutCategory = function (workspace) {
     block.setAttribute('gap', 16);
     xmlList.push(block);
   }
-  if (Blocks['procedures_ifreturn']) {
+  if (Blocks['procedures_ifelsereturn']) {
     // <block type="procedures_ifreturn" gap="16"></block>
     const block = utilsXml.createElement('block');
-    block.setAttribute('type', 'procedures_ifreturn');
+    block.setAttribute('type', 'procedures_ifelsereturn');
     block.setAttribute('gap', 16);
     xmlList.push(block);
   }

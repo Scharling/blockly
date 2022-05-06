@@ -216,31 +216,15 @@ FSharp['args_callreturn'] = function (block) {
   return [code, FSharp.ORDER_FUNCTION_APPLICATION];
 };
 
-// FSharp['procedures_callnoreturn'] = function (block) {
-//   // Call a procedure with no return value.
-//   // Generated code is for a function call as a statement is the same as a
-//   // function call as a value, with the addition of line ending.
-//   const tuple = FSharp['procedures_callreturn'](block);
-//   return tuple[0] + '\n';
-// };
-
-FSharp['procedures_ifreturn'] = function (block) {
+FSharp['procedures_ifelsereturn'] = function (block) {
   // Conditionally return value from a procedure.
   const condition =
-    FSharp.valueToCode(block, 'CONDITION', FSharp.ORDER_NONE) || 'False';
-  let code = 'if ' + condition + ':\n';
-  if (FSharp.STATEMENT_SUFFIX) {
-    // Inject any statement suffix here since the regular one at the end
-    // will not get executed if the return is triggered.
-    code += FSharp.prefixLines(
-      FSharp.injectId(FSharp.STATEMENT_SUFFIX, block), FSharp.INDENT);
-  }
-  if (block.hasReturnValue_) {
-    const value =
-      FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || 'None';
-    code += FSharp.INDENT + 'return ' + value + '\n';
-  } else {
-    code += FSharp.INDENT + 'return\n';
-  }
-  return code;
+    FSharp.valueToCode(block, 'CONDITION', FSharp.ORDER_NONE) || 'false';
+  let code = 'if ' + condition;
+  const value =
+    FSharp.valueToCode(block, 'VALUE1', FSharp.ORDER_NONE) || '0';
+  const value2 =
+    FSharp.valueToCode(block, 'VALUE2', FSharp.ORDER_NONE) || '0';
+  code += ' then ' + value + ' else ' + value2 + '\n';
+  return [code, FSharp.ORDER_IF];
 };

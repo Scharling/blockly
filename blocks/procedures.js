@@ -1528,49 +1528,48 @@ Blocks['args_callreturn'] = {
   //defType_: 'args_defreturn',
 };
 
-Blocks['procedures_ifreturn'] = {
+Blocks['procedures_ifelsereturn'] = {
   /**
    * Block for conditionally returning a value from a procedure.
    * @this {Block}
    */
   init: function () {
     this.appendValueInput('CONDITION')
-      .setCheck('Boolean')
+      .setCheck(['Boolean', 'BooleanValue'])
       .appendField(Msg['CONTROLS_IF_MSG_IF']);
-    this.appendValueInput('VALUE').appendField(
+    this.appendValueInput('VALUE1').appendField(
       Msg['PROCEDURES_DEFRETURN_RETURN']);
+    this.appendValueInput('VALUE2').appendField('else return');
     this.setInputsInline(true);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
+    this.setOutput(true);
     this.setStyle('procedure_blocks');
     this.setTooltip(Msg['PROCEDURES_IFRETURN_TOOLTIP']);
     this.setHelpUrl(Msg['PROCEDURES_IFRETURN_HELPURL']);
-    this.hasReturnValue_ = true;
   },
-  /**
-   * Create XML to represent whether this block has a return value.
-   * @return {!Element} XML storage element.
-   * @this {Block}
-   */
-  mutationToDom: function () {
-    const container = xmlUtils.createElement('mutation');
-    container.setAttribute('value', Number(this.hasReturnValue_));
-    return container;
-  },
-  /**
-   * Parse XML to restore whether this block has a return value.
-   * @param {!Element} xmlElement XML storage element.
-   * @this {Block}
-   */
-  domToMutation: function (xmlElement) {
-    const value = xmlElement.getAttribute('value');
-    this.hasReturnValue_ = (value === '1');
-    if (!this.hasReturnValue_) {
-      this.removeInput('VALUE');
-      this.appendDummyInput('VALUE').appendField(
-        Msg['PROCEDURES_DEFRETURN_RETURN']);
-    }
-  },
+  // /**
+  //  * Create XML to represent whether this block has a return value.
+  //  * @return {!Element} XML storage element.
+  //  * @this {Block}
+  //  */
+  // mutationToDom: function () {
+  //   const container = xmlUtils.createElement('mutation');
+  //   container.setAttribute('value', Number(this.hasReturnValue_));
+  //   return container;
+  // },
+  // /**
+  //  * Parse XML to restore whether this block has a return value.
+  //  * @param {!Element} xmlElement XML storage element.
+  //  * @this {Block}
+  //  */
+  // domToMutation: function (xmlElement) {
+  //   const value = xmlElement.getAttribute('value');
+  //   this.hasReturnValue_ = (value === '1');
+  //   if (!this.hasReturnValue_) {
+  //     this.removeInput('VALUE');
+  //     this.appendDummyInput('VALUE').appendField(
+  //       Msg['PROCEDURES_DEFRETURN_RETURN']);
+  //   }
+  // },
 
   // This block does not need JSO serialization hooks (saveExtraState and
   // loadExtraState) because the state of this block is already encoded in the
@@ -1599,18 +1598,6 @@ Blocks['procedures_ifreturn'] = {
     } while (block);
     if (legal) {
       // If needed, toggle whether this block has a return value.
-      if (block.type === 'procedures_defnoreturn' && this.hasReturnValue_) {
-        this.removeInput('VALUE');
-        this.appendDummyInput('VALUE').appendField(
-          Msg['PROCEDURES_DEFRETURN_RETURN']);
-        this.hasReturnValue_ = false;
-      } else if (
-        block.type === 'procedures_defreturn' && !this.hasReturnValue_) {
-        this.removeInput('VALUE');
-        this.appendValueInput('VALUE').appendField(
-          Msg['PROCEDURES_DEFRETURN_RETURN']);
-        this.hasReturnValue_ = true;
-      }
       this.setWarningText(null);
       if (!this.isInFlyout) {
         this.setEnabled(true);
@@ -1630,6 +1617,109 @@ Blocks['procedures_ifreturn'] = {
   // FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn'],
   FUNCTION_TYPES: ['procedures_defreturn', 'procedures_anonymous', 'procedures_defnoreturn'],
 };
+
+// Blocks['procedures_ifreturn'] = {
+//   /**
+//    * Block for conditionally returning a value from a procedure.
+//    * @this {Block}
+//    */
+//   init: function () {
+//     this.appendValueInput('CONDITION')
+//       .setCheck('Boolean')
+//       .appendField(Msg['CONTROLS_IF_MSG_IF']);
+//     this.appendValueInput('VALUE').appendField(
+//       Msg['PROCEDURES_DEFRETURN_RETURN']);
+//     this.setInputsInline(true);
+// this.setPreviousStatement(true);
+// this.setNextStatement(true);
+//     this.setStyle('procedure_blocks');
+//     this.setTooltip(Msg['PROCEDURES_IFRETURN_TOOLTIP']);
+//     this.setHelpUrl(Msg['PROCEDURES_IFRETURN_HELPURL']);
+//     this.hasReturnValue_ = true;
+//   },
+//   /**
+//    * Create XML to represent whether this block has a return value.
+//    * @return {!Element} XML storage element.
+//    * @this {Block}
+//    */
+//   mutationToDom: function () {
+//     const container = xmlUtils.createElement('mutation');
+//     container.setAttribute('value', Number(this.hasReturnValue_));
+//     return container;
+//   },
+//   /**
+//    * Parse XML to restore whether this block has a return value.
+//    * @param {!Element} xmlElement XML storage element.
+//    * @this {Block}
+//    */
+//   domToMutation: function (xmlElement) {
+//     const value = xmlElement.getAttribute('value');
+//     this.hasReturnValue_ = (value === '1');
+//     if (!this.hasReturnValue_) {
+//       this.removeInput('VALUE');
+//       this.appendDummyInput('VALUE').appendField(
+//         Msg['PROCEDURES_DEFRETURN_RETURN']);
+//     }
+//   },
+
+//   // This block does not need JSO serialization hooks (saveExtraState and
+//   // loadExtraState) because the state of this block is already encoded in the
+//   // block's position in the workspace.
+//   // XML hooks are kept for backwards compatibility.
+
+//   /**
+//    * Called whenever anything on the workspace changes.
+//    * Add warning if this flow block is not nested inside a loop.
+//    * @param {!AbstractEvent} _e Change event.
+//    * @this {Block}
+//    */
+//   onchange: function (_e) {
+//     if (this.workspace.isDragging && this.workspace.isDragging()) {
+//       return;  // Don't change state at the start of a drag.
+//     }
+//     let legal = false;
+//     // Is the block nested in a procedure?
+//     let block = this;
+//     do {
+//       if (this.FUNCTION_TYPES.indexOf(block.type) !== -1) {
+//         legal = true;
+//         break;
+//       }
+//       block = block.getSurroundParent();
+//     } while (block);
+//     if (legal) {
+//       // If needed, toggle whether this block has a return value.
+//       if (block.type === 'procedures_defnoreturn' && this.hasReturnValue_) {
+//         this.removeInput('VALUE');
+//         this.appendDummyInput('VALUE').appendField(
+//           Msg['PROCEDURES_DEFRETURN_RETURN']);
+//         this.hasReturnValue_ = false;
+//       } else if (
+//         block.type === 'procedures_defreturn' && !this.hasReturnValue_) {
+//         this.removeInput('VALUE');
+//         this.appendValueInput('VALUE').appendField(
+//           Msg['PROCEDURES_DEFRETURN_RETURN']);
+//         this.hasReturnValue_ = true;
+//       }
+//       this.setWarningText(null);
+//       if (!this.isInFlyout) {
+//         this.setEnabled(true);
+//       }
+//     } else {
+//       this.setWarningText(Msg['PROCEDURES_IFRETURN_WARNING']);
+//       if (!this.isInFlyout && !this.getInheritedDisabled()) {
+//         this.setEnabled(false);
+//       }
+//     }
+//   },
+//   /**
+//    * List of block types that are functions and thus do not need warnings.
+//    * To add a new function type add this to your code:
+//    * Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('custom_func');
+//    */
+//   // FUNCTION_TYPES: ['procedures_defnoreturn', 'procedures_defreturn'],
+//   FUNCTION_TYPES: ['procedures_defreturn', 'procedures_anonymous', 'procedures_defnoreturn'],
+// };
 
 Blocks['procedures_defnoreturn'] = {
   ...PROCEDURE_DEF_COMMON,
