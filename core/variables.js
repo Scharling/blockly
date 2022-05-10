@@ -198,7 +198,8 @@ const flyoutCategoryBlocks = function (workspace) {
       variableModelList.sort(VariableModel.compareByName);
       var varSet = new Set();
       for (let i = 0, variable; (variable = variableModelList[i]); i++) {
-        if (!varSet.has(variable.name)) {
+        let nameKey = (variable.displayName) ? variable.displayName : variable.name;
+        if (!varSet.has(nameKey)) {
           const block = utilsXml.createElement('block');
           block.setAttribute('type', 'variables_get');
           block.setAttribute('gap', 8);

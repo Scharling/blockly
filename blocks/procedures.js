@@ -342,7 +342,6 @@ const PROCEDURE_DEF_COMMON = {
       }
       const varModel = this.argumentVarModels_[i];
       const variable = Variables.getOrCreateVariablePackage(outerWs, varModel.getId(), varName, varModel.type, varModel.displayName);
-      console.log("fuck", variable, varName, outerWs.getVariableMap());
       const typeBlockNode = typeUtils.createBlockFromType(variable.type);
 
       if (typeBlockNode != null) {

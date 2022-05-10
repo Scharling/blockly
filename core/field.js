@@ -30,32 +30,32 @@ const style = goog.require('Blockly.utils.style');
 const userAgent = goog.require('Blockly.utils.userAgent');
 const utilsXml = goog.require('Blockly.utils.xml');
 /* eslint-disable-next-line no-unused-vars */
-const {BlockSvg} = goog.requireType('Blockly.BlockSvg');
+const { BlockSvg } = goog.requireType('Blockly.BlockSvg');
 /* eslint-disable-next-line no-unused-vars */
-const {Block} = goog.requireType('Blockly.Block');
+const { Block } = goog.requireType('Blockly.Block');
 /* eslint-disable-next-line no-unused-vars */
-const {ConstantProvider} = goog.requireType('Blockly.blockRendering.ConstantProvider');
+const { ConstantProvider } = goog.requireType('Blockly.blockRendering.ConstantProvider');
 /* eslint-disable-next-line no-unused-vars */
-const {Coordinate} = goog.requireType('Blockly.utils.Coordinate');
-const {DropDownDiv} = goog.require('Blockly.DropDownDiv');
+const { Coordinate } = goog.requireType('Blockly.utils.Coordinate');
+const { DropDownDiv } = goog.require('Blockly.DropDownDiv');
 /* eslint-disable-next-line no-unused-vars */
-const {IASTNodeLocationSvg} = goog.require('Blockly.IASTNodeLocationSvg');
+const { IASTNodeLocationSvg } = goog.require('Blockly.IASTNodeLocationSvg');
 /* eslint-disable-next-line no-unused-vars */
-const {IASTNodeLocationWithBlock} = goog.require('Blockly.IASTNodeLocationWithBlock');
+const { IASTNodeLocationWithBlock } = goog.require('Blockly.IASTNodeLocationWithBlock');
 /* eslint-disable-next-line no-unused-vars */
-const {IKeyboardAccessible} = goog.require('Blockly.IKeyboardAccessible');
+const { IKeyboardAccessible } = goog.require('Blockly.IKeyboardAccessible');
 /* eslint-disable-next-line no-unused-vars */
-const {IRegistrable} = goog.require('Blockly.IRegistrable');
+const { IRegistrable } = goog.require('Blockly.IRegistrable');
 /* eslint-disable-next-line no-unused-vars */
-const {Input} = goog.requireType('Blockly.Input');
-const {MarkerManager} = goog.require('Blockly.MarkerManager');
-const {Rect} = goog.require('Blockly.utils.Rect');
+const { Input } = goog.requireType('Blockly.Input');
+const { MarkerManager } = goog.require('Blockly.MarkerManager');
+const { Rect } = goog.require('Blockly.utils.Rect');
 /* eslint-disable-next-line no-unused-vars */
-const {ShortcutRegistry} = goog.requireType('Blockly.ShortcutRegistry');
-const {Size} = goog.require('Blockly.utils.Size');
-const {Svg} = goog.require('Blockly.utils.Svg');
+const { ShortcutRegistry } = goog.requireType('Blockly.ShortcutRegistry');
+const { Size } = goog.require('Blockly.utils.Size');
+const { Svg } = goog.require('Blockly.utils.Svg');
 /* eslint-disable-next-line no-unused-vars */
-const {WorkspaceSvg} = goog.requireType('Blockly.WorkspaceSvg');
+const { WorkspaceSvg } = goog.requireType('Blockly.WorkspaceSvg');
 /** @suppress {extraRequire} */
 goog.require('Blockly.Events.BlockChange');
 /** @suppress {extraRequire} */
@@ -79,7 +79,7 @@ goog.require('Blockly.Gesture');
  * @implements {IRegistrable}
  * @alias Blockly.Field
  */
-const Field = function(value, opt_validator, opt_config) {
+const Field = function (value, opt_validator, opt_config) {
   /**
    * A generic value possessed by the field.
    * Should generally be non-null, only null when the field is created.
@@ -284,7 +284,7 @@ Field.prototype.SERIALIZABLE = false;
  *    parameter supports.
  * @protected
  */
-Field.prototype.configure_ = function(config) {
+Field.prototype.configure_ = function (config) {
   let tooltip = config['tooltip'];
   if (typeof tooltip === 'string') {
     tooltip = parsing.replaceMessageReferences(config['tooltip']);
@@ -299,7 +299,7 @@ Field.prototype.configure_ = function(config) {
  * Attach this field to a block.
  * @param {!Block} block The block containing this field.
  */
-Field.prototype.setSourceBlock = function(block) {
+Field.prototype.setSourceBlock = function (block) {
   if (this.sourceBlock_) {
     throw Error('Field already bound to a block');
   }
@@ -311,9 +311,9 @@ Field.prototype.setSourceBlock = function(block) {
  * @return {?ConstantProvider} The renderer constant
  *     provider.
  */
-Field.prototype.getConstants = function() {
+Field.prototype.getConstants = function () {
   if (!this.constants_ && this.sourceBlock_ && this.sourceBlock_.workspace &&
-      this.sourceBlock_.workspace.rendered) {
+    this.sourceBlock_.workspace.rendered) {
     this.constants_ = this.sourceBlock_.workspace.getRenderer().getConstants();
   }
   return this.constants_;
@@ -323,7 +323,7 @@ Field.prototype.getConstants = function() {
  * Get the block this field is attached to.
  * @return {Block} The block containing this field.
  */
-Field.prototype.getSourceBlock = function() {
+Field.prototype.getSourceBlock = function () {
   return this.sourceBlock_;
 };
 
@@ -332,7 +332,7 @@ Field.prototype.getSourceBlock = function() {
  * methods initModel and initView rather than this method.
  * @package
  */
-Field.prototype.init = function() {
+Field.prototype.init = function () {
   if (this.fieldGroup_) {
     // Field has already been initialized once.
     return;
@@ -354,7 +354,7 @@ Field.prototype.init = function() {
  * Create the block UI for this field.
  * @package
  */
-Field.prototype.initView = function() {
+Field.prototype.initView = function () {
   this.createBorderRect_();
   this.createTextElement_();
 };
@@ -364,7 +364,7 @@ Field.prototype.initView = function() {
  * No-op by default.
  * @package
  */
-Field.prototype.initModel = function() {};
+Field.prototype.initModel = function () { };
 
 /**
  * Create a field border rect element. Not to be overridden by subclasses.
@@ -372,18 +372,18 @@ Field.prototype.initModel = function() {};
  * separate function to call.
  * @protected
  */
-Field.prototype.createBorderRect_ = function() {
+Field.prototype.createBorderRect_ = function () {
   this.borderRect_ = dom.createSvgElement(
-      Svg.RECT, {
-        'rx': this.getConstants().FIELD_BORDER_RECT_RADIUS,
-        'ry': this.getConstants().FIELD_BORDER_RECT_RADIUS,
-        'x': 0,
-        'y': 0,
-        'height': this.size_.height,
-        'width': this.size_.width,
-        'class': 'blocklyFieldRect',
-      },
-      this.fieldGroup_);
+    Svg.RECT, {
+    'rx': this.getConstants().FIELD_BORDER_RECT_RADIUS,
+    'ry': this.getConstants().FIELD_BORDER_RECT_RADIUS,
+    'x': 0,
+    'y': 0,
+    'height': this.size_.height,
+    'width': this.size_.width,
+    'class': 'blocklyFieldRect',
+  },
+    this.fieldGroup_);
 };
 
 /**
@@ -392,12 +392,12 @@ Field.prototype.createBorderRect_ = function() {
  * function to call.
  * @protected
  */
-Field.prototype.createTextElement_ = function() {
+Field.prototype.createTextElement_ = function () {
   this.textElement_ = dom.createSvgElement(
-      Svg.TEXT, {
-        'class': 'blocklyText',
-      },
-      this.fieldGroup_);
+    Svg.TEXT, {
+    'class': 'blocklyText',
+  },
+    this.fieldGroup_);
   if (this.getConstants().FIELD_TEXT_BASELINE_CENTER) {
     this.textElement_.setAttribute('dominant-baseline', 'central');
   }
@@ -410,10 +410,10 @@ Field.prototype.createTextElement_ = function() {
  * custom input handling.
  * @protected
  */
-Field.prototype.bindEvents_ = function() {
+Field.prototype.bindEvents_ = function () {
   Tooltip.bindMouseEvents(this.getClickTarget_());
   this.mouseDownWrapper_ = browserEvents.conditionalBind(
-      this.getClickTarget_(), 'mousedown', this, this.onMouseDown_);
+    this.getClickTarget_(), 'mousedown', this, this.onMouseDown_);
 };
 
 /**
@@ -423,7 +423,7 @@ Field.prototype.bindEvents_ = function() {
  *    field's state.
  * @package
  */
-Field.prototype.fromXml = function(fieldElement) {
+Field.prototype.fromXml = function (fieldElement) {
   this.setValue(fieldElement.textContent);
 };
 
@@ -434,7 +434,7 @@ Field.prototype.fromXml = function(fieldElement) {
  * @return {!Element} The element containing info about the field's state.
  * @package
  */
-Field.prototype.toXml = function(fieldElement) {
+Field.prototype.toXml = function (fieldElement) {
   fieldElement.textContent = this.getValue();
   return fieldElement;
 };
@@ -449,7 +449,7 @@ Field.prototype.toXml = function(fieldElement) {
  * @return {*} JSON serializable state.
  * @package
  */
-Field.prototype.saveState = function(_doFullSerialization) {
+Field.prototype.saveState = function (_doFullSerialization) {
   const legacyState = this.saveLegacyState(Field);
   if (legacyState !== null) {
     return legacyState;
@@ -463,11 +463,11 @@ Field.prototype.saveState = function(_doFullSerialization) {
  * @param {*} state The state we want to apply to the field.
  * @package
  */
-Field.prototype.loadState = function(state) {
+Field.prototype.loadState = function (state) {
   if (this.loadLegacyState(Field, state)) {
     return;
   }
-  this.setValue(state);
+  this.setValue(state, true);
 };
 
 /**
@@ -479,14 +479,14 @@ Field.prototype.loadState = function(state) {
  * @return {?string} The stringified version of the XML state, or null.
  * @protected
  */
-Field.prototype.saveLegacyState = function(callingClass) {
+Field.prototype.saveLegacyState = function (callingClass) {
   if (callingClass.prototype.saveState === this.saveState &&
-      callingClass.prototype.toXml !== this.toXml) {
+    callingClass.prototype.toXml !== this.toXml) {
     const elem = utilsXml.createElement('field');
     elem.setAttribute('name', this.name || '');
     const text = Xml.domToText(this.toXml(elem));
     return text.replace(
-        ' xmlns="https://developers.google.com/blockly/xml"', '');
+      ' xmlns="https://developers.google.com/blockly/xml"', '');
   }
   // Either they called this on purpose from their saveState, or they have
   // no implementations of either hook. Just do our thing.
@@ -501,10 +501,10 @@ Field.prototype.saveLegacyState = function(callingClass) {
  * @param {*} state The state to apply to the field.
  * @return {boolean} Whether the state was applied or not.
  */
-Field.prototype.loadLegacyState = function(callingClass, state) {
+Field.prototype.loadLegacyState = function (callingClass, state) {
   if (callingClass.prototype.loadState === this.loadState &&
-      callingClass.prototype.fromXml !== this.fromXml) {
-    this.fromXml(Xml.textToDom(/** @type {string} */ (state)));
+    callingClass.prototype.fromXml !== this.fromXml) {
+    this.fromXml(Xml.textToDom(/** @type {string} */(state)));
     return true;
   }
   // Either they called this on purpose from their loadState, or they have
@@ -516,7 +516,7 @@ Field.prototype.loadLegacyState = function(callingClass, state) {
  * Dispose of all DOM objects and events belonging to this editable field.
  * @package
  */
-Field.prototype.dispose = function() {
+Field.prototype.dispose = function () {
   DropDownDiv.hideIfOwner(this);
   WidgetDiv.hideIfOwner(this);
   Tooltip.unbindMouseEvents(this.getClickTarget_());
@@ -533,7 +533,7 @@ Field.prototype.dispose = function() {
 /**
  * Add or remove the UI indicating if this field is editable or not.
  */
-Field.prototype.updateEditable = function() {
+Field.prototype.updateEditable = function () {
   const group = this.fieldGroup_;
   if (!this.EDITABLE || !group) {
     return;
@@ -554,7 +554,7 @@ Field.prototype.updateEditable = function() {
  *     source block is editable.
  * @param {boolean} enabled True if enabled.
  */
-Field.prototype.setEnabled = function(enabled) {
+Field.prototype.setEnabled = function (enabled) {
   this.enabled_ = enabled;
   this.updateEditable();
 };
@@ -564,7 +564,7 @@ Field.prototype.setEnabled = function(enabled) {
  *     source block is editable.
  * @return {boolean} Whether this field is enabled.
  */
-Field.prototype.isEnabled = function() {
+Field.prototype.isEnabled = function () {
   return this.enabled_;
 };
 
@@ -572,10 +572,10 @@ Field.prototype.isEnabled = function() {
  * Check whether this field defines the showEditor_ function.
  * @return {boolean} Whether this field is clickable.
  */
-Field.prototype.isClickable = function() {
+Field.prototype.isClickable = function () {
   return this.enabled_ && !!this.sourceBlock_ &&
-      this.sourceBlock_.isEditable() && !!this.showEditor_ &&
-      (typeof this.showEditor_ === 'function');
+    this.sourceBlock_.isEditable() && !!this.showEditor_ &&
+    (typeof this.showEditor_ === 'function');
 };
 
 /**
@@ -585,9 +585,9 @@ Field.prototype.isClickable = function() {
  * @return {boolean} Whether this field is currently enabled, editable and on
  * an editable block.
  */
-Field.prototype.isCurrentlyEditable = function() {
+Field.prototype.isCurrentlyEditable = function () {
   return this.enabled_ && this.EDITABLE && !!this.sourceBlock_ &&
-      this.sourceBlock_.isEditable();
+    this.sourceBlock_.isEditable();
 };
 
 /**
@@ -595,16 +595,16 @@ Field.prototype.isCurrentlyEditable = function() {
  * Handles the logic for backwards compatibility and incongruous states.
  * @return {boolean} Whether this field should be serialized or not.
  */
-Field.prototype.isSerializable = function() {
+Field.prototype.isSerializable = function () {
   let isSerializable = false;
   if (this.name) {
     if (this.SERIALIZABLE) {
       isSerializable = true;
     } else if (this.EDITABLE) {
       console.warn(
-          'Detected an editable field that was not serializable.' +
-          ' Please define SERIALIZABLE property as true on all editable custom' +
-          ' fields. Proceeding with serialization.');
+        'Detected an editable field that was not serializable.' +
+        ' Please define SERIALIZABLE property as true on all editable custom' +
+        ' fields. Proceeding with serialization.');
       isSerializable = true;
     }
   }
@@ -615,7 +615,7 @@ Field.prototype.isSerializable = function() {
  * Gets whether this editable field is visible or not.
  * @return {boolean} True if visible.
  */
-Field.prototype.isVisible = function() {
+Field.prototype.isVisible = function () {
   return this.visible_;
 };
 
@@ -625,7 +625,7 @@ Field.prototype.isVisible = function() {
  * @param {boolean} visible True if visible.
  * @package
  */
-Field.prototype.setVisible = function(visible) {
+Field.prototype.setVisible = function (visible) {
   if (this.visible_ === visible) {
     return;
   }
@@ -651,7 +651,7 @@ Field.prototype.setVisible = function(visible) {
  * @param {Function} handler The validator function
  *     or null to clear a previous validator.
  */
-Field.prototype.setValidator = function(handler) {
+Field.prototype.setValidator = function (handler) {
   this.validator_ = handler;
 };
 
@@ -659,7 +659,7 @@ Field.prototype.setValidator = function(handler) {
  * Gets the validation function for editable fields, or null if not set.
  * @return {?Function} Validation function, or null.
  */
-Field.prototype.getValidator = function() {
+Field.prototype.getValidator = function () {
   return this.validator_;
 };
 
@@ -668,7 +668,7 @@ Field.prototype.getValidator = function() {
  * Used for measuring the size and for positioning.
  * @return {!SVGGElement} The group element.
  */
-Field.prototype.getSvgRoot = function() {
+Field.prototype.getSvgRoot = function () {
   return /** @type {!SVGGElement} */ (this.fieldGroup_);
 };
 
@@ -677,7 +677,7 @@ Field.prototype.getSvgRoot = function() {
  * called by BlockSvg.applyColour().
  * @package
  */
-Field.prototype.applyColour = function() {
+Field.prototype.applyColour = function () {
   // Non-abstract sub-classes may wish to implement this. See FieldDropdown.
 };
 
@@ -688,7 +688,7 @@ Field.prototype.applyColour = function() {
  * done here, and should be triggered by getSize().
  * @protected
  */
-Field.prototype.render_ = function() {
+Field.prototype.render_ = function () {
   if (this.textContent_) {
     this.textContent_.nodeValue = this.getDisplayText_();
   }
@@ -701,7 +701,7 @@ Field.prototype.render_ = function() {
  *     or undefined if triggered programmatically.
  * @package
  */
-Field.prototype.showEditor = function(opt_e) {
+Field.prototype.showEditor = function (opt_e) {
   if (this.isClickable()) {
     this.showEditor_(opt_e);
   }
@@ -712,19 +712,19 @@ Field.prototype.showEditor = function(opt_e) {
  * @param {number=} opt_margin margin to use when positioning the text element.
  * @protected
  */
-Field.prototype.updateSize_ = function(opt_margin) {
+Field.prototype.updateSize_ = function (opt_margin) {
   const constants = this.getConstants();
   const xOffset = opt_margin !== undefined ?
-      opt_margin :
-      (this.borderRect_ ? this.getConstants().FIELD_BORDER_RECT_X_PADDING : 0);
+    opt_margin :
+    (this.borderRect_ ? this.getConstants().FIELD_BORDER_RECT_X_PADDING : 0);
   let totalWidth = xOffset * 2;
   let totalHeight = constants.FIELD_TEXT_HEIGHT;
 
   let contentWidth = 0;
   if (this.textElement_) {
     contentWidth = dom.getFastTextWidth(
-        this.textElement_, constants.FIELD_TEXT_FONTSIZE,
-        constants.FIELD_TEXT_FONTWEIGHT, constants.FIELD_TEXT_FONTFAMILY);
+      this.textElement_, constants.FIELD_TEXT_FONTSIZE,
+      constants.FIELD_TEXT_FONTWEIGHT, constants.FIELD_TEXT_FONTFAMILY);
     totalWidth += contentWidth;
   }
   if (this.borderRect_) {
@@ -745,7 +745,7 @@ Field.prototype.updateSize_ = function(opt_margin) {
  * @param {number} contentWidth The content width.
  * @protected
  */
-Field.prototype.positionTextElement_ = function(xOffset, contentWidth) {
+Field.prototype.positionTextElement_ = function (xOffset, contentWidth) {
   if (!this.textElement_) {
     return;
   }
@@ -753,30 +753,30 @@ Field.prototype.positionTextElement_ = function(xOffset, contentWidth) {
   const halfHeight = this.size_.height / 2;
 
   this.textElement_.setAttribute(
-      'x',
-      this.sourceBlock_.RTL ? this.size_.width - contentWidth - xOffset :
-                              xOffset);
+    'x',
+    this.sourceBlock_.RTL ? this.size_.width - contentWidth - xOffset :
+      xOffset);
   this.textElement_.setAttribute(
-      'y',
-      constants.FIELD_TEXT_BASELINE_CENTER ? halfHeight :
-                                             halfHeight -
-              constants.FIELD_TEXT_HEIGHT / 2 + constants.FIELD_TEXT_BASELINE);
+    'y',
+    constants.FIELD_TEXT_BASELINE_CENTER ? halfHeight :
+      halfHeight -
+      constants.FIELD_TEXT_HEIGHT / 2 + constants.FIELD_TEXT_BASELINE);
 };
 
 /**
  * Position a field's border rect after a size change.
  * @protected
  */
-Field.prototype.positionBorderRect_ = function() {
+Field.prototype.positionBorderRect_ = function () {
   if (!this.borderRect_) {
     return;
   }
   this.borderRect_.setAttribute('width', this.size_.width);
   this.borderRect_.setAttribute('height', this.size_.height);
   this.borderRect_.setAttribute(
-      'rx', this.getConstants().FIELD_BORDER_RECT_RADIUS);
+    'rx', this.getConstants().FIELD_BORDER_RECT_RADIUS);
   this.borderRect_.setAttribute(
-      'ry', this.getConstants().FIELD_BORDER_RECT_RADIUS);
+    'ry', this.getConstants().FIELD_BORDER_RECT_RADIUS);
 };
 
 
@@ -786,7 +786,7 @@ Field.prototype.positionBorderRect_ = function() {
  * This should *in general* be the only place render_ gets called from.
  * @return {!Size} Height and width.
  */
-Field.prototype.getSize = function() {
+Field.prototype.getSize = function () {
   if (!this.isVisible()) {
     return new Size(0, 0);
   }
@@ -798,8 +798,8 @@ Field.prototype.getSize = function() {
     // If the field is not visible the width will be 0 as well, one of the
     // problems with the old system.
     console.warn(
-        'Deprecated use of setting size_.width to 0 to rerender a' +
-        ' field. Set field.isDirty_ to true instead.');
+      'Deprecated use of setting size_.width to 0 to rerender a' +
+      ' field. Set field.isDirty_ to true instead.');
     this.render_();
   }
   return this.size_;
@@ -812,7 +812,7 @@ Field.prototype.getSize = function() {
  *     pixels relative to the top left corner of the page (window coordinates).
  * @package
  */
-Field.prototype.getScaledBBox = function() {
+Field.prototype.getScaledBBox = function () {
   let scaledWidth;
   let scaledHeight;
   let xy;
@@ -854,7 +854,7 @@ Field.prototype.getScaledBBox = function() {
  * @return {string} Text to display.
  * @protected
  */
-Field.prototype.getDisplayText_ = function() {
+Field.prototype.getDisplayText_ = function () {
   let text = this.getText();
   if (!text) {
     // Prevent the field from disappearing if empty.
@@ -877,7 +877,7 @@ Field.prototype.getDisplayText_ = function() {
  * Get the text from this field.
  * @return {string} Current text.
  */
-Field.prototype.getText = function() {
+Field.prototype.getText = function () {
   if (this.getText_) {
     const text = this.getText_.call(this);
     if (text !== null) {
@@ -894,7 +894,7 @@ Field.prototype.getText = function() {
  * already been recorded.
  * @package
  */
-Field.prototype.markDirty = function() {
+Field.prototype.markDirty = function () {
   this.isDirty_ = true;
   this.constants_ = null;
 };
@@ -906,7 +906,7 @@ Field.prototype.markDirty = function() {
  * already been recorded.
  * @package
  */
-Field.prototype.forceRerender = function() {
+Field.prototype.forceRerender = function () {
   this.isDirty_ = true;
   if (this.sourceBlock_ && this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
@@ -921,7 +921,7 @@ Field.prototype.forceRerender = function() {
  * than this method.
  * @param {*} newValue New value.
  */
-Field.prototype.setValue = function(newValue, isDragging) {
+Field.prototype.setValue = function (newValue, isDragging) {
   const doLogging = false;
   if (newValue === null) {
     doLogging && console.log('null, return');
@@ -962,7 +962,7 @@ Field.prototype.setValue = function(newValue, isDragging) {
   this.doValueUpdate_(newValue);
   if (source && eventUtils.isEnabled()) {
     eventUtils.fire(new (eventUtils.get(eventUtils.BLOCK_CHANGE))(
-        source, 'field', this.name || null, oldValue, newValue));
+      source, 'field', this.name || null, oldValue, newValue));
   }
   if (this.isDirty_) {
     this.forceRerender();
@@ -977,7 +977,7 @@ Field.prototype.setValue = function(newValue, isDragging) {
  * @return {*} New value, or an Error object.
  * @private
  */
-Field.prototype.processValidation_ = function(newValue, validatedValue) {
+Field.prototype.processValidation_ = function (newValue, validatedValue) {
   if (validatedValue === null) {
     this.doValueInvalid_(newValue);
     if (this.isDirty_) {
@@ -995,7 +995,7 @@ Field.prototype.processValidation_ = function(newValue, validatedValue) {
  * Get the current value of the field.
  * @return {*} Current value.
  */
-Field.prototype.getValue = function() {
+Field.prototype.getValue = function () {
   return this.value_;
 };
 
@@ -1006,7 +1006,7 @@ Field.prototype.getValue = function() {
  * @return {*} The validated value, same as input by default.
  * @protected
  */
-Field.prototype.doClassValidation_ = function(opt_newValue) {
+Field.prototype.doClassValidation_ = function (opt_newValue) {
   if (opt_newValue === null || opt_newValue === undefined) {
     return null;
   }
@@ -1019,7 +1019,7 @@ Field.prototype.doClassValidation_ = function(opt_newValue) {
  * @param {*} newValue The value to be saved.
  * @protected
  */
-Field.prototype.doValueUpdate_ = function(newValue) {
+Field.prototype.doValueUpdate_ = function (newValue) {
   this.value_ = newValue;
   this.isDirty_ = true;
 };
@@ -1031,7 +1031,7 @@ Field.prototype.doValueUpdate_ = function(newValue) {
  * @param {*} _invalidValue The input value that was determined to be invalid.
  * @protected
  */
-Field.prototype.doValueInvalid_ = function(_invalidValue) {
+Field.prototype.doValueInvalid_ = function (_invalidValue) {
   // NOP
 };
 
@@ -1040,7 +1040,7 @@ Field.prototype.doValueInvalid_ = function(_invalidValue) {
  * @param {!Event} e Mouse down event.
  * @protected
  */
-Field.prototype.onMouseDown_ = function(e) {
+Field.prototype.onMouseDown_ = function (e) {
   if (!this.sourceBlock_ || !this.sourceBlock_.workspace) {
     return;
   }
@@ -1057,7 +1057,7 @@ Field.prototype.onMouseDown_ = function(e) {
  *     parent object whose tooltip will be used, or null to display the tooltip
  *     of the parent block. To not display a tooltip pass the empty string.
  */
-Field.prototype.setTooltip = function(newTip) {
+Field.prototype.setTooltip = function (newTip) {
   if (!newTip && newTip !== '') {  // If null or undefined.
     newTip = this.sourceBlock_;
   }
@@ -1074,13 +1074,13 @@ Field.prototype.setTooltip = function(newTip) {
  * Returns the tooltip text for this field.
  * @return {string} The tooltip text for this field.
  */
-Field.prototype.getTooltip = function() {
+Field.prototype.getTooltip = function () {
   const clickTarget = this.getClickTarget_();
   if (clickTarget) {
     return Tooltip.getTooltipOfObject(clickTarget);
   }
   // Field has not been initialized yet. Return stashed this.tooltip_ value.
-  return Tooltip.getTooltipOfObject({tooltip: this.tooltip_});
+  return Tooltip.getTooltipOfObject({ tooltip: this.tooltip_ });
 };
 
 /**
@@ -1090,7 +1090,7 @@ Field.prototype.getTooltip = function() {
  * @return {!Element} Element to bind click handler to.
  * @protected
  */
-Field.prototype.getClickTarget_ = function() {
+Field.prototype.getClickTarget_ = function () {
   return this.clickTarget_ || this.getSvgRoot();
 };
 
@@ -1100,9 +1100,9 @@ Field.prototype.getClickTarget_ = function() {
  * @return {!Coordinate} Object with .x and .y properties.
  * @protected
  */
-Field.prototype.getAbsoluteXY_ = function() {
+Field.prototype.getAbsoluteXY_ = function () {
   return style.getPageOffset(
-      /** @type {!SVGRectElement} */ (this.getClickTarget_()));
+      /** @type {!SVGRectElement} */(this.getClickTarget_()));
 };
 
 /**
@@ -1112,7 +1112,7 @@ Field.prototype.getAbsoluteXY_ = function() {
  * @return {boolean} True if this field has any variable references.
  * @package
  */
-Field.prototype.referencesVariables = function() {
+Field.prototype.referencesVariables = function () {
   return false;
 };
 
@@ -1122,7 +1122,7 @@ Field.prototype.referencesVariables = function() {
  * @return {Input} The input that the field belongs to.
  * @package
  */
-Field.prototype.getParentInput = function() {
+Field.prototype.getParentInput = function () {
   let parentInput = null;
   const block = this.sourceBlock_;
   const inputs = block.inputList;
@@ -1144,7 +1144,7 @@ Field.prototype.getParentInput = function() {
  * Returns whether or not we should flip the field in RTL.
  * @return {boolean} True if we should flip in RTL.
  */
-Field.prototype.getFlipRtl = function() {
+Field.prototype.getFlipRtl = function () {
   return false;
 };
 
@@ -1152,7 +1152,7 @@ Field.prototype.getFlipRtl = function() {
  * Returns whether or not the field is tab navigable.
  * @return {boolean} True if the field is tab navigable.
  */
-Field.prototype.isTabNavigable = function() {
+Field.prototype.isTabNavigable = function () {
   return false;
 };
 
@@ -1163,7 +1163,7 @@ Field.prototype.isTabNavigable = function() {
  * @return {boolean} True if the shortcut has been handled, false otherwise.
  * @public
  */
-Field.prototype.onShortcut = function(_shortcut) {
+Field.prototype.onShortcut = function (_shortcut) {
   return false;
 };
 
@@ -1173,7 +1173,7 @@ Field.prototype.onShortcut = function(_shortcut) {
  *     field group.
  * @package
  */
-Field.prototype.setCursorSvg = function(cursorSvg) {
+Field.prototype.setCursorSvg = function (cursorSvg) {
   if (!cursorSvg) {
     this.cursorSvg_ = null;
     return;
@@ -1189,7 +1189,7 @@ Field.prototype.setCursorSvg = function(cursorSvg) {
  *     field group.
  * @package
  */
-Field.prototype.setMarkerSvg = function(markerSvg) {
+Field.prototype.setMarkerSvg = function (markerSvg) {
   if (!markerSvg) {
     this.markerSvg_ = null;
     return;
@@ -1203,7 +1203,7 @@ Field.prototype.setMarkerSvg = function(markerSvg) {
  * Redraw any attached marker or cursor svgs if needed.
  * @protected
  */
-Field.prototype.updateMarkers_ = function() {
+Field.prototype.updateMarkers_ = function () {
   const workspace =
       /** @type {!WorkspaceSvg} */ (this.sourceBlock_.workspace);
   if (workspace.keyboardAccessibilityMode && this.cursorSvg_) {
