@@ -50,7 +50,7 @@ goog.require('Blockly.Warning');
 Blockly.Blocks['comp_builder'] = {
     init: function () {
         this.appendDummyInput()
-            .appendField("Computation expression")
+            .appendField("computation expression")
             .appendField(new Blockly.FieldTextInput("name", ComputationExpressions.rename), "NAME");
         this.appendValueInput("BIND")
             .setCheck(null)
