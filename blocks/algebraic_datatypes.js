@@ -89,15 +89,16 @@ Blockly.Blocks['typedefinition'] = {
             .appendField(nameField, "TYPENAME")
             .appendField('', 'PARAMS')
             .appendField('as');
-        this.appendStatementInput("CASES")
-            .setCheck("String");
+        this.appendStatementInput('CASES');
         this.setInputsInline(true);
         this.setColour(180);
-        this.setTooltip("");
-        this.setHelpUrl("");
+        this.setTooltip('Create a type definition');
+        this.setHelpUrl('');
         this.itemCount_ = 0;
         this.updateShape_();
-        this.setMutator(new Blockly.Mutator(['typedefinition_create_with_item']));
+        this.setMutator(new Blockly.Mutator(
+            ['typedefinition_create_with_item'])
+        );
     },
     /**
      * Populate the mutator's dialog with this block's components.

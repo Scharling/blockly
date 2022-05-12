@@ -208,7 +208,7 @@ const flyoutCategory = function (workspace) {
         xmlList[xmlList.length - 1].setAttribute('gap', 24);
     }
 
-    const addOption = true;
+    const addOption = false;
     if (addOption) {
         const block = utilsXml.createElement('block');
         block.setAttribute('type', 'typedefinition');

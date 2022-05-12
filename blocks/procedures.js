@@ -662,8 +662,6 @@ Blocks['procedures_defreturn'] = {
       .appendField('', 'REC')
       .appendField('', 'PARAMS')
     this.appendValueInput('RETURN')
-      // .appendField('', 'RETURNTYPE')
-      // .appendField(' | ')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN'], 'RETURNTYPE');
     this.setMutator(new Mutator(['procedures_mutatorarg', ...types, 'datatype']));
@@ -683,7 +681,6 @@ Blocks['procedures_defreturn'] = {
     this.statementConnection_ = null;
     this.isRec_ = false;
     this.updateIsRec_(false);
-
   },
   /**
    * Return the signature of this procedure definition.
@@ -718,26 +715,14 @@ Blocks['procedures_anonymous'] = {
    * @this {Block}
    */
   init: function () {
-    //const initName = Procedures.findLegalName('', this);
-    //const nameField = new FieldTextInput(initName, Procedures.rename);
-    //nameField.setSpellcheck(false);
     this.setOutput(true);
     this.appendDummyInput()
       .appendField('do')
-      //.appendField(Msg['PROCEDURES_DEFRETURN_TITLE'])
-      //.appendField(nameField, 'NAME')
       .appendField('', 'PARAMS')
-    // .appendField('', 'RETURNTYPE');
     this.appendValueInput('RETURN')
       .setAlign(Align.RIGHT)
       .appendField(Msg['PROCEDURES_DEFRETURN_RETURN'], 'RETURNTYPE');
     this.setMutator(new Mutator(['procedures_mutatorarg', ...types, 'datatype']));
-    // if ((this.workspace.options.comments ||
-    //   (this.workspace.options.parentWorkspace &&
-    //     this.workspace.options.parentWorkspace.options.comments)) &&
-    //   Msg['PROCEDURES_DEFRETURN_COMMENT']) {
-    //   this.setCommentText(Msg['PROCEDURES_DEFRETURN_COMMENT']);
-    // }
     this.setStyle('procedure_blocks');
     this.setTooltip(Msg['PROCEDURES_DEFRETURN_TOOLTIP']);
     this.setHelpUrl(Msg['PROCEDURES_DEFRETURN_HELPURL']);
