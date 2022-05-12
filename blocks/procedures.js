@@ -974,7 +974,7 @@ const PROCEDURE_CALL_COMMON = {
    * @private
    * @this {Block}
    */
-  setProcedureParameters_: function (paramNames, paramIds, displayNames, types) {
+  setProcedureParameters_: function (paramNames, paramIds, displayNames, types, varIds) {
     // Data structures:
     // this.arguments = ['x', 'y']
     //     Existing param names.
@@ -1038,7 +1038,7 @@ const PROCEDURE_CALL_COMMON = {
       this.argumentVarModels_ = [];
       for (let i = 0; i < this.arguments_.length; i++) {
         const variable = Variables.getOrCreateVariablePackage(
-          this.workspace, null, this.arguments_[i], (types && types[i]) ? types[i] : "", (displayNames && displayNames[i]) ? displayNames[i] : "");
+          this.workspace, (varIds && varIds[i]) ? varIds[i] : null, this.arguments_[i], (types && types[i]) ? types[i] : "", (displayNames && displayNames[i]) ? displayNames[i] : "");
         this.argumentVarModels_.push(variable);
       }
     }
@@ -1210,18 +1210,20 @@ const PROCEDURE_CALL_COMMON = {
     const paramIds = [];
     const displayNames = [];
     const types = [];
+    const varIds = [];
     console.log("domtomut", name, argCount, xmlElement);
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
         args.push(childNode.getAttribute('name'));
         paramIds.push(childNode.getAttribute('paramId'));
+        varIds.push(childNode.getAttribute('varid'));
         displayNames.push(childNode.getAttribute('displayName'));
         if (childNode.childNodes[0] && childNode.childNodes[0].getAttribute('type')) {
           types.push(typeUtils.createTypeFromXml(childNode.childNodes[0]));
         }
       }
     }
-    this.setProcedureParameters_(args, paramIds, displayNames, types);
+    this.setProcedureParameters_(args, paramIds, displayNames, types, varIds);
   },
   /**
    * Returns the state of this block as a JSON serializable object.
