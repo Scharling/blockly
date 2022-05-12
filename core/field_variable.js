@@ -469,9 +469,16 @@ FieldVariable.dropdownCreate = function () {
   variableModelList.sort(VariableModel.compareByName);
 
   const options = [];
+  var varSet = new Set()
   for (let i = 0; i < variableModelList.length; i++) {
+    var variable = variableModelList[i];
     // Set the UUID as the internal representation of the variable.
-    options[i] = [variableModelList[i].name, variableModelList[i].getId()];
+    let nameKey = (variable.displayName) ? variable.displayName : variable.name;
+    if (!varSet.has(nameKey)) {
+      options.push([nameKey, variable.getId()]); 
+      varSet.add(nameKey);
+    }
+
   }
   options.push([Msg['RENAME_VARIABLE'], internalConstants.RENAME_VARIABLE_ID]);
   if (Msg['DELETE_VARIABLE']) {

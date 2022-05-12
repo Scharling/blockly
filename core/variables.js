@@ -205,7 +205,7 @@ const flyoutCategoryBlocks = function (workspace) {
           block.setAttribute('gap', 8);
           block.appendChild(generateVariableFieldDom(variable, true));
           xmlList.push(block);
-          varSet.add(variable.displayName);
+          varSet.add(nameKey);
         }
       }
     }
