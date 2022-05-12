@@ -131,7 +131,7 @@ FSharp['procedures_anonymous'] = function (block) {
     xfix2 = xfix1;
   }
   if (returnValue) {
-    returnValue = returnValue + '\n';
+    returnValue = returnValue;
   } else if (!branch) {
     branch = FSharp.INDENT + 'failwith "function not implemented"';
   }
