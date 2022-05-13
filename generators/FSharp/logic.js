@@ -85,8 +85,8 @@ FSharp['logic_operation'] = function (block) {
 FSharp['logic_negate'] = function (block) {
   // Negation.
   const argument0 =
-    FSharp.valueToCode(block, 'BOOL', FSharp.ORDER_NOT) || 'true';
-  const code = 'not ' + argument0;
+    FSharp.valueToCode(block, 'BOOL', FSharp.ORDER_NOT) || '';
+  const code = argument0 !== '' ? 'not ' + argument0 : 'not';
   return [code, FSharp.ORDER_NOT];
 };
 
