@@ -327,6 +327,7 @@ const flyoutCategory = function (workspace) {
           const arg = createCallArg(args[j].name, args[j].displayName, args[j].type);
           mutation.appendChild(arg);
         }
+        if (procedureList[i][4]) mutation.appendChild(typeUtils.createXmlFromType(procedureList[i][4], "returntype"));
         xmlList.push(block);
       }
 

@@ -14,7 +14,6 @@ FSharp['option_none'] = function (block) {
 };
 
 FSharp['option_some'] = function (block) {
-    // String or array length.
     const value = FSharp.valueToCode(block, 'VALUE', FSharp.ORDER_NONE) || 'None';
     const code = value === 'None' ? 'None' : 'Some ' + value;
     return [code, FSharp.ORDER_NONE];

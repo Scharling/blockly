@@ -1192,6 +1192,7 @@ const PROCEDURE_CALL_COMMON = {
       }
       container.appendChild(parameter);
     }
+    if (this.returnType) container.appendChild(typeUtils.createXmlFromType(this.returnType, "returntype"));
     return container;
   },
   /**
@@ -1221,6 +1222,8 @@ const PROCEDURE_CALL_COMMON = {
         if (childNode.childNodes[0] && childNode.childNodes[0].getAttribute('type')) {
           types.push(typeUtils.createTypeFromXml(childNode.childNodes[0]));
         }
+      } else if (childNode.nodeName.toLowerCase() === 'returntype') {
+        this.returnType = typeUtils.createTypeFromXml(childNode);
       }
     }
     this.setProcedureParameters_(args, paramIds, displayNames, types, varIds);
@@ -1247,6 +1250,7 @@ const PROCEDURE_CALL_COMMON = {
     }
     state['displayNames'] = displayNames;
     state['types'] = types;
+    if (this.returnType) state['returntype'] = this.returnType;
     return state;
   },
   /**
@@ -1265,6 +1269,8 @@ const PROCEDURE_CALL_COMMON = {
       ids.fill(null);
       this.setProcedureParameters_(params, ids, state['displayNames'], state['types']);
     }
+    const returnType = state['returntype'];
+    if (returnType) this.returnType = returnType;
   },
   /**
    * Return all variables referenced by this block.
@@ -1412,15 +1418,31 @@ const PROCEDURE_CALL_COMMON = {
   getCallResults: function () {
     const argCountValue = this.getFieldValue("ARGCOUNT");
     const argCount = argCountValue === "ALL" ? this.arguments_.length : Number(argCountValue);
-    if (argCount === this.arguments_.length) {
+    console.log("getCallResults", this.returnType);
+    if (argCount === this.arguments_.length && (!this.returnType || this.returnType.block_name !== "type_function")) {
       return [false, null]
     }
-
     const args = [];
-    this.arguments_.slice(argCount).forEach(argName => {
-      const variable = this.workspace.getVariableMap().getVariableByName(argName);
-      args.push(variable);
-    });
+    console.log("CREATE ONE YAY", this.returnType);
+    if (argCount !== this.arguments_.length) {
+      this.arguments_.slice(argCount).forEach(argName => {
+        const variable = this.workspace.getVariableMap().getVariableByName(argName);
+        args.push(variable);
+      });
+    } else {
+      for (let i = 0; i < this.returnType.inputs.length; i++) {
+        const input = this.returnType.inputs[i];
+        const v = {
+          name: "a" + i,
+          displayName: "a" + i,
+          type: input
+        };
+        args.push(v);
+      }
+      console.log("right path");
+    }
+    console.log(args);
+
     let name = this.id;
     let createCallBlock = false;
     if (this.parentBlock_ && this.parentBlock_.type === 'variables_set') {
