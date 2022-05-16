@@ -146,7 +146,6 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   mutationToDom: function (opt_paramIds) {
-    console.log("mutationToDom", this);
     const container = xmlUtils.createElement('mutation');
     if (opt_paramIds) {
       container.setAttribute('name', this.getFieldValue('NAME'));
@@ -184,7 +183,6 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   domToMutation: function (xmlElement) {
-    console.log("domToMutation", xmlElement);
     this.arguments_ = [];
     this.returnType_ = null;
     this.argumentVarModels_ = [];
@@ -226,7 +224,6 @@ const PROCEDURE_DEF_COMMON = {
    *     parameters and statements.
    */
   saveExtraState: function () {
-    console.log("Save extra");
     if (!this.argumentVarModels_.length && this.hasStatements_ && !this.returnType_) {
       return null;
     }
@@ -263,7 +260,6 @@ const PROCEDURE_DEF_COMMON = {
    *     statements.
    */
   loadExtraState: function (state) {
-    console.log("loadextra", state);
     this.arguments_ = [];
     this.argumentVarModels_ = [];
     if (state['params']) {
@@ -308,7 +304,6 @@ const PROCEDURE_DEF_COMMON = {
      *   </input>
      * </block>
      */
-    console.log("decomp");
     const containerBlockNode = xmlUtils.createElement('block');
     containerBlockNode.setAttribute('type', 'procedures_mutatorcontainer');
     const statementNode = xmlUtils.createElement('statement');
@@ -388,7 +383,6 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   compose: function (containerBlock) {
-    console.log("compose");
     // Parameter list.
     this.arguments_ = [];
     this.returnType_ = null;
@@ -1117,7 +1111,7 @@ const PROCEDURE_CALL_COMMON = {
 
     for (let i = 0; i < args; i++) {
       const argField = this.getField('ARGNAME' + i);
-      const variable = this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
+      const variable = this.argumentVarModels_[i] ? this.argumentVarModels_[i] : this.workspace.getVariableMap().getVariableByName(this.arguments_[i]);
       const extraType = (variable) ? " (" + variable?.type.getType() + ")" : "";
       const argName = (this.argumentVarModels_[i]) ? this.argumentVarModels_[i].displayName : this.arguments_[i];
       const text = argName + extraType;
@@ -1212,7 +1206,6 @@ const PROCEDURE_CALL_COMMON = {
     const displayNames = [];
     const types = [];
     const varIds = [];
-    console.log("domtomut", name, argCount, xmlElement);
     for (let i = 0, childNode; (childNode = xmlElement.childNodes[i]); i++) {
       if (childNode.nodeName.toLowerCase() === 'arg') {
         args.push(childNode.getAttribute('name'));
@@ -1418,12 +1411,10 @@ const PROCEDURE_CALL_COMMON = {
   getCallResults: function () {
     const argCountValue = this.getFieldValue("ARGCOUNT");
     const argCount = argCountValue === "ALL" ? this.arguments_.length : Number(argCountValue);
-    console.log("getCallResults", this.returnType);
     if (argCount === this.arguments_.length && (!this.returnType || this.returnType.block_name !== "type_function")) {
       return [false, null]
     }
     const args = [];
-    console.log("CREATE ONE YAY", this.returnType);
     if (argCount !== this.arguments_.length) {
       this.arguments_.slice(argCount).forEach(argName => {
         const variable = this.workspace.getVariableMap().getVariableByName(argName);
@@ -1432,16 +1423,15 @@ const PROCEDURE_CALL_COMMON = {
     } else {
       for (let i = 0; i < this.returnType.inputs.length; i++) {
         const input = this.returnType.inputs[i];
+        const name = input ? "a" + i + " (" + input.getType() + ")" : "a" + i;
         const v = {
-          name: "a" + i,
-          displayName: "a" + i,
+          name: name,
+          displayName: name,
           type: input
         };
         args.push(v);
       }
-      console.log("right path");
     }
-    console.log(args);
 
     let name = this.id;
     let createCallBlock = false;
