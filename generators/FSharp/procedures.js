@@ -169,7 +169,11 @@ function createArgsString(args, variableModels, procedureName) {
     for (var j = 0; j < variableModels.length; j++) {
       let varModel = variableModels[j];
       if (varModel.name == procedureArg) {
-        str = str + " (" + arg + " : " + varModel.type.getFSharpType() + ")"
+        if (varModel.type.getFSharpType()) {
+          str = str + " (" + arg + " : " + varModel.type.getFSharpType() + ")"
+        } else {
+          str = str + " " + arg;
+        }
         break;
       }
     }
