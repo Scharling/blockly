@@ -201,7 +201,7 @@ defineBlocksWithJsonArray([
   // Block for ternary operator.
   {
     'type': 'logic_ternary',
-    'message0': '%{BKY_LOGIC_TERNARY_CONDITION} %1',
+    'message0': 'if %1',
     'args0': [
       {
         'type': 'input_value',
@@ -209,14 +209,14 @@ defineBlocksWithJsonArray([
         'check': ['Boolean', 'BooleanValue'],
       },
     ],
-    'message1': '%{BKY_LOGIC_TERNARY_IF_TRUE} %1',
+    'message1': 'then %1',
     'args1': [
       {
         'type': 'input_value',
         'name': 'THEN',
       },
     ],
-    'message2': '%{BKY_LOGIC_TERNARY_IF_FALSE} %1',
+    'message2': 'else %1',
     'args2': [
       {
         'type': 'input_value',
