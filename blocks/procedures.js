@@ -543,7 +543,7 @@ const PROCEDURE_DEF_COMMON = {
    * @this {Block}
    */
   updateVarName: function (variable) {
-    const newName = variable.name;
+    const newName = variable.displayName ? variable.displayName : variable.name;
     let change = false;
     let oldName;
     for (let i = 0; i < this.argumentVarModels_.length; i++) {
